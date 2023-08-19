@@ -3,7 +3,7 @@
 @section('content')
 <h1 style="font-size: 40px; text-decoration: underline; margin-bottom: 30px;" >Reports</h1>
 <div class="card">
-    <div  class="card-body" id="mapid"></div>
+    <div id="mapid"></div>
     <button  style="position: absolute;
   bottom: 10px;
   left: 10px;

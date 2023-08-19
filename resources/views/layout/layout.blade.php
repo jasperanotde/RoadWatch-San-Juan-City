@@ -129,7 +129,7 @@
                 </div>
                 <div class="w-36 flex flex-row space-x-8 justify-between mx-auto my-10">
                     <a href="">
-                        <img src="images/facebook.png" class="h-5" alt="Facebook Logo" />
+                        <img src="{{url('images/facebook.png')}}" class="h-5" alt="Facebook Logo" />
                     </a>
                     <a href="">
                         <img src="images/twitter.png" class="h-5" alt="Facebook Logo" />

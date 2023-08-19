@@ -1,8 +1,12 @@
+
 @extends('layout.layout')
 
+@section('title', __('report.list'))
+
 @section('content')
-<h1 style="font-size: 40px; text-decoration: underline; margin-bottom: 30px;" >Reports</h1>
-<div class="card">
+
+<br><br><br><br><br>
+
     <div  class="card-body" id="mapid"></div>
     <button  style="position: absolute;
   bottom: 10px;
@@ -12,8 +16,7 @@
   border-radius: 8px;
   border: 1px black solid;
   z-index: 1000;" id="myButton">My Location</button>
-</div>
-@endsection
+
 
 @section('styles')
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.3.1/dist/leaflet.css"
@@ -144,3 +147,62 @@
 
 </script>
 @endpush
+
+
+<div class="mt-4 mb-3">
+    <div class="float-middle">
+        @can('create', new App\Models\Report)
+            <a href="{{ route('reports.create') }}" style="background: green; margin-bottom:" class="btn btn-success">Create New Report</a>
+        @endcan
+    </div>
+    <h1 class="text-black page-title">Reports <small>{{ __('app.total') }} : {{ $reports->total() }} Reports </small></h1>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <form method="GET" action="" accept-charset="UTF-8" class="form-inline">
+                    <div class="form-group">
+                        <label for="q" class="control-label">Search Report</label>
+                        <input placeholder="{{ __('report.search_text') }}" name="q" type="text" id="q" class="form-control mx-sm-2" value="{{ request('q') }}">
+                    </div>
+                    <input type="submit" style="background: green;" value="Search Report" class="btn btn-secondary">
+                    <a href="{{ route('reports.index') }}" class="btn btn-link">{{ __('app.reset') }}</a>
+                </form>
+            </div>
+            <table class="table table-sm table-responsive-sm">
+                <thead>
+                    <tr>
+                        <th class="text-center">{{ __('app.table_no') }}</th>
+                        <th>Report Name</th>
+                        <th>{{ __('report.address') }}</th>
+                        <th>Severity</th>
+                        <th>Urgency</th>
+                        <th>Photo</th>
+                        <th class="text-center">{{ __('app.action') }}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach($reports as $key => $report)
+                    <tr>
+                        <td class="text-center">{{ $reports->firstItem() + $key }}</td>
+                        <td>{!! $report->name_link !!}</td>
+                        <td>{{ $report->address }}</td>
+                        <td>{{ $report->severity }}</td>
+                        <td>{{ $report->urgency }}</td>
+                        <td><img src="{{ asset($report->photo) }}" width= '50' height='50' class="img img-responsive" /></td>
+
+
+                        <td class="text-center">
+                            <a href="{{ route('reports.show', $report) }}" id="show-report-{{ $report->id }}">{{ __('app.show') }}</a>
+                        </td>
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table>
+            <div class="card-body">{{ $reports->appends(Request::except('page'))->render() }}</div>
+        </div>
+    </div>
+</div>
+@endsection
