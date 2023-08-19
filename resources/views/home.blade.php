@@ -1,140 +1,54 @@
 @extends('layout.layout')
 
 @section('content')
-<h1 style="font-size: 40px; text-decoration: underline; margin-bottom: 30px;" >Reports</h1>
-<div class="card">
-    <div  class="card-body" id="mapid"></div>
-    <button  style="position: absolute;
-  bottom: 10px;
-  left: 10px;
-  background: white;
-  padding: 0.5em;
-  border-radius: 8px;
-  border: 1px black solid;
-  z-index: 1000;" id="myButton">My Location</button>
+
+<div class="w-full h-screen bg-center bg-cover" style="height:32rem; background-image:linear-gradient(180deg, rgba(0, 63, 103, 0) 0%, #113F67 100%), url('images/San Juan Aerial.png');">
+    <div class="flex items-center justify-center h-full w-full">
+        <div class="text-center">
+            <h1 class="font-josefinsans font-bold uppercase text-white text-2xl sm:text-4xl md:text-5xl lg:text-6xl">ENSURING SAFE JOURNEYS</br>ONE MILE AT A TIME!</h1>
+            <hr class="w-9/12 md:w-10/12 lg:w-11/12 h-1 md:h-1.5 mx-auto bg-white border-0 rounded my-2 sm:my-4 md:my-4 ">
+            <div class="">
+                <p class="font-poppins font-normal text-secondary text-xxs sm:text-xs md:text-sm lg:text-2xl">RoadWatch San Juan City: Empowering citizens to report and</br>repair damaged roads for safer and smoother journeys.</p>
+                <button class="mt-1 mx-2 md:mt-4 md:mx-3 px-4 py-1.5 md:px-9 md:py-2.5 bg-white text-primary text-xxs md:text-xs font-poppins font-normal rounded hover:bg-secondary hover:text-white focus:outline-none focus:bg-primary transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110 duration-300">View Reports</button>
+                <button class="mt-1 mx-2 md:mt-4 md:mx-3 px-4 py-1.5 md:px-9 md:py-2.5 bg-white text-primary text-xxs md:text-xs font-poppins font-normal rounded hover:bg-secondary hover:text-white focus:outline-none focus:bg-primary transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110 duration-300">Make a Report +</button>
+            </div>    
+        </div>
+    </div>
 </div>
+
+<section class="bg-white mx-5 sm:mx-20">
+        <div class="mt-10 grid justify-items-center">
+            <h1 class="text-4xl font-extrabold leading-none tracking-tight font-josefinsans text-primary"><span class="underline underline-offset-3 decoration-7 decoration-secondary">News & Updates</span></h1>
+        </div>
+        <div class="gap-8 items-center py-8 px-4 xl:gap-16 md:grid md:grid-cols-2 sm:py-14 lg:px-6">
+            <img class="rounded-xl drop-shadow-xl" src="images/San Juan City Hall.jpg" alt="San Juan City Hall">
+            <div class="mt-4 md:mt-0">
+                <h2 class="mb-4 text-4xl tracking-tight font-extrabold font-josefinsans text-primary">Lorem ipsum dolor sit amet, consectetur.</h2>
+                <p class="mb-6 font-light text-gray-500 md:text-lg">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+            </div>
+        </div>
+    </section>
+
+    <hr class="w-80 h-1 mx-auto bg-primary border-0 rounded">
+
+    <section class="bg-white mx-5 sm:mx-20">
+        <div class="gap-8 items-center py-8 px-4 xl:gap-16 md:grid md:grid-cols-2 sm:py-14 lg:px-6">
+            <div class="mt-4 md:mt-0">
+                <p class="mb-6 font-light text-gray-500 md:text-lg">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+            </div>
+            <img class="rounded-xl drop-shadow-xl" src="images/San Juan Road.jpg" alt="San Juan City Road">
+        </div>
+    </section>
+
+    <section class="bg-white mx-5 sm:mx-40">
+        <div class="grid justify-items-center">
+            <h1 class="text-4xl font-extrabold leading-none tracking-tight font-josefinsans text-primary"><span class="underline underline-offset-3 decoration-7 decoration-secondary">Completed Reports</span></h1>
+        </div>
+        <div class="py-8 px-4 md:gap-12 md:grid md:grid-cols-2 sm:pt-14 sm:pb-2 lg:px-6">
+            <img class="rounded-xl mb-2 lg:mb-0" src="images/San Juan City Hall.jpg" alt="San Juan City Hall">
+            <img class="rounded-xl lg:mb-0" src="images/San Juan City Hall.jpg" alt="San Juan City Hall">
+        </div>
+        <h2 class="text-md tracking-tight font-extrabold font-josefinsans text-primary text-center">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</h2>
+        <p class="font-light text-gray-500 indent-10 md:text-md py-10">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+    </section>
 @endsection
-
-@section('styles')
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.3.1/dist/leaflet.css"
-    integrity="sha512-Rksm5RenBEKSKFjgI3a41vrjkw4EVPlJ3+OiI65vTjIdo9brlAacEuKOiQ5OFh7cOI1bkDwLqdLw3Zg0cRJAAQ=="
-    crossorigin=""/>
-<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css" />
-<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css" />
-<link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
-
-<style>
-    #mapid { min-height: 500px; }
-</style>
-@endsection
-@push('scripts')
-<!-- Make sure you put this AFTER Leaflet's CSS -->
-<script src="https://unpkg.com/leaflet@1.3.1/dist/leaflet.js"
-    integrity="sha512-/Nsx9X4HebavoBvEBuyp3I7od5tA0UzAxs+j83KgC8PU0kgB4XiK4Lfe4y4cgBtaRJQEIFCW+oC506aPT2L1zw=="
-    crossorigin=""></script>
-<script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"></script>
-<script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
-
-<script>
-    var map = L.map('mapid').setView([{{ config('leaflet.map_center_latitude') }}, {{ config('leaflet.map_center_longitude') }}], {{ config('leaflet.zoom_level') }});
-
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-    }).addTo(map);
-
-    
-        L.Control.geocoder().addTo(map);
-        if (!navigator.geolocation) {
-            console.log("Your browser doesn't support geolocation feature!")
-        } else {
-            setInterval(() => {
-                navigator.geolocation.getCurrentPosition(getPosition)
-            }, 5000);
-        };
-
-        //getting user location and max radius (1km)
-        var marker, circle, lat, long, accuracy;
-
-        function getPosition(position) {
-            // console.log(position)
-            lat = position.coords.latitude
-            long = position.coords.longitude
-            accuracy = position.coords.accuracy
-
-            if (marker) {
-                map.removeLayer(marker)
-            }
-
-            if (circle) {
-                map.removeLayer(circle)
-            }
-
-            marker = L.marker([lat, long])
-            circle = L.circle([lat, long], { radius: 1000 })
-
-            var featureGroup = L.featureGroup([marker, circle]).addTo(map)
-            console.log("Your coordinate is: Lat: " + lat + " Long: " + long + " Accuracy: " + accuracy)
-    
-            //get back to user location
-            document.getElementById('myButton').addEventListener('click', function() {
-                map.fitBounds(featureGroup.getBounds())
-        });
-
-            var button = document.getElementById('myButton');
-            var mapContainer = map.getContainer();
-            mapContainer.appendChild(button);
-          }
-
-    var markers = L.markerClusterGroup();
-
-    axios.get('{{ route('api.reports.index') }}')
-    .then(function (response) {
-        var marker = L.geoJSON(response.data, {
-            pointToLayer: function(geoJsonPoint, latlng) {
-                return L.marker(latlng).bindPopup(function (layer) {
-                    return layer.feature.properties.map_popup_content;
-                });
-            }
-        });
-        markers.addLayer(marker);
-    })
-    .catch(function (error) {
-        console.log(error);
-    });
-    map.addLayer(markers);
-
-    //sattelite layer
-    
-    var satelliteLayer = L.tileLayer('http://mt0.google.com/vt/lyrs=s&hl=en&x={x}&y={y}&z={z}', {
-        maxZoom: 20,
-        subdomains: ['mt0', 'mt1', 'mt2', 'mt3']
-    });
-    var baseMaps = {
-        "Street": L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'),
-        "Satellite": satelliteLayer
-    };
-    L.control.layers(baseMaps).addTo(map);
-
-
-    @can('create', new App\Models\Report)
-    var theMarker;
-
-    map.on('click', function(e) {
-        let latitude = e.latlng.lat.toString().substring(0, 15);
-        let longitude = e.latlng.lng.toString().substring(0, 15);
-
-        if (theMarker != undefined) {
-            map.removeLayer(theMarker);
-        };
-
-        var popupContent = "Your location : " + latitude + ", " + longitude + ".";
-        popupContent += '<br><a href="{{ route('reports.create') }}?latitude=' + latitude + '&longitude=' + longitude + '">Add new report here</a>';
-
-        theMarker = L.marker([latitude, longitude]).addTo(map);
-        theMarker.bindPopup(popupContent)
-        .openPopup();
-    });
-    @endcan
-
-</script>
-@endpush
