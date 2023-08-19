@@ -5,27 +5,24 @@
 
 @section('content')
 
-</br></br></br></br></br></br></br></br></br></br>
-    <div  class="card-body" id="mapid"></div>
-    <button  style="position: absolute;
-  bottom: 10px;
-  left: 10px;
-  background: white;
-  padding: 0.5em;
-  border-radius: 8px;
-  border: 1px black solid;
-  z-index: 1000;" id="myButton">My Location</button>
+    <section class="mx-20">
+        <div class="my-20 relative rounded" id="mapid">
+            <button class="absolute bottom-0 bg-primary text-white p-2 rounded hover:bg-secondary m-2 z-[1000]" id="myButton">My Location</button>
+        </div> 
+    </section>
 
 @section('styles')
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
    crossorigin=""/>
-<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css" />
-<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css" />
+<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.9.1/dist/MarkerCluster.css" />
+<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.9.1/dist/MarkerCluster.Default.css" />
 <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
 
 <style>
-    #mapid { min-height: 300px; }
+    #mapid { 
+        min-height: 300px;
+        }
 </style>
 @endsection
 
@@ -34,7 +31,7 @@
  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
    crossorigin=""></script>
-<script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"></script>
+<script src="https://unpkg.com/leaflet.markercluster@1.9.1/dist/leaflet.markercluster.js"></script>
 <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
 
 <script>
