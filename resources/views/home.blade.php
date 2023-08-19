@@ -84,9 +84,6 @@
             var mapContainer = map.getContainer();
             mapContainer.appendChild(button);
           }
-  
-
-        
 
     var markers = L.markerClusterGroup();
 
@@ -138,9 +135,6 @@
         .openPopup();
     });
     @endcan
-
- 
-
 
 </script>
 @endpush

@@ -4,6 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   @vite(['resources/css/app.css','resources/js/app.js'])
+  @yield('styles')
 </head>
 
 <body>
@@ -114,6 +115,7 @@
     </header>
 
     @yield('content')
+    @stack('scripts')
 
     <footer class="bg-primary my-auto">
         <div class="max-w-2xl mx-auto text-white py-10">
