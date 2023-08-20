@@ -115,9 +115,8 @@
     </header>
 
     @yield('content')
-    @stack('scripts')
 
-    <!-- <footer class="bg-primary my-auto">
+    <footer class="bg-primary my-auto">
         <div class="max-w-2xl mx-auto text-white py-10">
                 <a href="" class="flex items-center">
                     <img src="images/RoadWatch Logo WB.png" class="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4" alt="RoadWatch Logo" />
@@ -142,6 +141,7 @@
                 </div>
             </div>
         </div>
-    </footer> -->
+    </footer>
+@stack('scripts')
 </body>
 </html>
