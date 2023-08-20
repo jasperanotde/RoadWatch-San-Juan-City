@@ -115,7 +115,6 @@
     </header>
 
     @yield('content')
-    @stack('scripts')
 
     <footer class="bg-primary my-auto">
         <div class="max-w-2xl mx-auto text-white py-10">
@@ -143,5 +142,7 @@
             </div>
         </div>
     </footer>
+    
+    @stack('scripts')
 </body>
 </html>
