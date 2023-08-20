@@ -19,7 +19,7 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 
 Route::group(['as' => 'api.', 'namespace' => 'Api'], function () {
     /*
-     * Outlets Endpoints
+     * Reports Endpoints
      */
     Route::get('reports', 'ReportController@index')->name('reports.index');
 });
