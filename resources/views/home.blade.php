@@ -1,21 +1,6 @@
 @extends('layout.layout')
 
 @section('content')
-<<<<<<< HEAD
-<h1 style="font-size: 40px; text-decoration: underline; margin-bottom: 30px;" >Reports</h1>
-<div  class="card-body" id="mapid"></div>
-<div class="card">
-<div  class="card-body" id="mapid"></div>
-    <button  style="position: absolute;
-  bottom: 10px;
-  left: 10px;
-  background: white;
-  padding: 0.5em;
-  border-radius: 8px;
-  border: 1px black solid;
-  z-index: 1000;" id="myButton">My Location</button>
-</div>
-=======
 
     <div class="w-full h-screen bg-center bg-cover" style="height:32rem; background-image:linear-gradient(180deg, rgba(0, 63, 103, 0) 0%, #113F67 100%), url('images/San Juan Aerial.png');">
         <div class="flex items-center justify-center h-full w-full">
@@ -66,5 +51,4 @@
         <h2 class="text-md tracking-tight font-extrabold font-josefinsans text-primary text-center">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</h2>
         <p class="font-light text-gray-500 indent-10 md:text-md py-10">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
     </section>
->>>>>>> f56c1fee18e4bf38a7c10b7765a99724a7b7a102
 @endsection
