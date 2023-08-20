@@ -87,7 +87,7 @@ class ReportController extends Controller
     {
         $this->authorize('update', $report);
 
-        return view('report.edit', compact('report'));
+        return view('reports.edit', compact('report'));
     }
 
     /**
