@@ -4,117 +4,209 @@
 
 @section('content')
 <br><br><br><br><br>
-<div class="row justify-content-center">
-    <div class="col-md-6">
-        @if (request('action') == 'delete' && $report)
-        @can('delete', $report)
-            <div class="card">
-                <div class="card-header">{{ __('report.delete') }}</div>
-                <div class="card-body">
-                    <label class="control-label text-primary">Report Name </label>
-                    <p>{{ $report->name }}</p>
-                    <label class="control-label text-primary">{{ __('report.address') }}</label>
-                    <p>{{ $report->address }}</p>
-                    <label class="control-label text-primary">{{ __('report.latitude') }}</label>
-                    <p>{{ $report->latitude }}</p>
-                    <label class="control-label text-primary">{{ __('report.longitude') }}</label>
-                    <p>{{ $report->longitude }}</p>
-                    <label class="control-label text-primary">{{ __('report.region') }}</label>
-                    <p>{{ $report->region }}</p>
-                    {!! $errors->first('report_id', '<span class="invalid-feedback" role="alert">:message</span>') !!}
-                </div>
-                <hr style="margin:0">
-                <div class="card-body text-danger">{{ __('report.delete_confirm') }}</div>
-                <div class="card-footer">
-                    <form enctype="multipart/form-data" method="POST" action="{{ route('reports.destroy', $report) }}" accept-charset="UTF-8" onsubmit="return confirm(&quot;{{ __('app.delete_confirm') }}&quot;)" class="del-form float-right" style="display: inline;">
-                        {{ csrf_field() }} {{ method_field('delete') }}
-                        <input name="report_id" type="hidden" value="{{ $report->id }}">
-                        <button type="submit" class="btn btn-danger">{{ __('app.delete_confirm_button') }}</button>
-                    </form>
-                    <a href="{{ route('reports.edit', $report) }}" class="btn btn-link">{{ __('app.cancel') }}</a>
-                </div>
-            </div>
-        @endcan
-        @else
-        <div class="card">
-            <div class="card-header"><h1 style="color: #113F67; font-size: 40px; font-weight: 900;">Edit Report</h1></div>
-            <form method="POST" enctype="multipart/form-data" action="{{ route('reports.update', $report) }}" accept-charset="UTF-8">
-                {{ csrf_field() }} {{ method_field('patch') }}
-                <div class="card-body">
-                    <div class="form-group">
-                        <label for="name" class="control-label">Report Name</label>
-                        <input id="name" type="text" class="form-control{{ $errors->has('name') ? ' is-invalid' : '' }}" name="name" value="{{ old('name', $report->name) }}" required>
-                        {!! $errors->first('name', '<span class="invalid-feedback" role="alert">:message</span>') !!}
-                    </div>
-                    <div class="form-group">
-                        <label for="address" class="control-label">{{ __('report.address') }}</label>
-                        <textarea id="address" class="form-control{{ $errors->has('address') ? ' is-invalid' : '' }}" name="address" rows="4">{{ old('address', $report->address) }}</textarea>
-                        {!! $errors->first('address', '<span class="invalid-feedback" role="alert">:message</span>') !!}
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="latitude" class="control-label">{{ __('report.latitude') }}</label>
-                                <input id="latitude" type="text" class="form-control{{ $errors->has('latitude') ? ' is-invalid' : '' }}" name="latitude" value="{{ old('latitude', $report->latitude) }}" required>
-                                {!! $errors->first('latitude', '<span class="invalid-feedback" role="alert">:message</span>') !!}
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="longitude" class="control-label">{{ __('report.longitude') }}</label>
-                                <input id="longitude" type="text" class="form-control{{ $errors->has('longitude') ? ' is-invalid' : '' }}" name="longitude" value="{{ old('longitude', $report->longitude) }}" required>
-                                {!! $errors->first('longitude', '<span class="invalid-feedback" role="alert">:message</span>') !!}
-                            </div>
-                        </div>
-                    </div>
 
-                    <div class="form-group">
-                        <label for="details" class="control-label">Details</label>
-                        <textarea id="details" class="form-control{{ $errors->has('details') ? ' is-invalid' : '' }}" name="details" rows="4">{{ old('details', $report->details) }}</textarea>
-                        {!! $errors->first('details', '<span class="invalid-feedback" role="alert">:message</span>') !!}
-                    </div>
-                    
-                    <label for="urgency" class="control-label">Urgency</label>
-                    <select class="form-select form-control{{ $errors->has('urgency') ? ' is-invalid' : '' }}" name="urgency" value="{{ old('urgency') }}" required aria-label="Default select example">
-                            <option selected>Open this select menu</option>
-                            <option value="Urgent">Urgent</option>
-                            <option value="Non-Urgent">Non-Urgent</option>
-                            <option value="3">Three</option>
-                        </select>
-                        {!! $errors->first('urgency', '<span class="invalid-feedback" role="alert">:message</span>') !!}
-                    </div>
-                    
-                    <div style="margin-left: 20px;" class="form-group">
-                        <input class="form-control" name="photo" type="file" id="photo">
-                        {!! $errors->first('photo', '<span class="invalid-feedback" role="alert">:message</span>') !!}
-                    </div>
-
-                    <div style="padding: 0 1.5em;" class="form-group">
-                    <label for="severity" class="control-label">Severity</label>
-                    <select class="form-select form-control{{ $errors->has('severity') ? ' is-invalid' : '' }}" name="severity" value="{{ old('severity') }}" required aria-label="Default select example">
-                            <option selected>Open this select menu</option>
-                            <option value="Mild">Mild</option>
-                            <option value="Moderate">Moderate</option>
-                            <option value="Severe Damage">Severe Damage</option>
-                        </select>
-                        {!! $errors->first('severity', '<span class="invalid-feedback" role="alert">:message</span>') !!}
-                        </div>
-                    
-                    <div id="mapid"></div>
-                    <div class="card-footer">
-                    <input type="submit" value="{{ __('report.update') }}" style="background: lightgreen"class="btn btn-success">
-                    <a href="{{ route('reports.show', $report) }}" class="btn btn-link">{{ __('app.cancel') }}</a>
+<div class="flex justify-center">
+    <div class="flex w-full max-w-screen-xl">
+        <!-- Left Side (Form) -->
+        <div class="w-1/2 p-4">
+            <div class="border rounded-lg shadow-lg">
+                @if (request('action') == 'delete' && $report)
                     @can('delete', $report)
-                        <a href="{{ route('reports.edit', [$report, 'action' => 'delete']) }}" id="del-report-{{ $report->id }}" class="btn btn-danger float-right">{{ __('app.delete') }}</a>
+                    <div class="bg-white rounded-lg shadow-md p-4">
+    <div class="bg-blue-500 text-white py-2 px-4 text-center font-semibold">{{ __('report.delete') }}</div>
+    <div class="p-4">
+        <label class="text-blue-600 font-semibold">Report Name</label>
+        <p>{{ $report->name }}</p>
+        <label class="text-blue-600 font-semibold">{{ __('report.address') }}</label>
+        <p>{{ $report->address }}</p>
+        {!! $errors->first('report_id', '<span class="text-red-500" role="alert">:message</span>') !!}
+    </div>
+    <hr class="my-0 border-gray-300">
+    <div class="p-4 text-red-500">{{ __('report.delete_confirm') }}</div>
+    <div class="flex justify-end p-4">
+        <form
+            enctype="multipart/form-data"
+            method="POST"
+            action="{{ route('reports.destroy', $report) }}"
+            accept-charset="UTF-8"
+            onsubmit="return confirm('{{ __('app.delete_confirm') }}')"
+            class="flex space-x-4"
+        >
+            @csrf
+            @method('delete')
+            <input name="report_id" type="hidden" value="{{ $report->id }}">
+            <button type="submit" class="bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded-lg">{{ __('app.delete_confirm_button') }}</button>
+        </form>
+        <a href="{{ route('reports.edit', $report) }}" class="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg ml-2">{{ __('app.cancel') }}</a>
+    </div>
+</div>
+
                     @endcan
-                </div>
-                </div>
-                
-            </form>
+                @else
+                    <div class="card">
+                        <div class="card-header">
+                            <h1 class="text-2xl font-bold text-indigo-700">{{ __('report.edit') }}</h1>
+                        </div>
+                        <form
+                            method="POST"
+                            enctype="multipart/form-data"
+                            action="{{ route('reports.update', $report) }}"
+                            accept-charset="UTF-8"
+                        >
+                            @csrf
+                            @method('patch')
+                            <div class="card-body">
+                                <div class="mb-4">
+                                    <label for="name" class="block text-sm font-medium text-gray-600">{{ __('report.name') }}</label>
+                                    <input
+                                        id="name"
+                                        type="text"
+                                        class="mt-1 p-2 w-full rounded-md transition duration-150 ease-in-out sm:text-sm sm:leading-5 {{ $errors->has('name') ? 'border-red-500' : 'border-gray-300' }}"
+                                        name="name"
+                                        value="{{ old('name', $report->name) }}"
+                                        required
+                                    >
+                                    @error('name')
+                                        <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                                    @enderror
+                                </div>
+
+                                <div class="mb-4">
+                                    <label for="address" class="block text-sm font-medium text-gray-600">{{ __('report.address') }}</label>
+                                    <textarea
+                                        id="address"
+                                        class="mt-1 p-2 w-full rounded-md transition duration-150 ease-in-out sm:text-sm sm:leading-5 {{ $errors->has('address') ? 'border-red-500' : 'border-gray-300' }}"
+                                        name="address"
+                                        rows="4"
+                                    >{{ old('address', $report->address) }}</textarea>
+                                    @error('address')
+                                        <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                                    @enderror
+                                </div>
+
+                                <div class="flex space-x-4 mb-4">
+                                    <div class="w-1/2">
+                                        <label for="latitude" class="block text-sm font-medium text-gray-600">{{ __('report.latitude') }}</label>
+                                        <input
+                                            id="latitude"
+                                            type="text"
+                                            class="mt-1 p-2 w-full rounded-md transition duration-150 ease-in-out sm:text-sm sm:leading-5 {{ $errors->has('latitude') ? 'border-red-500' : 'border-gray-300' }}"
+                                            name="latitude"
+                                            value="{{ old('latitude', $report->latitude) }}"
+                                            required
+                                        >
+                                        @error('latitude')
+                                            <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                                        @enderror
+                                    </div>
+
+                                    <div class="w-1/2">
+                                        <label for="longitude" class="block text-sm font-medium text-gray-600">{{ __('report.longitude') }}</label>
+                                        <input
+                                            id="longitude"
+                                            type="text"
+                                            class="mt-1 p-2 w-full rounded-md transition duration-150 ease-in-out sm:text-sm sm:leading-5 {{ $errors->has('longitude') ? 'border-red-500' : 'border-gray-300' }}"
+                                            name="longitude"
+                                            value="{{ old('longitude', $report->longitude) }}"
+                                            required
+                                        >
+                                        @error('longitude')
+                                            <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                                        @enderror
+                                    </div>
+                                </div>
+
+                                <div class="mb-4">
+                                    <label for="details" class="block text-sm font-medium text-gray-600">{{ __('report.details') }}</label>
+                                    <textarea
+                                        id="details"
+                                        class="mt-1 p-2 w-full rounded-md transition duration-150 ease-in-out sm:text-sm sm:leading-5 {{ $errors->has('details') ? 'border-red-500' : 'border-gray-300' }}"
+                                        name="details"
+                                        rows="4"
+                                    >{{ old('details', $report->details) }}</textarea>
+                                    @error('details')
+                                        <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                                    @enderror
+                                </div>
+
+                                <div class="mb-4">
+                                    <label for="urgency" class="block text-sm font-medium text-gray-600">{{ __('report.urgency') }}</label>
+                                    <select
+                                        id="urgency"
+                                        name="urgency"
+                                        class="mt-1 p-2 w-full rounded-md transition duration-150 ease-in-out sm:text-sm sm:leading-5 {{ $errors->has('urgency') ? 'border-red-500' : 'border-gray-300' }}"
+                                    >
+                                        <option value="Urgent" {{ old('urgency', $report->urgency) === 'Urgent' ? 'selected' : '' }}>Urgent</option>
+                                        <option value="Non-Urgent" {{ old('urgency', $report->urgency) === 'Non-Urgent' ? 'selected' : '' }}>Non-Urgent</option>
+                                        <option value="3" {{ old('urgency', $report->urgency) === '3' ? 'selected' : '' }}>Three</option>
+                                    </select>
+                                    @error('urgency')
+                                        <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                                    @enderror
+                                </div>
+
+                                <div class="mb-4">
+                                    <label for="photo" class="block text-sm font-medium text-gray-600">{{ __('report.photo') }}</label>
+                                    <input
+                                        id="photo"
+                                        type="file"
+                                        class="mt-1 p-2 w-full rounded-md transition duration-150 ease-in-out sm:text-sm sm:leading-5 {{ $errors->has('photo') ? 'border-red-500' : 'border-gray-300' }}"
+                                        name="photo"
+                                    >
+                                    @error('photo')
+                                        <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                                    @enderror
+
+                                    @if ($report->photo)
+                                        <div class="mt-2">
+                                            <img src="{{ asset($report->photo) }}" alt="Current Photo" class="max-w-xs">
+                                        </div>
+                                    @endif
+                                </div>
+
+                                <div class="mb-4">
+                                    <label for="severity" class="block text-sm font-medium text-gray-600">{{ __('report.severity') }}</label>
+                                    <select
+                                        id="severity"
+                                        name="severity"
+                                        class="mt-1 p-2 w-full rounded-md transition duration-150 ease-in-out sm:text-sm sm:leading-5 {{ $errors->has('severity') ? 'border-red-500' : 'border-gray-300' }}"
+                                    >
+                                        <option value="Mild" {{ old('severity', $report->severity) === 'Mild' ? 'selected' : '' }}>Mild</option>
+                                        <option value="Moderate" {{ old('severity', $report->severity) === 'Moderate' ? 'selected' : '' }}>Moderate</option>
+                                        <option value="Severe Damage" {{ old('severity', $report->severity) === 'Severe Damage' ? 'selected' : '' }}>Severe Damage</option>
+                                    </select>
+                                    @error('severity')
+                                        <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                                    @enderror
+                                </div>
+
+                                <div id="mapid" class="h-80"></div>
+                            </div>
+
+                            <div class="card-footer">
+                                <input type="submit" value="{{ __('report.update') }}" class="px-4 py-2 bg-green-500 text-white rounded-full hover:bg-green-600">
+                                <a href="{{ route('reports.show', $report) }}" class="text-indigo-700 hover:underline ">{{ __('app.cancel') }}</a>
+
+                                @can('delete', $report)
+                                    <a href="{{ route('reports.edit', [$report, 'action' => 'delete']) }}" id="del-report-{{ $report->id }}" class="text-red-700 hover:underline float-right">{{ __('app.delete') }}</a>
+                                @endcan
+                            </div>
+                        </form>
+                    </div>
+                @endif
+            </div>
+        </div>
+
+        <!-- Right Side (Map) -->
+        <div class="w-1/2 p-4">
+            <div class="border rounded-lg shadow-lg p-6">
+                <h2 class="text-xl font-bold text-indigo-700">{{ trans('report.location') }}</h2>
+                <div class="mt-4" id="mapid"></div>
+            </div>
         </div>
     </div>
 </div>
-@endif
+
 
 @section('styles')
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.3.1/dist/leaflet.css"

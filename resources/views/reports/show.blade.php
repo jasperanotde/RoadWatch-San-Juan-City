@@ -4,47 +4,73 @@
 
 @section('content')
 <br><br><br><br><br>
-<div class="row justify-content-center">
-    <div class="col-md-6">
-        <div class="card">
-            <div class="card-header">Report Details</div>
-            <div class="card-body">
-                <table class="table table-sm">
+<div class="flex justify-center">
+    <div class="flex w-full max-w-screen-xl">
+        <!-- Left Side (Report Details) -->
+        <div class="w-1/2 p-4">
+            <div class="border rounded-lg shadow-lg p-6">
+                <h1 class="text-xl font-bold text-primary mb-3 underline">Report Details</h1>
+                <table class="table-auto">
                     <tbody>
-                        <tr><td>Report Name<td>{{ $report->name }}</td></tr>
-                        <tr><td>report Address</td><td>{{ $report->address }}</td></tr>
-                        <tr><td>Details</td><td>{{ $report->details }}</td></tr>
-                        <tr><td>Photo</td><td><img src="{{ asset($report->photo) }}" width= '50' height='50' class="img img-responsive" /></td>
-                        <tr><td>Severity</td><td>{{ $report->severity }}</td></tr>
-                        <tr><td>Urgency</td><td>{{ $report->urgency }}</td></tr>
-
+                        <tr>
+                            <td class="pr-4">Report Name</td>
+                            <td>{{ $report->name }}</td>
+                        </tr>
+                        <tr>
+                            <td class="pr-4">Report Address</td>
+                            <td>{{ $report->address }}</td>
+                        </tr>
+                        <tr>
+                            <td class="pr-4">Details</td>
+                            <td>{{ $report->details }}</td>
+                        </tr>
+                        <tr>
+                            <td class="pr-4">Photo</td>
+                            <td>
+                                @if($report->photo)
+                                    <img src="{{ asset($report->photo) }}" width="50" height="50" class="img img-responsive" />
+                                @else
+                                    {{ __('report.no_photo') }}
+                                @endif
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="pr-4">Severity</td>
+                            <td>{{ $report->severity }}</td>
+                        </tr>
+                        <tr>
+                            <td class="pr-4">Urgency</td>
+                            <td>{{ $report->urgency }}</td>
+                        </tr>
                     </tbody>
                 </table>
+                <div class="mt-4">
+                    @can('update', $report)
+                        <a href="{{ route('reports.edit', $report) }}" id="edit-report-{{ $report->id }}" class="px-4 py-2 bg-primary text-white rounded-full mr-2">Edit Report</a>
+                    @endcan
+                    @if(auth()->check())
+                        <a href="{{ route('reports.index') }}" class="text-indigo-700 hover:underline">Back to Reports</a>
+                    @else
+                        <a href="{{ route('report_map.index') }}" class="text-indigo-700 hover:underline">{{ __('report.back_to_index') }}</a>
+                    @endif
+                </div>
             </div>
-            <div class="card-footer">
-                @can('update', $report)
-                    <a href="{{ route('reports.edit', $report) }}" id="edit-report-{{ $report->id }}" class="btn btn-warning">Edit Report</a>
-                @endcan
-                @if(auth()->check())
-                    <a href="{{ route('reports.index') }}" class="btn btn-link">Back to Reports</a>
+        </div>
+
+        <!-- Right Side (Map) -->
+        <div class="w-1/2 p-4">
+            <div class="border rounded-lg shadow-lg p-6">
+                <h1 class="text-xl font-bold text-indigo-700">{{ trans('report.location') }}</h1>
+                @if ($report->coordinate)
+                    <div id="mapid" class="h-80"></div>
                 @else
-                    <a href="{{ route('report_map.index') }}" class="btn btn-link">{{ __('report.back_to_index') }}</a>
+                    <p>{{ __('report.no_coordinate') }}</p>
                 @endif
             </div>
         </div>
     </div>
-    <div class="col-md-6">
-        <div class="card">
-            <div class="card-header">{{ trans('report.location') }}</div>
-            @if ($report->coordinate)
-            <div class="card-body" id="mapid"></div>
-            @else
-            <div class="card-body">{{ __('report.no_coordinate') }}</div>
-            @endif
-        </div>
-    </div>
-
 </div>
+
 @endsection
 
 @section('styles')

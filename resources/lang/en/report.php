@@ -2,7 +2,7 @@
 
 return [
     // Labels
-    'report'        => 'Outlet',
+    'report'        => 'Report',
     'list'          => 'Outlet List',
     'search'        => 'Search Outlet',
     'search_text'   => 'Name ...',

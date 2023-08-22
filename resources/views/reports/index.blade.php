@@ -1,15 +1,10 @@
-
 @extends('layout.layout')
 
 @section('title', __('report.list'))
 
 @section('content')
 <div class="mx-20">
-    <section class="mx-20">
-        <div class="mt-20 mb-10 relative rounded" id="mapid">
-            <button class="absolute bottom-0 bg-primary text-white p-2 rounded hover:bg-secondary m-2 z-[1000]" id="myButton">My Location</button>
-        </div> 
-    </section>
+
 
     @section('styles')
         <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
@@ -33,7 +28,7 @@
         <script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"></script>
         <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-
+        <script src="https://unpkg.com/flowbite@1.3.4/dist/flowbite.js"></script>
         <script>
             var map = L.map('mapid').setView([{{ config('leaflet.map_center_latitude') }}, {{ config('leaflet.map_center_longitude') }}], {{ config('leaflet.zoom_level') }});
 
@@ -116,6 +111,7 @@
 
             @can('create', new App\Models\Report)
             var theMarker;
+            var geocoder = L.Control.Geocoder.nominatim();
 
             map.on('click', function(e) {
                 let latitude = e.latlng.lat.toString().substring(0, 15);
@@ -125,9 +121,15 @@
                     map.removeLayer(theMarker);
                 };
 
-                var popupContent = "Your location : " + latitude + ", " + longitude + ".";
+                geocoder.reverse(e.latlng, map.options.crs.scale(map.getZoom()), function(results) {
+                var address = results[0] ? results[0].name : "Address not found";
+                var popupContent = "Your location: " + address;
                 popupContent += '<br><a href="{{ route('reports.create') }}?latitude=' + latitude + '&longitude=' + longitude + '">Add new report here</a>';
 
+                theMarker = L.marker(e.latlng).addTo(map);
+                theMarker.bindPopup(popupContent).openPopup();
+                });
+                
                 theMarker = L.marker([latitude, longitude]).addTo(map);
                 theMarker.bindPopup(popupContent)
                 .openPopup();
@@ -135,9 +137,9 @@
             @endcan
         </script>
     @endpush
-
-    <div class="flex justify-between items-center mx-20">
-        <h1 class="flex-grow text-4xl font-normal leading-none tracking-tight font-poppins text-primary"><span class="underline underline-offset-3 decoration-7 decoration-secondary">{{ __('app.total') }}:<small> {{ $reports->total() }} Reports </small></h1>
+ <br><br><br><br>
+    <div class="flex justify-between items-center">
+        <h1 class="font-josefinsans font-bold flex-grow text-4xl font-normal leading-none tracking-tight font-poppins text-primary"><span class="font-josefinsans font-bold underline underline-offset-3 decoration-7 decoration-secondary">{{ __('app.total') }}:<small> {{ $reports->total() }} Reports </small></h1>
         @can('create', new App\Models\Report)
             <a href="{{ route('reports.create') }}">
                 <button class="mt-1 mx-2 md:mt-4 md:mx-3 px-4 py-1.5 md:px-9 md:py-2.5 bg-primary text-white text-xxs md:text-xs font-poppins font-normal rounded hover:bg-secondary focus:outline-none focus:bg-primary transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110 duration-300">Create New Report</button>
@@ -145,6 +147,7 @@
         @endcan
     </div>
 
+    <br>
 <!-- Try mo ito zyre, for search ito and pag detch ng mga data pero di ko pa napapagana. If mapapagana mu -->
 <!--
     <div class="mb-3 mt-5 mx-40">
@@ -199,53 +202,95 @@
     </script>
 -->
 
-    <div class="row">
-        <div class="col-md-12">
-            <div class="card">
-                <div class="card-header">
-                    <form method="GET" action="" accept-charset="UTF-8" class="form-inline">
-                        <div class="form-group">
-                            <label for="q" class="control-label">Search Report</label>
-                            <input placeholder="{{ __('report.search_text') }}" name="q" type="text" id="q" class="form-control mx-sm-2" value="{{ request('q') }}">
-                        </div>
-                        <input type="submit" style="background: green;" value="Search Report" class="btn btn-secondary">
-                        <a href="{{ route('reports.index') }}" class="btn btn-link">{{ __('app.reset') }}</a>
-                    </form>
-                </div>
-                <table class="table table-sm table-responsive-sm">
-                    <thead>
-                        <tr>
-                            <th class="text-center">{{ __('app.table_no') }}</th>
-                            <th>Report Name</th>
-                            <th>{{ __('report.address') }}</th>
-                            <th>Severity</th>
-                            <th>Urgency</th>
-                            <th>Photo</th>
-                            <th class="text-center">{{ __('app.action') }}</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach($reports as $key => $report)
-                        <tr>
-                            <td class="text-center">{{ $reports->firstItem() + $key }}</td>
-                            <td>{!! $report->name_link !!}</td>
-                            <td>{{ $report->address }}</td>
-                            <td>{{ $report->severity }}</td>
-                            <td>{{ $report->urgency }}</td>
-                            <td><img src="{{ asset($report->photo) }}" width= '50' height='50' class="img img-responsive" /></td>
+<div class="max-w-2xl mx-auto">
 
-
-                            <td class="text-center">
-                                <a href="{{ route('reports.show', $report) }}" id="show-report-{{ $report->id }}">{{ __('app.show') }}</a>
-                            </td>
-                        </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-                <div class="card-body">{{ $reports->appends(Request::except('page'))->render() }}</div>
+<div class="relative overflow-x-auto shadow-md sm:rounded-lg">
+    <div class="p-4">
+        <label for="table-search" class="sr-only">Search</label>
+        <div class="relative mt-1">
+            <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                <svg class="w-5 h-5 text-gray-500 dark:text-gray-400" fill="currentColor" viewBox="0 0 20 20"
+                    xmlns="http://www.w3.org/2000/svg">
+                    <path fill-rule="evenodd"
+                        d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
+                        clip-rule="evenodd"></path>
+                </svg>
             </div>
+            <input type="text" id="table-search" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-80 pl-10 p-2.5  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Search for items">
+            <div class="absolute top-0 right-0  ml-4">
+                <a href="{{ route('reports.create') }}">
+            <button class="bg-primary text-white p-2 rounded hover:bg-secondary m-2 font-bold py-2 px-4 rounded">
+                Create New Report
+            </button></a>
         </div>
+
+        </div>
+        </div>
+        <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+            <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                <tr>
+                    
+                <th scope="col" class="px-6 py-3">
+                        {{ __('app.table_no') }}
+                    </th>
+                    <th scope="col" class="px-6 py-3">
+                        Report Name
+                    </th>
+                    <th scope="col" class="px-6 py-3">
+                        {{ __('report.address') }}
+                    </th>
+                    <th scope="col" class="px-6 py-3">
+                        Severity
+                    </th>
+                    <th scope="col" class="px-6 py-3">
+                        Urgency
+                    </th>
+                    <th scope="col" class="px-6 py-3">
+                        Photo
+                    </th>
+
+                    <th scope="col" class="px-6 py-3">
+                       Edit
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+
+                   @foreach($reports as $key => $report)
+
+                <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
+                    <td class="px-6 py-4">
+                        {{ $reports->firstItem() + $key }}
+                    </td>
+                    <td class="px-6 py-4">
+                        {!! $report->name_link !!}
+                    </td>
+                    <td class="px-6 py-4">
+                        {{ $report->address }}
+                    </td>
+                    <td class="px-6 py-4">
+                        {{ $report->severity }}
+                    </td>
+                    <td class="px-6 py-4">
+                        {{ $report->urgency }}
+                    </td>
+                    <td class="px-6 py-4">
+                        <img src="{{ asset($report->photo) }}" width= '50' height='50' class="img img-responsive" />
+                    </td>
+                    <td class="px-6 py-4">
+                         <a href="{{ route('reports.show', $report) }}" id="show-report-{{ $report->id }}">										{{ __('app.show') }}
+                         </a>
+                    </td>
+                </tr>
+@endforeach
+            </tbody>
+        </table>
+            <div class="card-body">{{ $reports->appends(Request::except('page'))->render() }}</div>
     </div>
 
+    <script src="https://unpkg.com/flowbite@1.3.4/dist/flowbite.js"></script>
 </div>
+</div>
+
+<br><br>
 @endsection
