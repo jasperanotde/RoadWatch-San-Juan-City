@@ -3,12 +3,8 @@
 @section('title', __('report.create'))
 
 @section('content')
-<br><br><br><br><br>
 
-
-
-
-<div class="flex justify-center">
+<div class="my-20 flex justify-center">
   <div class="flex w-full max-w-screen-xl">
     <!-- Left Side (Form) -->
     <div class="w-1/2 p-4">
@@ -38,12 +34,13 @@
             name="address"
             class="w-full bg-gray-100 bg-opacity-50 rounded border border-gray-300 focus:border-indigo-500 focus:bg-white focus:ring-2 focus:ring-indigo-200 h-32 text-base outline-none text-gray-700 py-1 px-3 resize-none leading-6 transition-colors duration-200 ease-in-out"
             rows="4"
-          >{{ old('address') }}</textarea>
+          >{{ old('address', request('address')) }}</textarea>
           {!! $errors->first('address', '<span class="text-red-500 text-sm">:message</span>') !!}
         </div>
       </div>
-      <div class="flex ml-2">
-            <!-- Latitude Field -->
+      
+      <!-- <div class="flex ml-2">
+            // Latitude Field
             <div class="flex-1 pr-2">
               <div class="form-group">
                 <label for="latitude" class="control-label">{{ __('report.latitude') }}</label>
@@ -52,7 +49,7 @@
               </div>
             </div>
 
-            <!-- Longitude Field -->
+            // Longitude Field
             <div class="flex-1 pl-2">
               <div class="form-group">
                 <label for="longitude" class="control-label">{{ __('report.longitude') }}</label>
@@ -60,7 +57,7 @@
                 {!! $errors->first('longitude', '<span class="invalid-feedback" role="alert">:message</span>') !!}
               </div>
             </div>
-          </div>
+          </div> -->
 
       <div class="p-2 w-full">
         <div class="relative">
@@ -85,7 +82,6 @@
             <option selected disabled>Select Urgency</option>
             <option value="Urgent">Urgent</option>
             <option value="Non-Urgent">Non-Urgent</option>
-            <option value="3">Three</option>
           </select>
           {!! $errors->first('urgency', '<span class="text-red-500 text-sm">:message</span>') !!}
         </div>
@@ -108,8 +104,7 @@
           <select
             class="w-full bg-gray-100 bg-opacity-50 rounded border border-gray-300 focus:border-indigo-500 focus:bg-white focus:ring-2 focus:ring-indigo-200 text-base outline-none text-gray-700 py-1 px-3 leading-8 transition-colors duration-200 ease-in-out"
             name="severity"
-            required
-          >
+            required>
             <option selected disabled>Select Severity</option>
             <option value="Mild">Mild</option>
             <option value="Moderate">Moderate</option>
@@ -155,9 +150,10 @@
 <!-- Make sure you put this AFTER Leaflet's CSS -->
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-        <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
         integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
         crossorigin=""></script>
+<script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
        
 <script>
     var mapCenter = [{{ request('latitude', config('leaflet.map_center_latitude')) }}, {{ request('longitude', config('leaflet.map_center_longitude')) }}];
@@ -168,26 +164,34 @@
     }).addTo(map);
 
     var marker = L.marker(mapCenter).addTo(map);
-    function updateMarker(lat, lng) {
+
+    function updateMarker(lat, lng, address) {
         marker
         .setLatLng([lat, lng])
-        .bindPopup("Your location :  " + marker.getLatLng().toString())
+        .bindPopup("Your location :  " + address)
         .openPopup();
         return false;
     };
 
+    var geocoder = L.Control.Geocoder.nominatim();
+
     map.on('click', function(e) {
+        geocoder.reverse(e.latlng, map.options.crs.scale(map.getZoom()), function(results) {
+        var address = results[0] ? results[0].name : "Address not found";
         let latitude = e.latlng.lat.toString().substring(0, 15);
         let longitude = e.latlng.lng.toString().substring(0, 15);
         $('#latitude').val(latitude);
         $('#longitude').val(longitude);
-        updateMarker(latitude, longitude);
+        $('#address').val(address);
+        updateMarker(latitude, longitude, address);
+      });
     });
 
     var updateMarkerByInputs = function() {
-        return updateMarker( $('#latitude').val() , $('#longitude').val());
+        return updateMarker( $('#latitude').val() , $('#longitude').val() , $('#address').val(address));
     }
     $('#latitude').on('input', updateMarkerByInputs);
     $('#longitude').on('input', updateMarkerByInputs);
+    $('#address').on('input', updateMarkerByInputs);
 </script>
 @endpush

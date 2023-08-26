@@ -50,7 +50,7 @@ class Report extends Model
     }
 
     /**
-     * Get school coordinate attribute.
+     * Get Report coordinate attribute.
      *
      * @return string|null
      */
@@ -60,7 +60,6 @@ class Report extends Model
             return $this->latitude.', '.$this->longitude;
         }
     }
-
 
       /**
      * Get report address attribute.
@@ -112,20 +111,26 @@ class Report extends Model
 
     /**
      * Get report map_popup_content attribute.
-     *
+     * 
      * @return string
      */
     public function getMapPopupContentAttribute()
     {
         $mapPopupContent = '';
-        $mapPopupContent .= '<div class="my-2"><strong>'.__('report.name').':</strong><br>'.$this->name_link.'</div>';
-        $mapPopupContent .= '<div class="my-2"><strong>'.__('report.address').':</strong><br>'.$this->address.'</div>';
-        $mapPopupContent .= '<div class="my-2"><strong>'.__('report.details').':</strong><br>'.$this->details.'</div>';
-        $mapPopupContent .= '<div class="my-2"><strong>'.__('report.photo').':</strong><br>'.$this->photo.'</div>';
-        $mapPopupContent .= '<div class="my-2"><strong>'.__('report.severity').':</strong><br>'.$this->severity.'</div>';
-        $mapPopupContent .= '<div class="my-2"><strong>'.__('report.urgency').':</strong><br>'.$this->urgency.'</div>';
-        $mapPopupContent .= '<div class="my-2"><strong>'.__('report.coordinate').':</strong><br>'.$this->coordinate.'</div>';
-        $mapPopupContent .= '<div class="my-2"><strong>'.__('report.status').':</strong><br>'.$this->status.'</div>';
+        $mapPopupContent .= '<div class="my-2 text-lg font-poppins text-primary"><center>'.$this->name_link.'</div>';
+
+         // Display the image using an <img> tag
+         if ($this->photo) {
+            $imagePath = asset($this->photo); // Replace with the actual path
+            $mapPopupContent .= '<div class="my-2 w-auto h-26 rounded text-center"><img src="'.$imagePath.'" alt="Report Photo"></div>';
+        }
+
+        $mapPopupContent .= '<div class="my-2 text-slate-800"><strong>'.__('report.address').':</strong><br>'.$this->address.'</div>';
+        $mapPopupContent .= '<div class="my-2 text-slate-800"><strong>'.__('report.details').':</strong><br>'.$this->details.'</div>';
+        $mapPopupContent .= '<div class="my-2 text-slate-800"><strong>'.__('report.severity').':</strong><br>'.$this->severity.'</div>';
+        $mapPopupContent .= '<div class="my-2 text-slate-800"><strong>'.__('report.urgency').':</strong><br>'.$this->urgency.'</div>';
+        // $mapPopupContent .= '<div class="my-2"><strong>'.__('report.coordinate').':</strong><br>'.$this->coordinate.'</div>';
+        $mapPopupContent .= '<div class="my-2 text-slate-800"><strong>'.__('report.status').':</strong><br>'.$this->status.'</div>';
 
         return $mapPopupContent;
     }

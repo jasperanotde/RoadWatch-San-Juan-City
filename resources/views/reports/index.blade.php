@@ -4,7 +4,11 @@
 
 @section('content')
 <div class="mx-20">
-
+    <section class="mx-20">
+        <div class="mt-20 mb-10 relative rounded" id="mapid">
+            <button class="absolute bottom-0 bg-primary text-white p-2 rounded hover:bg-secondary m-2 z-[1000]" id="myButton">My Location</button>
+        </div> 
+    </section>
 
     @section('styles')
         <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
@@ -15,7 +19,7 @@
         <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
         <style>
             #mapid { 
-                min-height: 300px;
+                min-height: 500px;
                 }
         </style>
     @endsection
@@ -36,7 +40,6 @@
                 attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
             }).addTo(map);
 
-            
                 L.Control.geocoder().addTo(map);
                 if (!navigator.geolocation) {
                     console.log("Your browser doesn't support geolocation feature!")
@@ -46,11 +49,11 @@
                     }, 5000);
                 };
 
-                //getting user location and max radius (1km)
+                // Getting user location and max radius (500 meter)
                 var marker, circle, lat, long, accuracy;
+                var featureGroup;
 
                 function getPosition(position) {
-                    // console.log(position)
                     lat = position.coords.latitude
                     long = position.coords.longitude
                     accuracy = position.coords.accuracy
@@ -64,29 +67,32 @@
                     }
 
                     marker = L.marker([lat, long])
-                    circle = L.circle([lat, long], { radius: 1000 })
+                    circle = L.circle([lat, long], { radius: 500 })
 
-                    var featureGroup = L.featureGroup([marker, circle]).addTo(map)
+                    featureGroup = L.featureGroup([marker, circle]).addTo(map)
                     console.log("Your coordinate is: Lat: " + lat + " Long: " + long + " Accuracy: " + accuracy)
-            
-                    //get back to user location
-                    document.getElementById('myButton').addEventListener('click', function() {
-                        map.fitBounds(featureGroup.getBounds())
-                });
 
-                    var button = document.getElementById('myButton');
-                    var mapContainer = map.getContainer();
-                    mapContainer.appendChild(button);
+                    // Set a custom zoom level when getting user's location
+                    // map.setView([lat, long], 10); // Adjust the zoom level (15 in this example)
                 }
+
+                //Get back to user location
+                document.getElementById('myButton').addEventListener('click', function() {
+                        if(featureGroup) {
+                            map.fitBounds(featureGroup.getBounds())
+                        }
+                        event.stopPropagation();
+                    });
         
             var markers = L.markerClusterGroup();
-
             axios.get('{{ route('api.reports.index') }}')
             .then(function (response) {
                 var marker = L.geoJSON(response.data, {
                     pointToLayer: function(geoJsonPoint, latlng) {
                         return L.marker(latlng).bindPopup(function (layer) {
-                            return layer.feature.properties.map_popup_content;
+                            // Stil modifying the opacity/transparency of the popup content's background
+                            var popupContent = '<div class="opacity-100">' +  layer.feature.properties.map_popup_content + '</div>';
+                            return popupContent;
                         });
                     }
                 });
@@ -97,8 +103,7 @@
             });
             map.addLayer(markers);
 
-            //sattelite layer
-            
+            // Sattelite layer
             var satelliteLayer = L.tileLayer('http://mt0.google.com/vt/lyrs=s&hl=en&x={x}&y={y}&z={z}', {
                 maxZoom: 20,
                 subdomains: ['mt0', 'mt1', 'mt2', 'mt3']
@@ -109,6 +114,7 @@
             };
             L.control.layers(baseMaps).addTo(map);
 
+            // Manually Pin on Map to create report
             @can('create', new App\Models\Report)
             var theMarker;
             var geocoder = L.Control.Geocoder.nominatim();
@@ -119,92 +125,35 @@
 
                 if (theMarker != undefined) {
                     map.removeLayer(theMarker);
-                };
+                }
 
                 geocoder.reverse(e.latlng, map.options.crs.scale(map.getZoom()), function(results) {
                 var address = results[0] ? results[0].name : "Address not found";
                 var popupContent = "Your location: " + address;
-                popupContent += '<br><a href="{{ route('reports.create') }}?latitude=' + latitude + '&longitude=' + longitude + '">Add new report here</a>';
+                popupContent += '<br><a href="{{ route('reports.create') }}?latitude=' + latitude + '&longitude=' + longitude + 
+                '&address=' + address + '">Add new report here</a>';
 
                 theMarker = L.marker(e.latlng).addTo(map);
                 theMarker.bindPopup(popupContent).openPopup();
+
+                // Remove the marker after 5 seconds
+                    setTimeout(function() {
+                        if (theMarker) {
+                            map.removeLayer(theMarker);
+                        }
+                    }, 5000);
                 });
-                
-                theMarker = L.marker([latitude, longitude]).addTo(map);
-                theMarker.bindPopup(popupContent)
-                .openPopup();
             });
             @endcan
         </script>
     @endpush
- <br><br><br><br>
-    <div class="flex justify-between items-center">
-        <h1 class="font-josefinsans font-bold flex-grow text-4xl font-normal leading-none tracking-tight font-poppins text-primary"><span class="font-josefinsans font-bold underline underline-offset-3 decoration-7 decoration-secondary">{{ __('app.total') }}:<small> {{ $reports->total() }} Reports </small></h1>
-        @can('create', new App\Models\Report)
-            <a href="{{ route('reports.create') }}">
-                <button class="mt-1 mx-2 md:mt-4 md:mx-3 px-4 py-1.5 md:px-9 md:py-2.5 bg-primary text-white text-xxs md:text-xs font-poppins font-normal rounded hover:bg-secondary focus:outline-none focus:bg-primary transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110 duration-300">Create New Report</button>
-            </a>
-        @endcan
-    </div>
-
-    <br>
-<!-- Try mo ito zyre, for search ito and pag detch ng mga data pero di ko pa napapagana. If mapapagana mu -->
-<!--
-    <div class="mb-3 mt-5 mx-40">
-        <div class="relative mb-5 flex w-full flex-wrap items-stretch">
-            <input
-            id="datatable-search-input"
-            type="search"
-            class="relative m-0 -mr-0.5 block w-[1px] min-w-0 flex-auto rounded border border-solid border-neutral-300 bg-transparent bg-clip-padding px-3 py-[0.25rem] text-base font-normal leading-[1.6] text-neutral-700 outline-none transition duration-200 ease-in-out focus:z-[3] focus:border-primary focus:text-neutral-700 focus:shadow-[inset_0_0_0_1px_rgb(59,113,202)] focus:outline-none dark:border-neutral-600 dark:text-neutral-200 dark:placeholder:text-neutral-200 dark:focus:border-primary"
-            placeholder="Search"
-            aria-label="Search"
-            aria-describedby="button-addon1" />
-        </div>
-    </div>
-    <div id="datatable"></div>
-
-    <script>
-        import {
-    Datatable,
-    initTE,
-  } from "tw-elements";
-
-  initTE({ Datatable });
-
-  const data = {
-    columns: [
-      { label: 'Name', field: 'name' },
-      { label: 'location', field: 'address' },
-      { label: 'Severity', field: 'severity' },
-      { label: 'Urgency', field: 'urgency' },
-      { label: 'Photo', field: 'photo' },
-      { label: 'Status', field: 'status' },
-    ],
-    rows: [
-        @foreach($reports as $report)
-        [
-            "{{ $report->name }}",
-            "{{ $report->address }}",
-            "{{ $report->severity }}"
-            "{{ $report->urgency }}",
-            "{{ $report->photo }}",
-            "{{ $report->status }}",
-        ],
-        @endforeach
-    ],
-  };
-  
-  const instance = new Datatable(document.getElementById('datatable'), data)
-  
-  document.getElementById('datatable-search-input').addEventListener('input', (e) => {
-    instance.search(e.target.value);
-  });
-    </script>
--->
 
 <div class="max-w-2xl mx-auto">
+    <div class="flex justify-between items-center">
+        <h1 class="font-josefinsans font-bold flex-grow text-4xl font-normal leading-none tracking-tight font-poppins text-primary"><span class="font-josefinsans font-bold underline underline-offset-3 decoration-7 decoration-secondary">{{ __('app.total') }}:<small> {{ $reports->total() }} Reports </small></h1>
+    </div>
 
-<div class="relative overflow-x-auto shadow-md sm:rounded-lg">
+<div class="mb-20 relative overflow-x-auto shadow-md sm:rounded-lg">
     <div class="p-4">
         <label for="table-search" class="sr-only">Search</label>
         <div class="relative mt-1">
@@ -222,7 +171,7 @@
             <button class="bg-primary text-white p-2 rounded hover:bg-secondary m-2 font-bold py-2 px-4 rounded">
                 Create New Report
             </button></a>
-        </div>
+            </div>
 
         </div>
         </div>
@@ -255,9 +204,7 @@
                 </tr>
             </thead>
             <tbody>
-
-                   @foreach($reports as $key => $report)
-
+                @foreach($reports as $key => $report)
                 <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
                     <td class="px-6 py-4">
                         {{ $reports->firstItem() + $key }}
@@ -282,15 +229,13 @@
                          </a>
                     </td>
                 </tr>
-@endforeach
+                @endforeach
             </tbody>
         </table>
             <div class="card-body">{{ $reports->appends(Request::except('page'))->render() }}</div>
     </div>
-
     <script src="https://unpkg.com/flowbite@1.3.4/dist/flowbite.js"></script>
 </div>
 </div>
 
-<br><br>
 @endsection
