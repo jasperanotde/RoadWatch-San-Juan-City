@@ -3,9 +3,8 @@
 @section('title', __('report.edit'))
 
 @section('content')
-<br><br><br><br><br>
 
-<div class="flex justify-center">
+<div class="flex justify-center m-20">
     <div class="flex w-full max-w-screen-xl">
         <!-- Left Side (Form) -->
         <div class="w-1/2 p-4">
@@ -13,11 +12,11 @@
                 @if (request('action') == 'delete' && $report)
                     @can('delete', $report)
                     <div class="bg-white rounded-lg shadow-md p-4">
-    <div class="bg-blue-500 text-white py-2 px-4 text-center font-semibold">{{ __('report.delete') }}</div>
+    <div class="bg-secondary text-white py-2 px-4 text-center font-semibold">{{ __('report.delete') }}</div>
     <div class="p-4">
-        <label class="text-blue-600 font-semibold">Report Name</label>
+        <label class="text-primary font-semibold">Report Name</label>
         <p>{{ $report->name }}</p>
-        <label class="text-blue-600 font-semibold">{{ __('report.address') }}</label>
+        <label class="text-primary font-semibold">{{ __('report.address') }}</label>
         <p>{{ $report->address }}</p>
         {!! $errors->first('report_id', '<span class="text-red-500" role="alert">:message</span>') !!}
     </div>
@@ -40,12 +39,11 @@
         <a href="{{ route('reports.edit', $report) }}" class="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg ml-2">{{ __('app.cancel') }}</a>
     </div>
 </div>
-
                     @endcan
                 @else
-                    <div class="card">
+                    <div class="card p-4">
                         <div class="card-header">
-                            <h1 class="text-2xl font-bold text-indigo-700">{{ __('report.edit') }}</h1>
+                            <h1 class="text-2xl font-bold text-primary">{{ __('report.edit') }}</h1>
                         </div>
                         <form
                             method="POST"
@@ -84,7 +82,7 @@
                                     @enderror
                                 </div>
 
-                                <div class="flex space-x-4 mb-4">
+                                <div class="flex space-x-4 mb-4 hidden">
                                     <div class="w-1/2">
                                         <label for="latitude" class="block text-sm font-medium text-gray-600">{{ __('report.latitude') }}</label>
                                         <input
@@ -179,16 +177,13 @@
                                         <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
                                     @enderror
                                 </div>
-
-                                <div id="mapid" class="h-80"></div>
                             </div>
 
                             <div class="card-footer">
                                 <input type="submit" value="{{ __('report.update') }}" class="px-4 py-2 bg-green-500 text-white rounded-full hover:bg-green-600">
-                                <a href="{{ route('reports.show', $report) }}" class="text-indigo-700 hover:underline ">{{ __('app.cancel') }}</a>
-
+                                <a href="{{ route('reports.show', $report) }}" class="text-indigo-700 hover:underline float-right mx-5">{{ __('app.cancel') }}</a>
                                 @can('delete', $report)
-                                    <a href="{{ route('reports.edit', [$report, 'action' => 'delete']) }}" id="del-report-{{ $report->id }}" class="text-red-700 hover:underline float-right">{{ __('app.delete') }}</a>
+                                    <a href="{{ route('reports.edit', [$report, 'action' => 'delete']) }}" id="del-report-{{ $report->id }}" class="text-red-700 hover:underline float-right mx-5">{{ __('app.delete') }}</a>
                                 @endcan
                             </div>
                         </form>
@@ -200,8 +195,8 @@
         <!-- Right Side (Map) -->
         <div class="w-1/2 p-4">
             <div class="border rounded-lg shadow-lg p-6">
-                <h2 class="text-xl font-bold text-indigo-700">{{ trans('report.location') }}</h2>
-                <div class="mt-4" id="mapid"></div>
+                <h2 class="text-xl font-bold text-primary">{{ trans('report.location') }}</h2>
+                <div class="mt-4 z-0" id="mapid"></div>
             </div>
         </div>
     </div>
@@ -209,9 +204,9 @@
 
 
 @section('styles')
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.3.1/dist/leaflet.css"
-    integrity="sha512-Rksm5RenBEKSKFjgI3a41vrjkw4EVPlJ3+OiI65vTjIdo9brlAacEuKOiQ5OFh7cOI1bkDwLqdLw3Zg0cRJAAQ=="
-    crossorigin=""/>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+        crossorigin=""/>
 
 <style>
     #mapid { height: 300px; }
@@ -219,9 +214,11 @@
 @endsection
 
 @push('scripts')
-<script src="https://unpkg.com/leaflet@1.3.1/dist/leaflet.js"
-    integrity="sha512-/Nsx9X4HebavoBvEBuyp3I7od5tA0UzAxs+j83KgC8PU0kgB4XiK4Lfe4y4cgBtaRJQEIFCW+oC506aPT2L1zw=="
-    crossorigin=""></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+            integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+            crossorigin=""></script>
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
 <script>
     var mapCenter = [{{ $report->latitude }}, {{ $report->longitude }}];
     var map = L.map('mapid').setView(mapCenter, {{ config('leaflet.detail_zoom_level') }});
@@ -230,29 +227,51 @@
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
     }).addTo(map);
 
-    var marker = L.marker(mapCenter).addTo(map);
-    function updateMarker(lat, lng) {
+    // This is for the pin of the report
+    // Get the image URL from the URL parameters
+    var imageUrl = '{{ request()->query('image') }}';
+
+    // Create the custom icon
+    var customIcon = L.icon({
+        iconUrl: imageUrl, // Replace with your custom icon image URL
+        iconSize: [35, 35], // Customize icon size if needed
+    });
+
+    // Add CSS classes and styles to the custom icon
+    customIcon.options.className = 'custom-pin'; // Add your custom CSS class
+    customIcon.options.iconSize = [35, 35]; // Modify icon size
+
+    var marker = L.marker(mapCenter, { icon: customIcon }).addTo(map);
+    function updateMarker(lat, lng, address) {
         marker
         .setLatLng([lat, lng])
-        .bindPopup("Your location :  " + marker.getLatLng().toString())
+        .bindPopup("Your location :  " + address)
         .openPopup();
         return false;
     };
 
-    map.on('click', function(e) {
-        let latitude = e.latlng.lat.toString().substring(0, 15);
-        let longitude = e.latlng.lng.toString().substring(0, 15);
-        $('#latitude').val(latitude);
-        $('#longitude').val(longitude);
-        updateMarker(latitude, longitude);
-    });
+    var geocoder = L.Control.Geocoder.nominatim();
 
-    var updateMarkerByInputs = function() {
-        return updateMarker( $('#latitude').val() , $('#longitude').val());
-    }
-    $('#latitude').on('input', updateMarkerByInputs);
-    $('#longitude').on('input', updateMarkerByInputs);
-    
+map.on('click', function(e) {
+  let latitude = e.latlng.lat.toString().substring(0, 15);
+  let longitude = e.latlng.lng.toString().substring(0, 15);
+
+    geocoder.reverse(e.latlng, map.options.crs.scale(map.getZoom()), function(results) {
+    let address = results[0] ? results[0].name : "Address not found";
+      $('#address').val(address);
+      $('#latitude').val(latitude);
+      $('#longitude').val(longitude);
+      updateMarker(latitude, longitude, address);
+  });
+});
+
+var updateMarkerByInputs = function() {
+    return updateMarker( $('#latitude').val() , $('#longitude').val() , $('#address').val(address) );
+}
+$('#latitude').on('input', updateMarkerByInputs);
+$('#longitude').on('input', updateMarkerByInputs);
+$('#address').on('input', updateMarkerByInputs);
+
 </script>
 @endpush
 @endsection

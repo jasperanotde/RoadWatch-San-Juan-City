@@ -5,7 +5,7 @@
 @section('content')
 <div class="mx-20">
     <section class="mx-20">
-        <div class="mt-20 mb-10 relative rounded" id="mapid">
+        <div class="mt-20 mb-10 relative rounded z-0" id="mapid">
             <button class="absolute bottom-0 bg-primary text-white p-2 rounded hover:bg-secondary m-2 z-[1000]" id="myButton">My Location</button>
         </div> 
     </section>
@@ -40,111 +40,119 @@
                 attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
             }).addTo(map);
 
-                L.Control.geocoder().addTo(map);
-                if (!navigator.geolocation) {
-                    console.log("Your browser doesn't support geolocation feature!")
-                } else {
-                    setInterval(() => {
-                        navigator.geolocation.getCurrentPosition(getPosition)
-                    }, 5000);
-                };
+            L.Control.geocoder().addTo(map);
+            if (!navigator.geolocation) {
+                console.log("Your browser doesn't support geolocation feature!")
+            } else {
+                setInterval(() => {
+                    navigator.geolocation.getCurrentPosition(getPosition)
+                }, 5000);
+            };
 
-                // Getting user location and max radius (500 meter)
-                var marker, circle, lat, long, accuracy;
-                var featureGroup;
+            // Getting user location and max radius (500 meter)
+            var marker, circle, lat, long, accuracy;
+            var featureGroup;
 
-                function getPosition(position) {
-                    lat = position.coords.latitude
-                    long = position.coords.longitude
-                    accuracy = position.coords.accuracy
+            function getPosition(position) {
+                lat = position.coords.latitude
+                long = position.coords.longitude
+                accuracy = position.coords.accuracy
 
-                    if (marker) {
-                        map.removeLayer(marker)
-                    }
-
-                    if (circle) {
-                        map.removeLayer(circle)
-                    }
-
-                    marker = L.marker([lat, long])
-                    circle = L.circle([lat, long], { radius: 500 })
-
-                    featureGroup = L.featureGroup([marker, circle]).addTo(map)
-                    console.log("Your coordinate is: Lat: " + lat + " Long: " + long + " Accuracy: " + accuracy)
-
-                    // Set a custom zoom level when getting user's location
-                    // map.setView([lat, long], 10); // Adjust the zoom level (15 in this example)
+                if (marker) {
+                    map.removeLayer(marker)
                 }
 
-                //Get back to user location
-                document.getElementById('myButton').addEventListener('click', function() {
-                        if(featureGroup) {
-                            map.fitBounds(featureGroup.getBounds())
-                        }
-                        event.stopPropagation();
-                    });
+                if (circle) {
+                    map.removeLayer(circle)
+                }
+
+                marker = L.marker([lat, long])
+                circle = L.circle([lat, long], { radius: 500 })
+
+                featureGroup = L.featureGroup([marker, circle]).addTo(map)
+                console.log("Your coordinate is: Lat: " + lat + " Long: " + long + " Accuracy: " + accuracy)
+
+                // Set a custom zoom level when getting user's location
+                // map.setView([lat, long], 10); // Adjust the zoom level (15 in this example)
+            }
+
+            //Get back to user location
+            document.getElementById('myButton').addEventListener('click', function() {
+                    if(featureGroup) {
+                        map.fitBounds(featureGroup.getBounds())
+                    }
+                    event.stopPropagation();
+                });
         
             var markers = L.markerClusterGroup();
             axios.get('{{ route('api.reports.index') }}')
-            .then(function (response) {
-                var marker = L.geoJSON(response.data, {
-                    pointToLayer: function(geoJsonPoint, latlng) {
-                        return L.marker(latlng).bindPopup(function (layer) {
-                            // Stil modifying the opacity/transparency of the popup content's background
-                            var popupContent = '<div class="opacity-100">' +  layer.feature.properties.map_popup_content + '</div>';
-                            return popupContent;
-                        });
-                    }
+                .then(function (response) {
+
+            var geojsonFeatures = response.data.features;
+
+            geojsonFeatures.forEach(function (feature) {
+                var customIcon = L.icon({
+                    iconUrl: feature.properties.photo, // Use the 'photo' field for the image URL
+                    iconSize: [25, 25], // Customize icon size if needed
                 });
-                markers.addLayer(marker);
-            })
-            .catch(function (error) {
-                console.log(error);
-            });
-            map.addLayer(markers);
 
-            // Sattelite layer
-            var satelliteLayer = L.tileLayer('http://mt0.google.com/vt/lyrs=s&hl=en&x={x}&y={y}&z={z}', {
-                maxZoom: 20,
-                subdomains: ['mt0', 'mt1', 'mt2', 'mt3']
-            });
-            var baseMaps = {
-                "Street": L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'),
-                "Satellite": satelliteLayer
-            };
-            L.control.layers(baseMaps).addTo(map);
+            // Add CSS classes and styles to the custom icon
+            customIcon.options.className = 'custom-pin'; // Add your custom CSS class
+            customIcon.options.iconSize = [35, 35]; // Modify icon size
 
-            // Manually Pin on Map to create report
-            @can('create', new App\Models\Report)
-            var theMarker;
-            var geocoder = L.Control.Geocoder.nominatim();
+            var marker = L.marker([feature.geometry.coordinates[1], feature.geometry.coordinates[0]], { icon: customIcon })
+                .bindPopup(feature.properties.map_popup_content);
+            markers.addLayer(marker);
+        });
+    })
+    .catch(function (error) {
+        console.log(error);
+    });
 
-            map.on('click', function(e) {
-                let latitude = e.latlng.lat.toString().substring(0, 15);
-                let longitude = e.latlng.lng.toString().substring(0, 15);
+    map.addLayer(markers);
 
-                if (theMarker != undefined) {
+    // Sattelite layer
+    var satelliteLayer = L.tileLayer('http://mt0.google.com/vt/lyrs=s&hl=en&x={x}&y={y}&z={z}', {
+        maxZoom: 20,
+        subdomains: ['mt0', 'mt1', 'mt2', 'mt3']
+    });
+    var baseMaps = {
+        "Street": L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'),
+        "Satellite": satelliteLayer
+    };
+    L.control.layers(baseMaps).addTo(map);
+
+    // Manually Pin on Map to create report
+    @can('create', new App\Models\Report)
+    var theMarker;
+    var geocoder = L.Control.Geocoder.nominatim();
+
+    map.on('click', function(e) {
+        let latitude = e.latlng.lat.toString().substring(0, 15);
+        let longitude = e.latlng.lng.toString().substring(0, 15);
+
+        if (theMarker != undefined) {
+            map.removeLayer(theMarker);
+        }
+
+        geocoder.reverse(e.latlng, map.options.crs.scale(map.getZoom()), function(results) {
+        var address = results[0] ? results[0].name : "Address not found";
+        var popupContent = "Your location: " + address;
+        popupContent += '<br><a href="{{ route('reports.create') }}?latitude=' + latitude + '&longitude=' + longitude + 
+        '&address=' + address + '">Add new report here</a>';
+
+        theMarker = L.marker(e.latlng).addTo(map);
+        theMarker.bindPopup(popupContent).openPopup();
+
+        // Remove the marker after 5 seconds
+            setTimeout(function() {
+                if (theMarker) {
                     map.removeLayer(theMarker);
                 }
-
-                geocoder.reverse(e.latlng, map.options.crs.scale(map.getZoom()), function(results) {
-                var address = results[0] ? results[0].name : "Address not found";
-                var popupContent = "Your location: " + address;
-                popupContent += '<br><a href="{{ route('reports.create') }}?latitude=' + latitude + '&longitude=' + longitude + 
-                '&address=' + address + '">Add new report here</a>';
-
-                theMarker = L.marker(e.latlng).addTo(map);
-                theMarker.bindPopup(popupContent).openPopup();
-
-                // Remove the marker after 5 seconds
-                    setTimeout(function() {
-                        if (theMarker) {
-                            map.removeLayer(theMarker);
-                        }
-                    }, 5000);
-                });
-            });
-            @endcan
+            }, 5000);
+        });
+    });
+    @endcan
         </script>
     @endpush
 
@@ -225,7 +233,7 @@
                         <img src="{{ asset($report->photo) }}" width= '50' height='50' class="img img-responsive" />
                     </td>
                     <td class="px-6 py-4">
-                         <a href="{{ route('reports.show', $report) }}" id="show-report-{{ $report->id }}">										{{ __('app.show') }}
+                         <a href="{{ route('reports.show', ['report' => $report, 'image' => $report->getPhoto()]) }}" id="show-report-{{ $report->id }}">										{{ __('app.show') }}
                          </a>
                     </td>
                 </tr>

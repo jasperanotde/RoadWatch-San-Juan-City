@@ -122,7 +122,13 @@ class Report extends Model
          // Display the image using an <img> tag
          if ($this->photo) {
             $imagePath = asset($this->photo); // Replace with the actual path
-            $mapPopupContent .= '<div class="my-2 w-auto h-26 rounded text-center"><img src="'.$imagePath.'" alt="Report Photo"></div>';
+            // Add custom styling with Tailwind CSS classes
+        $mapPopupContent .= '<div class="p-4 border rounded-lg bg-white shadow">';
+        $mapPopupContent .= '<div class="relative w-32 h-32 mx-auto">';
+        $mapPopupContent .= '<div class="absolute w-4 h-4 -bottom-2 left-1/2 transform -translate-x-2 bg-white border-t-2 border-l-2 border-gray-300 rotate-45"></div>';
+        $mapPopupContent .= '<img src="'.$imagePath.'" alt="Report Photo" class="rounded-lg w-full h-full object-cover">';
+        $mapPopupContent .= '</div>';
+        $mapPopupContent .= '</div>';
         }
 
         $mapPopupContent .= '<div class="my-2 text-slate-800"><strong>'.__('report.address').':</strong><br>'.$this->address.'</div>';

@@ -66,6 +66,7 @@ class ReportController extends Controller
         return redirect()->route('reports.show', $report);
     }
 
+
     /**
      * Display the specified report.
      *

@@ -3,8 +3,7 @@
 @section('title', __('report.detail'))
 
 @section('content')
-<br><br><br><br><br>
-<div class="flex justify-center">
+<div class="flex justify-center m-20">
     <div class="flex w-full max-w-screen-xl">
         <!-- Left Side (Report Details) -->
         <div class="w-1/2 p-4">
@@ -46,10 +45,10 @@
                 </table>
                 <div class="mt-4">
                     @can('update', $report)
-                        <a href="{{ route('reports.edit', $report) }}" id="edit-report-{{ $report->id }}" class="px-4 py-2 bg-primary text-white rounded-full mr-2">Edit Report</a>
+                        <a href="{{ route('reports.edit', ['report' => $report, 'image' => $report->getPhoto()]) }}" id="edit-report-{{ $report->id }}" class="px-4 py-2 bg-primary text-white rounded-full mr-2">Edit Report</a>
                     @endcan
                     @if(auth()->check())
-                        <a href="{{ route('reports.index') }}" class="text-indigo-700 hover:underline">Back to Reports</a>
+                        <a href="{{ route('reports.index') }}" class="text-indigo-700 hover:underline float-right">Back to Reports</a>
                     @else
                         <a href="{{ route('report_map.index') }}" class="text-indigo-700 hover:underline">{{ __('report.back_to_index') }}</a>
                     @endif
@@ -60,9 +59,9 @@
         <!-- Right Side (Map) -->
         <div class="w-1/2 p-4">
             <div class="border rounded-lg shadow-lg p-6">
-                <h1 class="text-xl font-bold text-indigo-700">{{ trans('report.location') }}</h1>
+                <h1 class="text-xl font-bold text-primary">{{ trans('report.location') }}</h1>
                 @if ($report->coordinate)
-                    <div id="mapid" class="h-80"></div>
+                    <div id="mapid" class="h-80 z-0"></div>
                 @else
                     <p>{{ __('report.no_coordinate') }}</p>
                 @endif
@@ -74,9 +73,9 @@
 @endsection
 
 @section('styles')
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.3.1/dist/leaflet.css"
-    integrity="sha512-Rksm5RenBEKSKFjgI3a41vrjkw4EVPlJ3+OiI65vTjIdo9brlAacEuKOiQ5OFh7cOI1bkDwLqdLw3Zg0cRJAAQ=="
-    crossorigin=""/>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+        crossorigin=""/>
 
 <!-- map syle (please move it to the css public folder) -->
 <style>
@@ -87,18 +86,70 @@
 @push('scripts')
 
 <!-- Make sure you put this AFTER Leaflet's CSS -->
-<script src="https://unpkg.com/leaflet@1.3.1/dist/leaflet.js"
-    integrity="sha512-/Nsx9X4HebavoBvEBuyp3I7od5tA0UzAxs+j83KgC8PU0kgB4XiK4Lfe4y4cgBtaRJQEIFCW+oC506aPT2L1zw=="
-    crossorigin=""></script>
-
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+        crossorigin=""></script>
+        <script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 <script>
+    
     var map = L.map('mapid').setView([{{ $report->latitude }}, {{ $report->longitude }}], {{ config('leaflet.detail_zoom_level') }});
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
     }).addTo(map);
 
-    L.marker([{{ $report->latitude }}, {{ $report->longitude }}]).addTo(map)
+    // Getting user location and max radius (500 meter)
+    if (!navigator.geolocation) {
+        console.log("Your browser doesn't support geolocation feature!")
+    } else {
+        setInterval(() => {
+            navigator.geolocation.getCurrentPosition(getPosition)
+        }, 5000);
+    };
+
+    var marker, circle, lat, long, accuracy;
+    var featureGroup;
+    function getPosition(position) {
+        lat = position.coords.latitude
+        long = position.coords.longitude
+        accuracy = position.coords.accuracy
+
+        if (marker) {
+            map.removeLayer(marker)
+        }
+
+        if (circle) {
+            map.removeLayer(circle)
+        }
+
+        marker = L.marker([lat, long])
+        circle = L.circle([lat, long], { radius: 500 })
+
+        featureGroup = L.featureGroup([marker, circle]).addTo(map)
+        console.log("Your coordinate is: Lat: " + lat + " Long: " + long + " Accuracy: " + accuracy)
+
+        // Set a custom zoom level when getting user's location
+        // map.setView([lat, long], 10); // Adjust the zoom level (15 in this example)
+    }
+
+    // This is for the pin of the report
+    // Get the image URL from the URL parameters
+    var imageUrl = '{{ request()->query('image') }}';
+
+    // Create the custom icon
+    var customIcon = L.icon({
+        iconUrl: imageUrl, // Replace with your custom icon image URL
+        iconSize: [35, 35], // Customize icon size if needed
+    });
+
+    // Add CSS classes and styles to the custom icon
+    customIcon.options.className = 'custom-pin'; // Add your custom CSS class
+    customIcon.options.iconSize = [35, 35]; // Modify icon size
+
+    // Create the marker using the custom icon and add it to the map
+    var reportMarker = L.marker([{{ $report->latitude }}, {{ $report->longitude }}], { icon: customIcon })
+        .addTo(map)
         .bindPopup('{!! $report->map_popup_content !!}');
 </script>
 @endpush

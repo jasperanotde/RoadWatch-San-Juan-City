@@ -38,9 +38,8 @@
           {!! $errors->first('address', '<span class="text-red-500 text-sm">:message</span>') !!}
         </div>
       </div>
-      
-      <!-- <div class="flex ml-2">
-            // Latitude Field
+
+      <div class="flex ml-2 hidden">
             <div class="flex-1 pr-2">
               <div class="form-group">
                 <label for="latitude" class="control-label">{{ __('report.latitude') }}</label>
@@ -49,7 +48,6 @@
               </div>
             </div>
 
-            // Longitude Field
             <div class="flex-1 pl-2">
               <div class="form-group">
                 <label for="longitude" class="control-label">{{ __('report.longitude') }}</label>
@@ -57,7 +55,7 @@
                 {!! $errors->first('longitude', '<span class="invalid-feedback" role="alert">:message</span>') !!}
               </div>
             </div>
-          </div> -->
+          </div>
 
       <div class="p-2 w-full">
         <div class="relative">
@@ -127,7 +125,7 @@
     <div class="w-1/2 p-4">
       <div class="border rounded-lg shadow-lg p-6">
         <h2 class="text-xl font-bold text-indigo-700">{{ trans('report.location') }}</h2>
-        <div class="mt-4" id="mapid"></div>
+        <div class="mt-4 z-0" id="mapid"></div>
       </div>
     </div>
   </div>
@@ -149,7 +147,7 @@
 @push('scripts')
 <!-- Make sure you put this AFTER Leaflet's CSS -->
 
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
         integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
         crossorigin=""></script>
@@ -176,19 +174,20 @@
     var geocoder = L.Control.Geocoder.nominatim();
 
     map.on('click', function(e) {
+      let latitude = e.latlng.lat.toString().substring(0, 15);
+      let longitude = e.latlng.lng.toString().substring(0, 15);
+
         geocoder.reverse(e.latlng, map.options.crs.scale(map.getZoom()), function(results) {
-        var address = results[0] ? results[0].name : "Address not found";
-        let latitude = e.latlng.lat.toString().substring(0, 15);
-        let longitude = e.latlng.lng.toString().substring(0, 15);
-        $('#latitude').val(latitude);
-        $('#longitude').val(longitude);
-        $('#address').val(address);
-        updateMarker(latitude, longitude, address);
+        let address = results[0] ? results[0].name : "Address not found";
+          $('#address').val(address);
+          $('#latitude').val(latitude);
+          $('#longitude').val(longitude);
+          updateMarker(latitude, longitude, address);
       });
     });
 
     var updateMarkerByInputs = function() {
-        return updateMarker( $('#latitude').val() , $('#longitude').val() , $('#address').val(address));
+        return updateMarker( $('#latitude').val() , $('#longitude').val() , $('#address').val(address) );
     }
     $('#latitude').on('input', updateMarkerByInputs);
     $('#longitude').on('input', updateMarkerByInputs);
