@@ -161,10 +161,45 @@
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
     }).addTo(map);
 
-    var marker = L.marker(mapCenter).addTo(map);
+      if (!navigator.geolocation) {
+          console.log("Your browser doesn't support geolocation feature!")
+      } else {
+          setInterval(() => {
+              navigator.geolocation.getCurrentPosition(getPosition)
+          }, 5000);
+      };
+
+      // Getting user location and max radius (500 meter)
+      var marker, circle, lat, long, accuracy;
+      var featureGroup;
+
+      function getPosition(position) {
+          lat = position.coords.latitude
+          long = position.coords.longitude
+          accuracy = position.coords.accuracy
+
+          if (marker) {
+              map.removeLayer(marker)
+          }
+
+          if (circle) {
+              map.removeLayer(circle)
+          }
+
+          marker = L.marker([lat, long])
+          circle = L.circle([lat, long], { radius: 500 })
+
+          featureGroup = L.featureGroup([marker, circle]).addTo(map)
+          console.log("Your coordinate is: Lat: " + lat + " Long: " + long + " Accuracy: " + accuracy)
+
+          // Set a custom zoom level when getting user's location
+          // map.setView([lat, long], 10); // Adjust the zoom level (15 in this example)
+      }
+
+  var newPinMarker = L.marker(mapCenter).addTo(map);
 
     function updateMarker(lat, lng, address) {
-        marker
+      newPinMarker
         .setLatLng([lat, lng])
         .bindPopup("Your location :  " + address)
         .openPopup();

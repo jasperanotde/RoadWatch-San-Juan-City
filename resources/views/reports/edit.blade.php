@@ -227,6 +227,46 @@
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
     }).addTo(map);
 
+    var circle, lat, long, accuracy;
+    var featureGroup;
+    var customPopup = L.popup({ closeButton: false }); // Create the custom popup
+
+    function getPosition(position) {
+        lat = position.coords.latitude;
+        long = position.coords.longitude;
+        accuracy = position.coords.accuracy;
+
+        if (customPopup) {
+            map.removeLayer(customPopup);
+        }
+
+        if (circle) {
+            map.removeLayer(circle);
+        }
+
+        // Set the content of the custom popup
+        var customPopupContent = '<div class="custom-popup">Current Location</div>';
+        customPopup.setLatLng([lat, long]).setContent(customPopupContent);
+        circle = L.circle([lat, long], { radius: 500 });
+
+        // Add the custom popup to the map
+        featureGroup = L.featureGroup([customPopup, circle]).addTo(map);
+
+        console.log("Your coordinate is: Lat: " + lat + " Long: " + long + " Accuracy: " + accuracy);
+
+        // Set a custom zoom level when getting user's location
+        // map.setView([lat, long], 10); // Adjust the zoom level (15 in this example)
+    }
+
+    // Getting user location and max radius (500 meter)
+    if (!navigator.geolocation) {
+        console.log("Your browser doesn't support geolocation feature!")
+    } else {
+        setInterval(() => {
+            navigator.geolocation.getCurrentPosition(getPosition)
+        }, 5000);
+    };
+
     // This is for the pin of the report
     // Get the image URL from the URL parameters
     var imageUrl = '{{ request()->query('image') }}';
@@ -241,9 +281,9 @@
     customIcon.options.className = 'custom-pin'; // Add your custom CSS class
     customIcon.options.iconSize = [35, 35]; // Modify icon size
 
-    var marker = L.marker(mapCenter, { icon: customIcon }).addTo(map);
+    var reportMarker = L.marker(mapCenter, { icon: customIcon }).addTo(map);
     function updateMarker(lat, lng, address) {
-        marker
+        reportMarker
         .setLatLng([lat, lng])
         .bindPopup("Your location :  " + address)
         .openPopup();
