@@ -47,8 +47,8 @@
                                     aria-expanded="false"
                                     data-te-ripple-init
                                     data-te-ripple-color="light">
-                                    {{ __('Admin') }} {{ Auth::user()->name }}
-                                    <span class="ml-2 w-2"> <!-- {{ __('Admin') }} -- Still for configuration. Goal: Get the name ADMIN from DB -->
+                                    {{ Auth::user()->name }}
+                                    <span class="ml-2 w-2">
                                         <svg
                                             xmlns="http://www.w3.org/2000/svg"
                                             viewBox="0 0 20 20"
@@ -73,16 +73,16 @@
                                     </li>
                                     <li>
                                         <a class="block w-full whitespace-nowrap bg-transparent px-4 py-2 text-sm font-normal text-neutral-700 hover:bg-neutral-100 active:text-neutral-800 active:no-underline disabled:pointer-events-none disabled:bg-transparent disabled:text-neutral-400 dark:text-neutral-200 dark:hover:bg-neutral-600"
-                                            href="#"
+                                            href="{{ route('users.index') }}"
                                             data-te-dropdown-item-ref>
-                                            User Management </a>
+                                            Manage Users </a>
                                     </li>
                                     <li>
                                         <a
                                             class="block w-full whitespace-nowrap bg-transparent px-4 py-2 text-sm font-normal text-neutral-700 hover:bg-neutral-100 active:text-neutral-800 active:no-underline disabled:pointer-events-none disabled:bg-transparent disabled:text-neutral-400 dark:text-neutral-200 dark:hover:bg-neutral-600"
-                                            href="#"
+                                            href="{{ route('roles.index') }}"
                                             data-te-dropdown-item-ref>
-                                            Setting </a>
+                                            Manage Roles </a>
                                     </li>
                                     <hr class="my-2 h-0 border border-t-0 border-solid border-neutral-700 opacity-25 dark:border-neutral-200" />
                                     <li>

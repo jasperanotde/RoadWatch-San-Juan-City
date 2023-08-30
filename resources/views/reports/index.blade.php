@@ -161,89 +161,88 @@
         <h1 class="font-josefinsans font-bold flex-grow text-4xl font-normal leading-none tracking-tight font-poppins text-primary"><span class="font-josefinsans font-bold underline underline-offset-3 decoration-7 decoration-secondary">{{ __('app.total') }}:<small> {{ $reports->total() }} Reports </small></h1>
     </div>
 
-<div class="mb-20 relative overflow-x-auto shadow-md sm:rounded-lg">
-    <div class="p-4">
-        <label for="table-search" class="sr-only">Search</label>
-        <div class="relative mt-1">
-            <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                <svg class="w-5 h-5 text-gray-500 dark:text-gray-400" fill="currentColor" viewBox="0 0 20 20"
-                    xmlns="http://www.w3.org/2000/svg">
-                    <path fill-rule="evenodd"
-                        d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
-                        clip-rule="evenodd"></path>
-                </svg>
-            </div>
-            <input type="text" id="table-search" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-80 pl-10 p-2.5  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Search for items">
-            <div class="absolute top-0 right-0  ml-4">
-                <a href="{{ route('reports.create') }}">
-            <button class="bg-primary text-white p-2 rounded hover:bg-secondary m-2 font-bold py-2 px-4 rounded">
-                Create New Report
-            </button></a>
-            </div>
+    <div class="mb-20 relative overflow-x-auto shadow-md sm:rounded-lg">
+        <div class="p-4">
+            <label for="table-search" class="sr-only">Search</label>
+            <div class="relative mt-1">
+                <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                    <svg class="w-5 h-5 text-gray-500 dark:text-gray-400" fill="currentColor" viewBox="0 0 20 20"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path fill-rule="evenodd"
+                            d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
+                            clip-rule="evenodd"></path>
+                    </svg>
+                </div>
+                <input type="text" id="table-search" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-80 pl-10 p-2.5  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Search for items">
+                <div class="absolute top-0 right-0  ml-4">
+                    <a href="{{ route('reports.create') }}">
+                <button class="bg-primary text-white p-2 rounded hover:bg-secondary m-2 font-bold py-2 px-4 rounded">
+                    Create New Report
+                </button></a>
+                </div>
 
-        </div>
-        </div>
-        <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
-            <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-                <tr>
-                    
-                <th scope="col" class="px-6 py-3">
-                        {{ __('app.table_no') }}
-                    </th>
+            </div>
+            </div>
+            <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+                <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                    <tr>
+                        
                     <th scope="col" class="px-6 py-3">
-                        Report Name
-                    </th>
-                    <th scope="col" class="px-6 py-3">
-                        {{ __('report.address') }}
-                    </th>
-                    <th scope="col" class="px-6 py-3">
-                        Severity
-                    </th>
-                    <th scope="col" class="px-6 py-3">
-                        Urgency
-                    </th>
-                    <th scope="col" class="px-6 py-3">
-                        Photo
-                    </th>
+                            {{ __('app.table_no') }}
+                        </th>
+                        <th scope="col" class="px-6 py-3">
+                            Report Name
+                        </th>
+                        <th scope="col" class="px-6 py-3">
+                            {{ __('report.address') }}
+                        </th>
+                        <th scope="col" class="px-6 py-3">
+                            Severity
+                        </th>
+                        <th scope="col" class="px-6 py-3">
+                            Urgency
+                        </th>
+                        <th scope="col" class="px-6 py-3">
+                            Photo
+                        </th>
 
-                    <th scope="col" class="px-6 py-3">
-                       Edit
-                    </th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach($reports as $key => $report)
-                <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
-                    <td class="px-6 py-4">
-                        {{ $reports->firstItem() + $key }}
-                    </td>
-                    <td class="px-6 py-4">
-                        {!! $report->name_link !!}
-                    </td>
-                    <td class="px-6 py-4">
-                        {{ $report->address }}
-                    </td>
-                    <td class="px-6 py-4">
-                        {{ $report->severity }}
-                    </td>
-                    <td class="px-6 py-4">
-                        {{ $report->urgency }}
-                    </td>
-                    <td class="px-6 py-4">
-                        <img src="{{ asset($report->photo) }}" width= '50' height='50' class="img img-responsive" />
-                    </td>
-                    <td class="px-6 py-4">
-                         <a href="{{ route('reports.show', ['report' => $report, 'image' => $report->getPhoto()]) }}" id="show-report-{{ $report->id }}">										{{ __('app.show') }}
-                         </a>
-                    </td>
-                </tr>
-                @endforeach
-            </tbody>
-        </table>
-            <div class="card-body">{{ $reports->appends(Request::except('page'))->render() }}</div>
+                        <th scope="col" class="px-6 py-3">
+                        Edit
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach($reports as $key => $report)
+                    <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
+                        <td class="px-6 py-4">
+                            {{ $reports->firstItem() + $key }}
+                        </td>
+                        <td class="px-6 py-4">
+                            {!! $report->name_link !!}
+                        </td>
+                        <td class="px-6 py-4">
+                            {{ $report->address }}
+                        </td>
+                        <td class="px-6 py-4">
+                            {{ $report->severity }}
+                        </td>
+                        <td class="px-6 py-4">
+                            {{ $report->urgency }}
+                        </td>
+                        <td class="px-6 py-4">
+                            <img src="{{ asset($report->photo) }}" width= '50' height='50' class="img img-responsive" />
+                        </td>
+                        <td class="px-6 py-4">
+                            <a href="{{ route('reports.show', ['report' => $report, 'image' => $report->getPhoto()]) }}" id="show-report-{{ $report->id }}">										{{ __('app.show') }}
+                            </a>
+                        </td>
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table>
+                <div class="card-body">{{ $reports->appends(Request::except('page'))->render() }}</div>
+        </div>
+        <script src="https://unpkg.com/flowbite@1.3.4/dist/flowbite.js"></script>
     </div>
-    <script src="https://unpkg.com/flowbite@1.3.4/dist/flowbite.js"></script>
 </div>
-</div>
-
 @endsection

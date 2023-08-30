@@ -2,17 +2,27 @@
 
 namespace App\Http\Controllers;
 
-
-
-
 use App\Models\Report;
 use App\Http\Controllers\Controller;
-
-
 use Illuminate\Http\Request;
+use Illuminate\View\View;
+use Illuminate\Http\RedirectResponse;
 
 class ReportController extends Controller
 {
+    /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    function __construct()
+    {
+         $this->middleware('permission:report-list|report-create|report-edit|report-delete', ['only' => ['index','show']]);
+         $this->middleware('permission:report-create', ['only' => ['create','store']]);
+         $this->middleware('permission:report-edit', ['only' => ['edit','update']]);
+         $this->middleware('permission:report-delete', ['only' => ['destroy']]);
+    }
+
     public function index()
     {
         $this->authorize('manage_report');

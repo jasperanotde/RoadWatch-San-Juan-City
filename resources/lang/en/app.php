@@ -6,6 +6,7 @@ return [
     'total'             => 'Total',
     'action'            => 'Actions',
     'show_detail_title' => 'View :name :type detail',
+    'role_title'        => 'Role Management',
 
     // Actions
     'show'           => 'View Detail',
