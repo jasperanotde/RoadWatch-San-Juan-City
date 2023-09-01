@@ -2,7 +2,7 @@
 
 @section('content')
 
-<!-- Modal -->
+<!-- Delete Modal -->
 <div id="deleteModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
     <div class="bg-white rounded-lg p-6">
         <p class="mb-4">Are you sure you want to delete this role?</p>
@@ -14,6 +14,18 @@
 </div>
 
 <div class="max-w-2xl mx-auto my-20">
+@if ($message = Session::get('success'))
+    <div class="flex items-center p-4 mb-4 text-sm text-green-800 rounded-lg bg-green-50 dark:bg-gray-800 dark:text-green-400" role="alert">
+        <svg class="flex-shrink-0 inline w-4 h-4 mr-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+            <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z"/>
+        </svg>
+        <span class="sr-only">Info</span>
+        <div>
+            <span class="font-medium">{{ $message }}</span>
+        </div>
+    </div>
+@endif
+
     <div class="my-10 flex justify-between items-center">
         <h1 class="font-josefinsans font-bold flex-grow text-4xl font-normal leading-none tracking-tight font-poppins text-primary"><span class="font-josefinsans font-bold underline underline-offset-3 decoration-7 decoration-secondary">{{ __('app.role_title') }}</h1>
     </div>
@@ -32,25 +44,12 @@
                 </div>
                 <input type="text" id="table-search" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-80 pl-10 p-2.5  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Search for items">
                 <div class="absolute top-0 right-0  ml-4">
-                @can('role-create')
-                    <a href="{{ route('roles.create') }}">
-                <button class="bg-primary text-white p-2 rounded hover:bg-secondary m-2 font-bold py-2 px-4 rounded">
-                    Create New Role
-                </button></a>
-                @endcan
+                    @can('role-create')
+                    <button type="button" data-modal-target="CreateRoleModal" data-modal-toggle="CreateRoleModal" class="bg-primary text-white p-2 rounded hover:bg-secondary m-2 font-bold py-2 px-4 rounded">
+                        Create New Role
+                    </button>
+                    @endcan
                 </div>
-
-                @if ($message = Session::get('success'))
-                    <div class="flex items-center p-4 mb-4 text-sm text-green-800 rounded-lg bg-green-50 dark:bg-gray-800 dark:text-green-400" role="alert">
-                        <svg class="flex-shrink-0 inline w-4 h-4 mr-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
-                            <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z"/>
-                        </svg>
-                        <span class="sr-only">Info</span>
-                        <div>
-                            <span class="font-medium">{{ $message }}</span>
-                        </div>
-                    </div>
-                @endif
             </div>
         </div>
             <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
@@ -99,61 +98,14 @@
                             @endcan
                             
                             @can('role-delete')
-                            <button id="showDeleteModal" class="inline-flex items-center px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded-md"
+                            <button class="inline-flex items-center px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded-md"
                                     data-delete-url="{{ route('roles.destroy', $role->id) }}">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
                                     <path fill-rule="evenodd" d="M16.5 4.478v.227a48.816 48.816 0 013.878.512.75.75 0 11-.256 1.478l-.209-.035-1.005 13.07a3 3 0 01-2.991 2.77H8.084a3 3 0 01-2.991-2.77L4.087 6.66l-.209.035a.75.75 0 01-.256-1.478A48.567 48.567 0 017.5 4.705v-.227c0-1.564 1.213-2.9 2.816-2.951a52.662 52.662 0 013.369 0c1.603.051 2.815 1.387 2.815 2.951zm-6.136-1.452a51.196 51.196 0 013.273 0C14.39 3.05 15 3.684 15 4.478v.113a49.488 49.488 0 00-6 0v-.113c0-.794.609-1.428 1.364-1.452zm-.355 5.945a.75.75 0 10-1.5.058l.347 9a.75.75 0 101.499-.058l-.346-9zm5.48.058a.75.75 0 10-1.498-.058l-.347 9a.75.75 0 001.5.058l.345-9z"/>
                                     </svg>
                                 Delete
                             </button>
-                            <div id="deleteModal" class="hidden">
-                                <!-- Modal content here -->
-                            </div>
-                            <script>
-                                const showDeleteModalButton = document.getElementById('showDeleteModal');
-                                const deleteModal = document.getElementById('deleteModal');
-                                const confirmDeleteButton = document.getElementById('confirmDelete');
-                                const cancelDeleteButton = document.getElementById('cancelDelete');
-                                let deleteForm;
-
-                                const csrfToken = "{{ csrf_token() }}";
-
-                                showDeleteModalButton.addEventListener('click', function() {
-                                    deleteModal.classList.remove('hidden');
-                                    const deleteUrl = this.getAttribute('data-delete-url');
-                                    deleteForm = document.createElement('form');
-                                    deleteForm.setAttribute('method', 'POST'); // Use POST method
-                                    deleteForm.setAttribute('action', deleteUrl);
-                                    deleteForm.setAttribute('style', 'display:inline');
-                                    deleteForm.setAttribute('id', 'delete-form');
-
-                                    // Add CSRF token input field
-                                    const csrfTokenInput = document.createElement('input');
-                                    csrfTokenInput.setAttribute('type', 'hidden');
-                                    csrfTokenInput.setAttribute('name', '_token');
-                                    csrfTokenInput.setAttribute('value', csrfToken); // Use Blade directive to get CSRF token value
-                                    deleteForm.appendChild(csrfTokenInput);
-
-                                    // Add hidden input field to simulate DELETE request
-                                    const methodInput = document.createElement('input');
-                                    methodInput.setAttribute('type', 'hidden');
-                                    methodInput.setAttribute('name', '_method');
-                                    methodInput.setAttribute('value', 'DELETE');
-                                    deleteForm.appendChild(methodInput);
-
-                                    deleteModal.appendChild(deleteForm);
-                                });
-
-                                confirmDeleteButton.addEventListener('click', function(event) {
-                                    event.preventDefault();
-                                    deleteForm.submit();
-                                });
-
-                                cancelDeleteButton.addEventListener('click', function() {
-                                    deleteModal.classList.add('hidden');
-                                });
-                            </script>
-                        @endcan
+                            @endcan
                         </td>
                     </tr>
                     @endforeach
@@ -164,7 +116,50 @@
         <script src="https://unpkg.com/flowbite@1.3.4/dist/flowbite.js"></script>
     </div>
 </div>
-@include('roles.show')
+@include('roles.create')
+<script>
+    const showDeleteModalButton = document.querySelectorAll('[data-delete-url]');
+    const deleteModal = document.getElementById('deleteModal');
+    const confirmDeleteButton = document.getElementById('confirmDelete');
+    const cancelDeleteButton = document.getElementById('cancelDelete');
+    let deleteForm;
+    const csrfToken = "{{ csrf_token() }}";
+    
+    showDeleteModalButton.forEach((button) => {
+        button.addEventListener('click', function() {
+        deleteModal.classList.remove('hidden');
+        const deleteUrl = this.getAttribute('data-delete-url');
+        deleteForm = document.createElement('form');
+        deleteForm.setAttribute('method', 'POST'); // Use POST method
+        deleteForm.setAttribute('action', deleteUrl);
+        deleteForm.setAttribute('style', 'display:inline');
+        deleteForm.setAttribute('id', 'delete-form');
+
+        // Add CSRF token input field
+        const csrfTokenInput = document.createElement('input');
+        csrfTokenInput.setAttribute('type', 'hidden');
+        csrfTokenInput.setAttribute('name', '_token');
+        csrfTokenInput.setAttribute('value', csrfToken); // Use Blade directive to get CSRF token value
+        deleteForm.appendChild(csrfTokenInput);
+
+        // Add hidden input field to simulate DELETE request
+        const methodInput = document.createElement('input');
+        methodInput.setAttribute('type', 'hidden');
+        methodInput.setAttribute('name', '_method');
+        methodInput.setAttribute('value', 'DELETE');
+        deleteForm.appendChild(methodInput);
+
+        deleteModal.appendChild(deleteForm);
+        });
+    });
+
+    confirmDeleteButton.addEventListener('click', function(event) {
+        event.preventDefault();
+        deleteForm.submit();
+    });
+
+    cancelDeleteButton.addEventListener('click', function() {
+        deleteModal.classList.add('hidden');
+    });
+</script>
 @endsection
-
-

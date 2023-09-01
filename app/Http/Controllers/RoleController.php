@@ -33,7 +33,8 @@ class RoleController extends Controller
     public function index(Request $request): View
     {
         $roles = Role::orderBy('id','DESC')->paginate(5);
-        return view('roles.index',compact('roles'))
+        $permission = Permission::get(); // Fetch permissions
+        return view('roles.index',compact('roles', 'permission'))
             ->with('i', ($request->input('page', 1) - 1) * 5);
     }
     
@@ -45,7 +46,7 @@ class RoleController extends Controller
     public function create(): View
     {
         $permission = Permission::get();
-        return view('roles.create',compact('permission'));
+        return view('roles.create', compact('permission'));
     }
     
     /**
@@ -58,7 +59,7 @@ class RoleController extends Controller
     {
         $this->validate($request, [
             'name' => 'required|unique:roles,name',
-            'permission' => 'required',
+            'permission' => 'required|array',
         ]);
     
         $role = Role::create(['name' => $request->input('name')]);
