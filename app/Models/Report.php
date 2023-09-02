@@ -109,6 +109,8 @@ class Report extends Model
         }
     }
 
+    
+
     /**
      * Get report map_popup_content attribute.
      * 

@@ -85,7 +85,14 @@ class ReportController extends Controller
      */
     public function show(Report $report)
     {
-        return view('reports.show', compact('report'));
+    
+    // Fetch the associated action slip using the relationship between Report and ActionSlip models
+    $actionSlip = $report->actionSlip; // Assuming you have a relationship method defined in the Report model
+       
+       
+        return view('reports.show', compact('report', 'actionSlip'));
+
+
     }
 
     /**

@@ -54,6 +54,27 @@
                     @endif
                 </div>
             </div>
+
+            <div class="mb-4">
+            <a href="{{ route('action_slips.create') }}" class="btn btn-primary">Create New Action Slip</a>
+            @if(session('success'))
+    <div class="alert alert-success">
+        {{ session('success') }}
+    </div>
+@endif
+
+@if(isset($actionSlip))
+    <div class="alert alert-success">
+        Action Slip Created Successfully:
+        <p>Title: {{ $actionSlip->title }}</p>
+        <p>Description: {{ $actionSlip->description }}</p>
+    </div>
+@endif
+
+
+
+            
+</div>
         </div>
 
         <!-- Right Side (Map) -->
