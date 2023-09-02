@@ -43,4 +43,11 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
     ];
+
+    public static function booted(): void
+    {
+        static::created(function (User $user) {
+            $user->assignRole('Normal User');
+        });
+    }
 }

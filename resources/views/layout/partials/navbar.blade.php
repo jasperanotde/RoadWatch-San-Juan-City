@@ -47,6 +47,9 @@
                                     aria-expanded="false"
                                     data-te-ripple-init
                                     data-te-ripple-color="light">
+                                    @foreach(Auth::user()->getRoleNames() as $roleName)
+                                        {{ $roleName }}:
+                                    @endforeach
                                     {{ Auth::user()->name }}
                                     <span class="ml-2 w-2">
                                         <svg
@@ -71,6 +74,7 @@
                                             data-te-dropdown-item-ref>
                                             Profile </a>
                                     </li>
+                                    @role('Admin')
                                     <li>
                                         <a class="block w-full whitespace-nowrap bg-transparent px-4 py-2 text-sm font-normal text-neutral-700 hover:bg-neutral-100 active:text-neutral-800 active:no-underline disabled:pointer-events-none disabled:bg-transparent disabled:text-neutral-400 dark:text-neutral-200 dark:hover:bg-neutral-600"
                                             href="{{ route('users.index') }}"
@@ -84,6 +88,7 @@
                                             data-te-dropdown-item-ref>
                                             Manage Roles </a>
                                     </li>
+                                    @endrole
                                     <hr class="my-2 h-0 border border-t-0 border-solid border-neutral-700 opacity-25 dark:border-neutral-200" />
                                     <li>
                                         <a class="block w-full whitespace-nowrap bg-transparent px-4 py-2 text-sm font-normal text-neutral-700 hover:bg-neutral-100 active:text-neutral-800 active:no-underline disabled:pointer-events-none disabled:bg-transparent disabled:text-neutral-400 dark:text-neutral-200 dark:hover:bg-neutral-600"
