@@ -8,6 +8,8 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
+use Spatie\Permission\Models\Role;
+use Spatie\Permission\Models\Permission;
 
 class User extends Authenticatable
 {
@@ -47,7 +49,12 @@ class User extends Authenticatable
     public static function booted(): void
     {
         static::created(function (User $user) {
-            $user->assignRole('Normal User');
+
+            if (! $user->hasRole('Admin')) {
+                return;
+            } else {
+                $user->assignRole('Normal User');
+            }
         });
     }
 }
