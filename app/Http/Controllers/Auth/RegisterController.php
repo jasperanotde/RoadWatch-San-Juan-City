@@ -80,7 +80,7 @@ class RegisterController extends Controller
     }
 
     // Create the "Normal User" role
-    $role = Role::create(['name' => 'Normal User']);
+    $role = Role::firstOrCreate(['name' => 'Normal User']);
 
     // Check if the role was created successfully
     if (!$role) {
