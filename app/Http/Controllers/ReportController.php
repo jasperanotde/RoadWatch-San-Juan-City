@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Report;
+use App\Models\ReportSubmission;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -22,6 +23,8 @@ class ReportController extends Controller
          $this->middleware('permission:report-edit', ['only' => ['edit','update']]);
          $this->middleware('permission:report-delete', ['only' => ['destroy']]);
     }
+
+
 
     public function index()
     {
@@ -67,6 +70,7 @@ class ReportController extends Controller
             'latitude'  => 'nullable|required_with:longitude|max:15',
             'longitude' => 'nullable|required_with:latitude|max:15',
         ]);
+
       
         $fileName = time().$request->file('photo')->getClientOriginalName();
         $path = $request->file('photo')->storeAs('images', $fileName, 'public'); 
@@ -85,14 +89,36 @@ class ReportController extends Controller
      */
     public function show(Report $report)
     {
+        return view('reports.show', compact('report'));
+    }
+
+
+    //para sa record slip
+    public function submit(Request $request, Report $report)
+    {
+        // Validate and save the submitted data for the report
+        $request->validate([
+            'new_field' => 'required|string|max:255',
+            'date' => 'required|date',
+            'location' => 'required|string|max:255',
+            'materials' => 'required|string|max:255',
+            'personnel' => 'required|string|max:255',
+            'actions_taken.' => 'string|max:255', // Validate each action in the array
+            'remarks' => 'nullable|string|max:255', // remarks is optional
+        ]);
     
-    // Fetch the associated action slip using the relationship between Report and ActionSlip models
-    $actionSlip = $report->actionSlip; // Assuming you have a relationship method defined in the Report model
-       
-       
-        return view('reports.show', compact('report', 'actionSlip'));
+        $report->submissions()->create([
+            'new_field' => $request->input('new_field'),
+            'date' => $request->input('date'),
+            'location' => $request->input('location'),
+            'materials' => $request->input('materials'),
+            'personnel' => $request->input('personnel'),
+            'actions_taken' => json_encode($request->input('actions_taken')), // Convert the selected checkboxes to a JSON string
+            'remarks' => $request->input('remarks'),
+        ]);
 
-
+    
+        return back();
     }
 
     /**
@@ -162,4 +188,5 @@ class ReportController extends Controller
 
         return back();
     }
+    
 }

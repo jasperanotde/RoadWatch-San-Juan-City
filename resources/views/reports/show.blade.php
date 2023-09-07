@@ -54,29 +54,126 @@
                     @endif
                 </div>
             </div>
-
-            <div class="mb-4">
-            <a href="{{ route('action_slips.create') }}" class="btn btn-primary">Create New Action Slip</a>
-            @if(session('success'))
-    <div class="alert alert-success">
-        {{ session('success') }}
-    </div>
-@endif
-
-@if(isset($actionSlip))
-    <div class="alert alert-success">
-        Action Slip Created Successfully:
-        <p>Title: {{ $actionSlip->title }}</p>
-        <p>Description: {{ $actionSlip->description }}</p>
-    </div>
-@endif
+ <!-- Display existing report details here -->
+<br>
 
 
+<!-- Modal toggle -->
+    <button data-modal-target="authentication-modal" data-modal-toggle="authentication-modal" class="block text-white bg-primary hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" type="button">
+    Create Action Slip
+    </button>
+    <br>
 
-            
+    @foreach ($report->submissions as $submission)
+    <div class="border rounded-lg shadow-lg p-6">
+        <div class="submission">
+            <p>{{ $submission->new_field }}</p>
+            <p>{{ $submission->date }}</p>
+            <p>{{ $submission->location }}</p>
+            <p>{{ $submission->materials }}</p>
+            <p>{{ $submission->personnel }}</p>
+            <p>Actions Taken:</p>
+        <ul>
+            @foreach ($submission->actionsTakenArray() as $action)
+                <li>
+                    <input type="checkbox" disabled {{ in_array($action, $submission->actionsTakenArray()) ? 'checked' : '' }}>
+                    {{ $action }}
+                </li>
+            @endforeach
+        </ul>  
+        <p>{{ $submission->remarks }}</p>
+
+           
+        </div>
 </div>
+@endforeach
+
+<!-- Main modal (create forms of record slip) -->
+<div style="width:80%; margin: 0 auto;" id="authentication-modal" tabindex="-1" aria-hidden="true" class="fixed top-0 left-0 right-0 z-50 hidden w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full">
+    <div class="relative w-full max-w-md max-h-full">
+        <!-- Modal content -->
+        <div class="relative bg-white rounded-lg shadow dark:bg-gray-700">
+            <button type="button" class="absolute top-3 right-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ml-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white" data-modal-hide="authentication-modal">
+                <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
+                </svg>
+                <span class="sr-only">Close modal</span>
+            </button>
+            <div class="px-6 py-6 lg:px-8">
+                <h3  style="text-align: center; padding-top: 10px;" class="mt-4 text-xl font-medium text-gray-900 dark:text-white">Action Slip Form</h3>
+
+                <form method="POST" action="{{ route('reports.submit', $report) }}" class="space-y-6">
+    		@csrf
+
+                    <div>
+                        <label for="new_field" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Name</label>
+                        <input type="text" name="new_field" id="new_field" required class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white" placeholder="name@company.com">
+                    </div>
+                    <div>
+            <label for="date" class="block text-sm font-medium text-gray-900 dark:text-white">Date</label>
+            <input type="date" name="date" id="date" required
+                class="block w-full px-4 py-2 mt-1 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white">
         </div>
 
+        <div>
+            <label for="location" class="block text-sm font-medium text-gray-900 dark:text-white">Location</label>
+            <input type="text" name="location" id="location" required
+                class="block w-full px-4 py-2 mt-1 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
+                placeholder="Enter Location">
+        </div>
+
+        <div>
+            <label for="materials" class="block text-sm font-medium text-gray-900 dark:text-white">Materials</label>
+            <input type="text" name="materials" id="materials" required
+                class="block w-full px-4 py-2 mt-1 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
+                placeholder="Enter Materials">
+        </div>
+
+        <div>
+            <label for="personnel" class="block text-sm font-medium text-gray-900 dark:text-white">Personnel</label>
+            <input type="text" name="personnel" id="personnel" required
+                class="block w-full px-4 py-2 mt-1 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
+                placeholder="Enter Personnel">
+        </div>
+
+        <div>
+            <label class="block text-sm font-medium text-gray-900 dark:text-white">Actions Taken</label>
+            <div class="space-y-2">
+                <label class="inline-flex items-center">
+                    <input type="checkbox" name="actions_taken[]" value="Action 1"
+                        class="form-checkbox h-5 w-5 text-blue-600">
+                    <span class="ml-2 text-gray-900 dark:text-white">Action 1</span>
+                </label>
+                <label class="inline-flex items-center">
+                    <input type="checkbox" name="actions_taken[]" value="Action 2"
+                        class="form-checkbox h-5 w-5 text-blue-600">
+                    <span class="ml-2 text-gray-900 dark:text-white">Action 2</span>
+                </label>
+                <label class="inline-flex items-center">
+                    <input type="checkbox" name="actions_taken[]" value="Action 3"
+                        class="form-checkbox h-5 w-5 text-blue-600">
+                    <span class="ml-2 text-gray-900 dark:text-white">Action 3</span>
+                </label>
+                <!-- Add more checkboxes as needed -->
+            </div>
+        </div>
+
+        <div>
+            <label for="remarks" class="block text-sm font-medium text-gray-900 dark:text-white">Remarks</label>
+            <textarea name="remarks" id="remarks" rows="4"
+                class="block w-full px-4 py-2 mt-1 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
+                placeholder="Enter Remarks"></textarea>
+        </div>
+                <br>
+                    <button type="submit" class="w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Submit</button>
+            
+                </form>
+                <br>
+            </div>
+        </div>
+    </div>
+</div> 
+</div> 
         <!-- Right Side (Map) -->
         <div class="w-1/2 p-4">
             <div class="border rounded-lg shadow-lg p-6">
@@ -89,6 +186,7 @@
             </div>
         </div>
     </div>
+</div>
 </div>
 
 @endsection

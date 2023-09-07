@@ -20,7 +20,6 @@ use App\Http\Controllers\ActionSlipController;
 
 
 
-
 Route::get('/', function () {
     return view('auth.login');
 });
@@ -50,7 +49,10 @@ Route::group(['middleware' => ['auth']], function() {
     Route::resource('users', UserController::class);
     Route::resource('reports', ReportController::class);
     Route::resource('action_slips', ActionSlipController::class);
+    Route::post('/reports/{report}/submit', [ReportController::class, 'submit'])->name('reports.submit');
+    Route::delete('/reports/{report}/submissions/{submission}', [ReportController::class, 'destroySubmission'])->name('reports.submissions.destroy');
 
+    
 });
 
 

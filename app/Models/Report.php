@@ -39,6 +39,13 @@ class Report extends Model
         return $link;
     }
 
+    public function submissions()
+    {
+        return $this->hasMany(ReportSubmission::class);
+    }
+    
+
+
     /**
      * report belongs to User model relation.
      *
