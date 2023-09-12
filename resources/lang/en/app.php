@@ -7,6 +7,7 @@ return [
     'action'            => 'Actions',
     'show_detail_title' => 'View :name :type detail',
     'role_title'        => 'Roles Management',
+    'user_title'        => 'User Management',
 
     // Actions
     'show'           => 'View Detail',
