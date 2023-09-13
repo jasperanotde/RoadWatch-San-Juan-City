@@ -1,5 +1,5 @@
 <header>
-        <nav class="absolute top-0 left-0 right-0 z-10 mx-5 sm:mx-20 bg-transparenr border-gray-200">
+        <nav class="absolute top-0 left-0 right-0 z-10 mx-5 sm:mx-20 bg-transparent border-gray-200">
             <div class="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
                 <a href="{{route('home')}}" class="flex items-center">
                     <img src="{{ asset('images/RoadWatch Logo.png') }}" class="h-8 mr-3" alt="RoadWatch Logo" />
