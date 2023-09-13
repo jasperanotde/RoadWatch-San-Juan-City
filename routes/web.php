@@ -50,7 +50,7 @@ Route::group(['middleware' => ['auth']], function() {
     Route::resource('reports', ReportController::class);
     Route::resource('action_slips', ActionSlipController::class);
     Route::post('/reports/{report}/submit', [ReportController::class, 'submit'])->name('reports.submit');
-    Route::delete('/reports/{report}/submissions/{submission}', [ReportController::class, 'destroySubmission'])->name('reports.submissions.destroy');
+    Route::delete('/reports/{report}/submissions', 'ReportController@deleteSubmissions')->name('reports.submissions.delete');
 
     
 });

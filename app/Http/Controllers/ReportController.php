@@ -121,6 +121,25 @@ class ReportController extends Controller
         return back();
     }
 
+
+    public function deleteSubmissions(Request $request, Report $report)
+    {
+        $submissionId = $request->input('submission_id');
+    
+        // Find the specific submission associated with the report by its ID
+        $submission = $report->submissions()->find($submissionId);
+    
+        if (!$submission) {
+            return redirect()->route('route_name_for_show_page', ['report' => $report])
+                ->with('error', 'Submission not found');
+        }
+    
+        // Delete the found submission
+        $submission->delete();
+
+        return back()->with('success', 'Submissions for the report have been deleted successfully');
+    }
+
     /**
      * Show the form for editing the specified report.
      *
