@@ -156,7 +156,7 @@
         </script>
     @endpush
 
-<div class="max-w-2xl mx-auto">
+<div class="max-w-4xl mx-auto">
     <div class="flex justify-between items-center">
         <h1 class="font-josefinsans font-bold flex-grow text-4xl font-normal leading-none tracking-tight font-poppins text-primary"><span class="font-josefinsans font-bold underline underline-offset-3 decoration-7 decoration-secondary">{{ __('app.total') }}:<small> {{ $reports->total() }} Reports </small></h1>
     </div>
@@ -183,7 +183,7 @@
 
             </div>
             </div>
-            <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+            <table class="w-full text-sm text-left text-gray-500">
                 <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                     <tr>
                         
@@ -207,13 +207,16 @@
                         </th>
 
                         <th scope="col" class="px-6 py-3">
-                        Edit
+                            Edit
+                        </th>
+                        <th scope="col" class="px-6 py-3">
+                            Status
                         </th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach($reports as $key => $report)
-                    <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
+                    <tr class="bg-white border-b hover:bg-gray-50">
                         <td class="px-6 py-4">
                             {{ $reports->firstItem() + $key }}
                         </td>
@@ -231,6 +234,9 @@
                         </td>
                         <td class="px-6 py-4">
                             <img src="{{ asset($report->photo) }}" width= '50' height='50' class="img img-responsive" />
+                        </td>
+                        <td class="px-6 py-4 text-lime-600">
+                            <Strong>{{ $report->status }}</strong>
                         </td>
                         <td class="px-6 py-4">
                             <a href="{{ route('reports.show', ['report' => $report, 'image' => $report->getPhoto()]) }}" id="show-report-{{ $report->id }}">										{{ __('app.show') }}

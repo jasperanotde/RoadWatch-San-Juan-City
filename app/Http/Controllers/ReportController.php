@@ -24,8 +24,6 @@ class ReportController extends Controller
          $this->middleware('permission:report-delete', ['only' => ['destroy']]);
     }
 
-
-
     public function index()
     {
         $this->authorize('manage_report');
@@ -71,7 +69,9 @@ class ReportController extends Controller
             'longitude' => 'nullable|required_with:latitude|max:15',
         ]);
 
-      
+        // Set the "status" field to "Pending"
+        $newReport['status'] = 'PENDING';
+
         $fileName = time().$request->file('photo')->getClientOriginalName();
         $path = $request->file('photo')->storeAs('images', $fileName, 'public'); 
         $newReport["photo"] = '/storage/'.$path;
@@ -79,7 +79,6 @@ class ReportController extends Controller
         $report = Report::create($newReport);
         return redirect()->route('reports.show', $report);
     }
-
 
     /**
      * Display the specified report.
@@ -90,54 +89,6 @@ class ReportController extends Controller
     public function show(Report $report)
     {
         return view('reports.show', compact('report'));
-    }
-
-
-    //para sa record slip
-    public function submit(Request $request, Report $report)
-    {
-        // Validate and save the submitted data for the report
-        $request->validate([
-            'new_field' => 'required|string|max:255',
-            'date' => 'required|date',
-            'location' => 'required|string|max:255',
-            'materials' => 'required|string|max:255',
-            'personnel' => 'required|string|max:255',
-            'actions_taken.' => 'string|max:255', // Validate each action in the array
-            'remarks' => 'nullable|string|max:255', // remarks is optional
-        ]);
-    
-        $report->submissions()->create([
-            'new_field' => $request->input('new_field'),
-            'date' => $request->input('date'),
-            'location' => $request->input('location'),
-            'materials' => $request->input('materials'),
-            'personnel' => $request->input('personnel'),
-            'actions_taken' => json_encode($request->input('actions_taken')), // Convert the selected checkboxes to a JSON string
-            'remarks' => $request->input('remarks'),
-        ]);
-
-    
-        return back();
-    }
-
-
-    public function deleteSubmissions(Request $request, Report $report)
-    {
-        $submissionId = $request->input('submission_id');
-    
-        // Find the specific submission associated with the report by its ID
-        $submission = $report->submissions()->find($submissionId);
-    
-        if (!$submission) {
-            return redirect()->route('route_name_for_show_page', ['report' => $report])
-                ->with('error', 'Submission not found');
-        }
-    
-        // Delete the found submission
-        $submission->delete();
-
-        return back()->with('success', 'Submissions for the report have been deleted successfully');
     }
 
     /**
@@ -206,6 +157,51 @@ class ReportController extends Controller
         }
 
         return back();
+    }
+    
+    // For Record Slip
+    public function submit(Request $request, Report $report)
+    {
+        // Validate and save the submitted data for the report
+        $request->validate([
+            'new_field' => 'required|string|max:255',
+            'date' => 'required|date',
+            'location' => 'required|string|max:255',
+            'materials' => 'required|string|max:255',
+            'personnel' => 'required|string|max:255',
+            'actions_taken.' => 'string|max:255', // Validate each action in the array
+            'remarks' => 'nullable|string|max:255', // Remarks is optional
+        ]);
+    
+        $report->submissions()->create([
+            'new_field' => $request->input('new_field'),
+            'date' => $request->input('date'),
+            'location' => $request->input('location'),
+            'materials' => $request->input('materials'),
+            'personnel' => $request->input('personnel'),
+            'actions_taken' => json_encode($request->input('actions_taken')), // Convert the selected checkboxes to a JSON string
+            'remarks' => $request->input('remarks'),
+        ]);
+
+        return back();
+    }
+
+    public function deleteSubmissions(Request $request, Report $report)
+    {
+        $submissionId = $request->input('submission_id');
+    
+        // Find the specific submission associated with the report by its ID
+        $submission = $report->submissions()->find($submissionId);
+    
+        if (!$submission) {
+            return redirect()->route('route_name_for_show_page', ['report' => $report])
+                ->with('error', 'Submission not found');
+        }
+    
+        // Delete the found submission
+        $submission->delete();
+
+        return back()->with('success', 'Submissions for the report have been deleted successfully');
     }
     
 }
