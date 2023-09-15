@@ -156,14 +156,14 @@
         </script>
     @endpush
 
-<div class="max-w-4xl mx-auto">
+<div class="max-w-6xl mx-auto">
     <div class="flex justify-between items-center">
         <h1 class="font-josefinsans font-bold flex-grow text-4xl font-normal leading-none tracking-tight font-poppins text-primary"><span class="font-josefinsans font-bold underline underline-offset-3 decoration-7 decoration-secondary">{{ __('app.total') }}:<small> {{ $reports->total() }} Reports </small></h1>
     </div>
 
     <div class="mb-20 relative overflow-x-auto shadow-md sm:rounded-lg">
         <div class="p-4">
-            <label for="table-search" class="sr-only">Search</label>
+        <label for="datatable-search-input" class="sr-only">Search</label>
             <div class="relative mt-1">
                 <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                     <svg class="w-5 h-5 text-gray-500 dark:text-gray-400" fill="currentColor" viewBox="0 0 20 20"
@@ -173,7 +173,7 @@
                             clip-rule="evenodd"></path>
                     </svg>
                 </div>
-                <input type="text" id="table-search" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-80 pl-10 p-2.5  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Search for items">
+                <input type="search" id="datatable-search-input" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-80 pl-10 p-2.5  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Search for items">
                 <div class="absolute top-0 right-0  ml-4">
                     <a href="{{ route('reports.create') }}">
                 <button class="bg-primary text-white p-2 rounded hover:bg-secondary m-2 font-bold py-2 px-4 rounded">
@@ -183,7 +183,7 @@
 
             </div>
             </div>
-            <table class="w-full text-sm text-left text-gray-500">
+            <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
                 <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                     <tr>
                         
@@ -246,6 +246,7 @@
                     @endforeach
                 </tbody>
             </table>
+        </div>
                 <div class="card-body">{{ $reports->appends(Request::except('page'))->render() }}</div>
         </div>
         <script src="https://unpkg.com/flowbite@1.3.4/dist/flowbite.js"></script>
