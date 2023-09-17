@@ -69,7 +69,6 @@
             <p>{{ $submission->new_field }}</p>
             <p>{{ $submission->date }}</p>
             <p>{{ $submission->location }}</p>
-<<<<<<< HEAD
             <p>Materials:</p>
             <ul>
                 <!-- removing array brackets -->
@@ -85,17 +84,6 @@
                     @endforeach
                 @endif           
             </ul>
-        <ul>
-            @foreach ($submission->actionsTakenArray() as $action)
-                <li>
-                    <input type="checkbox" disabled {{ in_array($action, $submission->actionsTakenArray()) ? 'checked' : '' }}>
-                    {{ $action }}
-                </li>
-            @endforeach
-        </ul>  
-=======
-            <p>{{ $submission->materials }}</p>
-            <p>{{ $submission->personnel }}</p>
             <p>Actions Taken:</p>
             <ul>
                 @foreach ($submission->actionsTakenArray() as $action)
@@ -105,7 +93,6 @@
                     </li>
                 @endforeach
             </ul>  
->>>>>>> 628ec9cdde49e6d958151a188ab5ca543a6cd345
         <p>{{ $submission->remarks }}</p>
         <button data-modal-target="delete-modal" data-modal-toggle="delete-modal" type="submit" class="btn btn-danger">Delete Submission</button>
         </div>
@@ -204,19 +191,19 @@
         </div>
 
         <div>
-        <label for="personnel" class="block text-sm font-medium text-gray-900 dark:text-white">Personnel</label>
-            <div id="personnel-container">
-                    <input
-                        type="text"
-                        name="personnel[]"
-                        class="block w-full px-4 py-2 mt-1 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
-                        placeholder="Enter Personnel"
-                        required
-                     >
-            </div>
-            <button type="button" id="add-personnel" class="text-blue-500 hover:underline focus:outline-none">
-                    Add Personnel
-                    </button>
+            <label for="personnel" class="block text-sm font-medium text-gray-900 dark:text-white">Personnel</label>
+                <div id="personnel-container">
+                        <input
+                            type="text"
+                            name="personnel[]"
+                            class="block w-full px-4 py-2 mt-1 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
+                            placeholder="Enter Personnel"
+                            required
+                        >
+                </div>
+                <button type="button" id="add-personnel" class="text-blue-500 hover:underline focus:outline-none">
+                        Add Personnel
+                </button>
         </div>
 
         <div>
