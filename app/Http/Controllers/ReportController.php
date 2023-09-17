@@ -101,8 +101,8 @@ class ReportController extends Controller
             'new_field' => 'required|string|max:255',
             'date' => 'required|date',
             'location' => 'required|string|max:255',
-            'materials' => 'required|string|max:255',
-            'personnel' => 'required|string|max:255',
+            'materials.*' => 'required|string|max:255',
+            'personnel.*' => 'required|string|max:255',
             'actions_taken.' => 'string|max:255', // Validate each action in the array
             'remarks' => 'nullable|string|max:255', // remarks is optional
         ]);
@@ -111,8 +111,8 @@ class ReportController extends Controller
             'new_field' => $request->input('new_field'),
             'date' => $request->input('date'),
             'location' => $request->input('location'),
-            'materials' => $request->input('materials'),
-            'personnel' => $request->input('personnel'),
+            'materials' => json_encode($request->input('materials')),
+            'personnel' => json_encode($request->input('personnel')),
             'actions_taken' => json_encode($request->input('actions_taken')), // Convert the selected checkboxes to a JSON string
             'remarks' => $request->input('remarks'),
         ]);

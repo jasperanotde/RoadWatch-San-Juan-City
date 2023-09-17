@@ -70,9 +70,21 @@
             <p>{{ $submission->new_field }}</p>
             <p>{{ $submission->date }}</p>
             <p>{{ $submission->location }}</p>
-            <p>{{ $submission->materials }}</p>
-            <p>{{ $submission->personnel }}</p>
-            <p>Actions Taken:</p>
+            <p>Materials:</p>
+            <ul>
+                <!-- removing array brackets -->
+                @foreach (json_decode($submission->materials) as $material)
+                    <li>- {{ $material }}</li>
+                @endforeach
+            </ul>
+               <p>Personnel:</p>
+            <ul>
+            @if (!is_null($submission->personnel))
+                    @foreach (json_decode($submission->personnel) as $person)
+                        <li>- {{ $person }}</li>
+                    @endforeach
+                @endif           
+            </ul>
         <ul>
             @foreach ($submission->actionsTakenArray() as $action)
                 <li>
@@ -110,7 +122,6 @@
 </div>
 @endforeach
 
-
 <!-- Main modal (create forms of record slip) -->
 <div style="width:80%; margin: 0 auto;" id="authentication-modal" tabindex="-1" aria-hidden="true" class="fixed top-0 left-0 right-0 z-50 hidden  p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full">
     <div class="relative w-full  max-h-full">
@@ -130,9 +141,18 @@
 
                     <div>
                         <label for="new_field" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Name</label>
-                        <input type="text" name="new_field" id="new_field" required class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white" placeholder="name@company.com">
+                        <input
+                            type="text"
+                            name="new_field"
+                            id="new_field"
+                            required
+                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
+                            placeholder="name@company.com"
+                            value="{{ $report->name }}"
+                            readonly
+                        >                    
                     </div>
-                    <div>
+        <div>
             <label for="date" class="block text-sm font-medium text-gray-900 dark:text-white">Date</label>
             <input type="date" name="date" id="date" required
                 class="block w-full px-4 py-2 mt-1 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white">
@@ -140,23 +160,50 @@
 
         <div>
             <label for="location" class="block text-sm font-medium text-gray-900 dark:text-white">Location</label>
-            <input type="text" name="location" id="location" required
+            <input
+                type="text"
+                name="location"
+                id="location"
+                required
                 class="block w-full px-4 py-2 mt-1 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
-                placeholder="Enter Location">
+                placeholder="Enter Location"
+                value="{{ $report->address }}"
+                readonly
+            >
         </div>
 
         <div>
             <label for="materials" class="block text-sm font-medium text-gray-900 dark:text-white">Materials</label>
-            <input type="text" name="materials" id="materials" required
-                class="block w-full px-4 py-2 mt-1 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
-                placeholder="Enter Materials">
+            <div id="materials-container">
+                <div class="mb-2">
+                    <input
+                        type="text"
+                        name="materials[]"
+                        class="block w-full px-4 py-2 mt-1 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
+                        placeholder="Enter Materials"
+                        required
+                    >
+                </div>
+            </div>
+    <button type="button" id="add-material" class="text-blue-500 hover:underline focus:outline-none">
+        Add Material
+    </button>
         </div>
 
         <div>
-            <label for="personnel" class="block text-sm font-medium text-gray-900 dark:text-white">Personnel</label>
-            <input type="text" name="personnel" id="personnel" required
-                class="block w-full px-4 py-2 mt-1 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
-                placeholder="Enter Personnel">
+        <label for="personnel" class="block text-sm font-medium text-gray-900 dark:text-white">Personnel</label>
+            <div id="personnel-container">
+                    <input
+                        type="text"
+                        name="personnel[]"
+                        class="block w-full px-4 py-2 mt-1 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
+                        placeholder="Enter Personnel"
+                        required
+                     >
+            </div>
+            <button type="button" id="add-personnel" class="text-blue-500 hover:underline focus:outline-none">
+                    Add Personnel
+                    </button>
         </div>
 
         <div>
@@ -196,11 +243,9 @@
         </div>
     </div>
 </div> 
-
-
-
-
 </div> 
+
+
         <!-- Right Side (Map) -->
         <div class="w-1/2 p-4">
             <div class="border rounded-lg shadow-lg p-6">
@@ -215,6 +260,8 @@
     </div>
 </div>
 </div>
+</div>
+
 
 @endsection
 
@@ -263,5 +310,47 @@
     var reportMarker = L.marker([{{ $report->latitude }}, {{ $report->longitude }}], { icon: customIcon })
         .addTo(map)
         .bindPopup('{!! $report->map_popup_content !!}');
+
+        document.addEventListener("DOMContentLoaded", function () {
+        const materialsContainer = document.getElementById("materials-container");
+        const addMaterialButton = document.getElementById("add-material");
+
+        addMaterialButton.addEventListener("click", function () {
+            const materialInput = document.createElement("div");
+            materialInput.innerHTML = `
+                <div class="mb-2">
+                    <input
+                        type="text"
+                        name="materials[]"
+                        class="block w-full px-4 py-2 mt-1 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
+                        placeholder="Enter Materials"
+                        required
+                    >
+                </div>
+            `;
+            materialsContainer.appendChild(materialInput);
+        });
+
+const addPersonnelButton = document.getElementById("add-personnel");
+const personnelContainer = document.getElementById("personnel-container");
+
+addPersonnelButton.addEventListener("click", function () {
+    const personnelInput = document.createElement("div");
+    personnelInput.innerHTML = `
+        <div class="mb-2">
+            <input
+                type="text"
+                name="personnel[]"
+                class="block w-full px-4 py-2 mt-1 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white"
+                placeholder="Enter Personnel"
+                required
+            >
+        </div>
+    `;
+    personnelContainer.appendChild(personnelInput);
+});
+
+        
+    });
 </script>
 @endpush

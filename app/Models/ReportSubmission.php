@@ -26,6 +26,18 @@ class ReportSubmission extends Model
     return json_decode($this->actions_taken, true);
 }
 
+
+public function materialsArray()
+{
+    return json_decode($this->materials, true);
+}
+
+public function personnelArray()
+{
+    return json_decode($this->personnel, true);
+}
+
+
     public function report()
     {
         return $this->belongsTo(Report::class);
