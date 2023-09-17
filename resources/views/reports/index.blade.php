@@ -208,13 +208,16 @@
                         </th>
 
                         <th scope="col" class="px-6 py-3">
-                        Edit
+                            Edit
+                        </th>
+                        <th scope="col" class="px-6 py-3">
+                            Status
                         </th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach($reports as $key => $report)
-                    <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600">
+                    <tr class="bg-white border-b hover:bg-gray-50">
                         <td class="px-6 py-4">
                             {{ $reports->firstItem() + $key }}
                         </td>
@@ -232,6 +235,9 @@
                         </td>
                         <td class="px-6 py-4">
                             <img src="{{ asset($report->photo) }}" width= '50' height='50' class="img img-responsive" />
+                        </td>
+                        <td class="px-6 py-4 text-lime-600">
+                            <Strong>{{ $report->status }}</strong>
                         </td>
                         <td class="px-6 py-4">
                             <a href="{{ route('reports.show', ['report' => $report, 'image' => $report->getPhoto()]) }}" id="show-report-{{ $report->id }}">										{{ __('app.show') }}
