@@ -26,11 +26,13 @@
                         <tr>
                             <td class="pr-4">Photo</td>
                             <td>
-                                @if($report->photo)
-                                    <img src="{{ asset($report->photo) }}" width="50" height="50" class="img img-responsive" />
-                                @else
-                                    {{ __('report.no_photo') }}
-                                @endif
+                            @if (!is_null($report->photo))
+                                @foreach (json_decode($report->photo) as $image)
+                                    <img src="{{ asset($image) }}" width="50" height="50" class="img img-responsive" />
+                                @endforeach
+                            @else
+                                {{ __('report.no_photo') }}
+                            @endif
                             </td>
                         </tr>
                         <tr>
@@ -243,13 +245,7 @@
         </div>
     </div>
 </div> 
-<<<<<<< HEAD
-=======
-
->>>>>>> 628ec9cdde49e6d958151a188ab5ca543a6cd345
 </div> 
-
-
         <!-- Right Side (Map) -->
         <div class="w-1/2 p-4">
             <div class="border rounded-lg shadow-lg p-6">
