@@ -52,7 +52,8 @@ Route::group(['middleware' => ['auth']], function() {
     Route::post('/reports/{report}/submit', [ReportController::class, 'submit'])->name('reports.submit');
     Route::delete('/reports/{report}/submissions', 'ReportController@deleteSubmissions')->name('reports.submissions.delete');
 
-    
+    // Add the 'gallery' route here
+    Route::get('/gallery', 'GalleryController@index')->name('gallery.index');
 });
 
 

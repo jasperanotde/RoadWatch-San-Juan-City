@@ -86,40 +86,46 @@
         
             // Create a marker cluster group with appropriate maxClusterRadius
             var markers = L.markerClusterGroup({
-                maxClusterRadius: 50 // Adjust this value to control when clustering occurs
+            maxClusterRadius: 50 // Adjust this value to control when clustering occurs
             });
 
             // Make an asynchronous GET request to the API endpoint
             axios.get('{{ route('api.reports.index') }}')
-                .then(function (response) {
-                    // Extract GeoJSON features from the response data
-                    var geojsonFeatures = response.data.features;
+            .then(function (response) {
+                // Extract GeoJSON features from the response data
+                var geojsonFeatures = response.data.features;
 
-                    // Loop through each GeoJSON feature
-                    geojsonFeatures.forEach(function (feature) {
-                        // Create a custom icon for the marker
-                        var customIcon = L.icon({
-                            iconUrl: feature.properties.photo, // Use the 'photo' field for the image URL
-                            iconSize: [35, 35], // Customize icon size if needed
-                            className: 'custom-pin' // Add your custom CSS class
-                        });
+                // Loop through each GeoJSON feature
+                geojsonFeatures.forEach(function (feature) {
+                // Decode the JSON-encoded photo path
+                var photos = JSON.parse(feature.properties.photo);
 
-                        // Create a marker with the custom icon and bind a popup
-                        var marker = L.marker(
-                            [feature.geometry.coordinates[1], feature.geometry.coordinates[0]],
-                            { icon: customIcon }
-                        ).bindPopup(feature.properties.map_popup_content);
+                // Get the first photo
+                var firstPhoto = photos[0];
 
-                        // Add the marker to the marker cluster group
-                        markers.addLayer(marker);
-                    });
-                    
-                    // Add the marker cluster group to the map
-                    map.addLayer(markers);
-                })
-                .catch(function (error) {
-                    console.error(error); // Log any errors to the console
+                // Create a custom icon for the marker
+                var customIcon = L.icon({
+                    iconUrl: firstPhoto, // Use the photo URL for the image URL
+                    iconSize: [35, 35], // Customize icon size if needed
+                    className: 'custom-pin' // Add your custom CSS class
                 });
+
+                // Create a marker with the custom icon and bind a popup
+                var marker = L.marker(
+                    [feature.geometry.coordinates[1], feature.geometry.coordinates[0]],
+                    { icon: customIcon }
+                ).bindPopup(feature.properties.map_popup_content);
+
+                // Add the marker to the marker cluster group
+                markers.addLayer(marker);
+                });
+
+                // Add the main marker cluster group to the map
+                map.addLayer(markers);
+            })
+            .catch(function (error) {
+                console.error(error); // Log any errors to the console
+            });
 
     // Sattelite layer
     var satelliteLayer = L.tileLayer('http://mt0.google.com/vt/lyrs=s&hl=en&x={x}&y={y}&z={z}', {

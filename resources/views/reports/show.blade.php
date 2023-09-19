@@ -26,13 +26,15 @@
                         <tr>
                             <td class="pr-4">Photo</td>
                             <td>
-                            @if (!is_null($report->photo))
-                                @foreach (json_decode($report->photo) as $image)
-                                    <img src="{{ asset($image) }}" width="50" height="50" class="img img-responsive" />
-                                @endforeach
-                            @else
-                                {{ __('report.no_photo') }}
-                            @endif
+                                @if (!is_null($report->photo))
+                                    @foreach (json_decode($report->photo) as $image)
+                                        <a href="{{ asset($image) }}" data-fancybox="gallery">
+                                            <img src="{{ asset($image) }}" width="50" height="50" class="img img-responsive" />
+                                        </a>
+                                    @endforeach
+                                @else
+                                    {{ __('report.no_photo') }}
+                                @endif
                             </td>
                         </tr>
                         <tr>
