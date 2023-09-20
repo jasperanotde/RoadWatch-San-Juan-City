@@ -12,3 +12,17 @@
     border-radius: 50%;
     /* Add more properties as needed */
   }
+
+  /* #glass{
+    backdrop-filter: blur(16px) saturate(180%);
+    -webkit-backdrop-filter: blur(16px) saturate(180%);
+    background: rgba( 17, 63, 103);
+    border-radius: 12px;
+    border: 1px solid rgba(209, 213, 219, 0.3);
+  }
+
+ */
+
+ #reports-container{
+  font-weight: 200;
+} 

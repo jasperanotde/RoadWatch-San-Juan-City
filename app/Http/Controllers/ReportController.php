@@ -63,7 +63,7 @@ class ReportController extends Controller
             'name'      => 'required|max:60',
             'address'   => 'nullable|max:255',
             'details'  => 'nullable|max:255',
-            'photo.*' => 'required|image|mimes:png,jpg,jpeg|max:2048',
+            'photo' => 'required|image|mimes:png,jpg,jpeg|max:2048',
             'severity'  => 'nullable|max:255',
             'urgency'  => 'nullable|max:255',
             'status'  => 'nullable|max:255',
@@ -71,19 +71,10 @@ class ReportController extends Controller
             'longitude' => 'nullable|required_with:latitude|max:15',
         ]);
 
-        // Set the "status" field to "Pending"
-        $newReport['status'] = 'PENDING';
-
-        $imagePaths = [];
-
-        foreach($request->file('photo') as $v) {
-            $fileName = time() . '_' . $v->getClientOriginalName();
-            $path = $v->storeAs('images', $fileName, 'public');
-            $imagePaths[] = '/storage/'.$path;
-        }
-
-        $newReport['photo'] = json_encode($imagePaths);
-
+      
+        $fileName = time().$request->file('photo')->getClientOriginalName();
+        $path = $request->file('photo')->storeAs('images', $fileName, 'public'); 
+        $newReport["photo"] = '/storage/'.$path;
         $newReport['creator_id'] = auth()->id();
         $report = Report::create($newReport);
         return redirect()->route('reports.show', $report);

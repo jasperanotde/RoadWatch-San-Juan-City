@@ -1,130 +1,206 @@
 @extends('layout.layout')
-
 @section('title', __('report.detail'))
 
 @section('content')
-<div class="flex justify-center m-20">
-    <div class="flex w-full max-w-screen-xl">
-        <!-- Left Side (Report Details) -->
-        <div class="w-1/2 p-4">
-            <div class="border rounded-lg shadow-lg p-6">
-                <h1 class="text-xl font-bold text-primary mb-3 underline">Report Details</h1>
+    <div id="reports-container" class="flex justify-center m-20">
+        <div class="flex w-full max-w-screen-xl">
+            <!-- Left Side (Report Details) -->
+            <div class="w-1/2 p-4">
+                <div style="border-radius: 10px" id="glass" class="glass border shadow-lg ">
+                    <div style="background: rgba(17,63,103); border-top-left-radius: 8px; border-top-right-radius: 8px;" class="text-white rounded-sm p-4">
+                        <h1 class="text-xl font-bold text-white">Report Details</h1>
+                    </div>
                 <table class="table-auto">
                     <tbody>
-                        <tr>
-                            <td class="pr-4">Report Name</td>
-                            <td>{{ $report->name }}</td>
+                        <tr class="bg-blue-100 hover:bg-blue-200 border-b">
+                            <td  class="px-6 py-4 w-2/5 border-r">Report Name : </td>
+                            <td  class="px-6 py-4 w-3/5 bg-gray-100 hover:bg-gray-200">{{ $report->name }}</td>
                         </tr>
-                        <tr>
-                            <td class="pr-4">Report Address</td>
-                            <td>{{ $report->address }}</td>
+                        <tr class="bg-blue-100 hover:bg-blue-200 border-b">
+                            <td class="px-6 py-4 w-2/5 border-r">Report Address : </td>
+                            <td class="px-6 py-4 w-3/5 bg-gray-100 hover:bg-gray-200">{{ $report->address }}</td>
                         </tr>
-                        <tr>
-                            <td class="pr-4">Details</td>
-                            <td>{{ $report->details }}</td>
+                        <tr class="bg-blue-100 hover:bg-blue-200 border-b">
+                            <td class="px-6 py-4 w-2/5 border-r">Details : </td>
+                            <td class="px-6 py-4 w-3/5 bg-gray-100 hover:bg-gray-200">{{ $report->details }}</td>
                         </tr>
-                        <tr>
-                            <td class="pr-4">Photo</td>
-                            <td>
+                        <tr class="bg-blue-100 hover:bg-blue-200 border-b">
+                            <td class="px-6 py-4 w-2/5 border-r">Photo : </td>
+                            <td class="px-6 py-4 w-3/5 bg-gray-100 hover:bg-gray-200"> 
                                 @if (!is_null($report->photo))
                                     @foreach (json_decode($report->photo) as $image)
                                         <a href="{{ asset($image) }}" data-fancybox="gallery">
                                             <img src="{{ asset($image) }}" width="50" height="50" class="img img-responsive" />
-                                        </a>
-                                    @endforeach
+                                         </a>
+                                     @endforeach
                                 @else
                                     {{ __('report.no_photo') }}
                                 @endif
                             </td>
                         </tr>
-                        <tr>
-                            <td class="pr-4">Severity</td>
-                            <td>{{ $report->severity }}</td>
+                        <tr class="bg-blue-100 hover:bg-blue-200 border-b">
+                            <td class="px-6 py-4 w-2/5 border-r">Severity : </td>
+                            <td class="px-6 py-4 w-3/5 bg-gray-100 hover:bg-gray-200">{{ $report->severity }}</td>
                         </tr>
-                        <tr>
-                            <td class="pr-4">Urgency</td>
-                            <td>{{ $report->urgency }}</td>
+                        <tr class="bg-blue-100 hover:bg-blue-200 border-b">
+                            <td class="px-6 py-4 w-2/5 border-r">Urgency :</td>
+                            <td class="px-6 py-4 w-3/5 bg-gray-100 hover:bg-gray-200">{{ $report->urgency }}</td>
                         </tr>
                     </tbody>
                 </table>
-                <div class="mt-4">
-                    @can('update', $report)
-                        <a href="{{ route('reports.edit', ['report' => $report, 'image' => $report->getPhoto()]) }}" id="edit-report-{{ $report->id }}" class="px-4 py-2 bg-primary text-white rounded-full mr-2">Edit Report</a>
-                    @endcan
-                    @if(auth()->check())
-                        <a href="{{ route('reports.index') }}" class="text-indigo-700 hover:underline float-right">Back to Reports</a>
-                    @else
-                        <a href="{{ route('report_map.index') }}" class="text-indigo-700 hover:underline">{{ __('report.back_to_index') }}</a>
-                    @endif
+                        <div class="mt-4 mb-4 p-4">
+                            @can('update', $report)
+                                <a href="{{ route('reports.edit', ['report' => $report, 'image' => $report->getPhoto()]) }}" id="edit-report-{{ $report->id }}" class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-blue-800 mr-2">Edit Report</a>
+                            @endcan
+                            @if(auth()->check())
+                                <a href="{{ route('reports.index') }}" class="text-indigo-700 hover:underline float-right">Back to Reports</a>
+                            @else
+                                <a href="{{ route('report_map.index') }}" class="text-indigo-700 hover:underline">{{ __('report.back_to_index') }}</a>
+                            @endif
+                        </div>
+                    </div>
                 </div>
+
+                 <!-- Right Side (Map) -->
+                 <div class="w-1/2 p-4 ">
+                    <div style="background: rgba(17,63,103); border-top-left-radius: 8px; border-top-right-radius: 8px;" class="text-white rounded-sm p-4">
+                        <h1 class="text-xl font-bold text-white">{{ trans('report.location') }}</h1>
+                    </div>
+                    @if ($report->coordinate)
+                        <div style=" border-bottom-right-radius: 8px;  border-bottom-left-radius: 8px;" id="mapid" class="border shadow-lg h-80 z-0"></div>
+                    @else
+                       <p>{{ __('report.no_coordinate') }}</p>
+                    @endif
+                 </div>
             </div>
- <!-- Display existing report details here -->
-<br>
-
-<!-- Modal toggle -->
-    <button data-modal-target="authentication-modal" data-modal-toggle="authentication-modal" class="block text-white bg-primary hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" type="button">
-    Create Action Slip
-    </button>
-    <br>
-
-    @foreach ($report->submissions as $submission)
-    <div class="border rounded-lg shadow-lg p-6">
-        <div class="submission">
-            <p>{{ $submission->new_field }}</p>
-            <p>{{ $submission->date }}</p>
-            <p>{{ $submission->location }}</p>
-            <p>Materials:</p>
-            <ul>
-                <!-- removing array brackets -->
-                @foreach (json_decode($submission->materials) as $material)
-                    <li>- {{ $material }}</li>
-                @endforeach
-            </ul>
-               <p>Personnel:</p>
-            <ul>
-            @if (!is_null($submission->personnel))
-                    @foreach (json_decode($submission->personnel) as $person)
-                        <li>- {{ $person }}</li>
-                    @endforeach
-                @endif           
-            </ul>
-            <p>Actions Taken:</p>
-            <ul>
-                @foreach ($submission->actionsTakenArray() as $action)
-                    <li>
-                        <input type="checkbox" disabled {{ in_array($action, $submission->actionsTakenArray()) ? 'checked' : '' }}>
-                        {{ $action }}
-                    </li>
-                @endforeach
-            </ul>  
-        <p>{{ $submission->remarks }}</p>
-        <button data-modal-target="delete-modal" data-modal-toggle="delete-modal" type="submit" class="btn btn-danger">Delete Submission</button>
         </div>
     </div>
+    
 
-<!-- delete modal -->
-<div style="width:80%; margin: 0 auto;" id="delete-modal" tabindex="-1" aria-hidden="true" class="fixed top-0 left-0 right-0 z-50 hidden w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full">
+<!------- Record Slip Index ------->
 
-<div class="relative bg-white rounded-lg shadow dark:bg-gray-700">
-            <button type="button" class="absolute top-3 right-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ml-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white" data-modal-hide="authentication-modal">
-                <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
-                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
-                </svg>
-                <span class="sr-only">Close modal</span>
-            </button>
+    <div id="glass" class="flex justify-center m-20 rounded-lg">
+        <div class="w-full  shadow-lg max-w-screen-xl">
+            <div style="background: rgba(17,63,103); border-top-left-radius: 8px; border-top-right-radius: 8px; display: flex; justify-content: space-between; align-items: center;" class="text-white rounded-sm p-4">
+                        <h1 class="text-xl font-bold text-white">Action Slips</h1>
 
-            <div class="px-6 py-6 lg:px-8">
-                <h3  style="text-align: center; padding-top: 10px;" class="mt-4 text-xl font-medium text-gray-900 dark:text-white">Do you want to delete this record slip?</h3>
+                         <!-- Modal toggle -->
+                        <button data-modal-target="authentication-modal" data-modal-toggle="authentication-modal" class="float-right block text-indigo-800 bg-white hover:bg-blue-800 hover:text-white   focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" type="button">
+                            Create Action Slip <span style="font-size: 18px; font-weight: bold; margin-left: 5px;">+</span>
+                        </span>
+                </div>
+
+        @foreach ($report->submissions as $submission)
+        <div class="submission">
+        <table class="table-auto">
+            <!-- <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Date</th>
+                    <th>Edit</th>
+                </tr>
+            </thead> nasisira yung foreach pag nilalagyan nito amp-->
+            <tbody>
+            <tr class=" bg-blue-100 border-b">
+                <!-- Show Button -->
+                <td class="px-5 py-4 w-full border-r"><button data-modal-target="show-modal-{{ $submission->id }}" data-modal-toggle="show-modal-{{ $submission->id }}" class="underline text-green-800">{{ $submission->date }}</button></td>  
+                <!-- Delete Button -->
+                <td class="px-5 py-4 w-1/2 bg-red-100 hover:bg-gray-200"><button data-modal-target="delete-modal-{{ $submission->id }}" data-modal-toggle="delete-modal-{{ $submission->id }}" type="submit" class="btn btn-danger">Delete Submission</button></td>
+            
+    <!-- End of Record Slip Index -->
+
+
+
+        <!------- Record Slip Show Modal  ------->
+
+        <div style="width:80%; margin: 0 auto;" id="show-modal-{{ $submission->id }}" tabindex="-1" aria-hidden="true" class=" fixed top-0 left-0 right-0 z-50 hidden w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full">
+            <div class="relative bg-white rounded-lg shadow dark:bg-gray-700">
+                <button type="button" class="absolute top-3 right-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ml-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white" data-modal-hide="show-modal-{{ $submission->id }}">
+                    <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
+                    </svg>
+                    <span class="sr-only">Close modal</span>
+                </button>
+
+        <div class="px-6 py-6 lg:px-8">
+            <div id="glass" class="border rounded-lg shadow-lg">
+                <div style="background: rgba(17,63,103); border-top-left-radius: 8px; border-top-right-radius: 8px;" class="text-white rounded-sm p-4">
+                        <h1 class="text-xl font-bold text-white">Action Slips</h1>
+                </div>
+            <div class="submission">
+                <p>{{ $submission->new_field }}</p>
+                <p>{{ $submission->date }}</p>
+                <p>{{ $submission->location }}</p>
+                <p>Materials:</p>
+                <ul>
+                    <!-- removing array brackets -->
+                    @foreach (json_decode($submission->materials) as $material)
+                        <li>- {{ $material }}</li>
+                    @endforeach
+                </ul>
+                <p>Personnel:</p>
+                <ul>
+                @if (!is_null($submission->personnel))
+                        @foreach (json_decode($submission->personnel) as $person)
+                            <li>- {{ $person }}</li>
+                        @endforeach
+                    @endif           
+                </ul>
+                <p>Actions Taken:</p>
+                <ul>
+                    @foreach ($submission->actionsTakenArray() as $action)
+                        <li>
+                            <input type="checkbox" disabled {{ in_array($action, $submission->actionsTakenArray()) ? 'checked' : '' }}>
+                            {{ $action }}
+                        </li>
+                    @endforeach
+                </ul>  
+            <p>{{ $submission->remarks }}</p>
+            <button data-modal-target="delete-modal" data-modal-toggle="delete-modal" type="submit" class="btn btn-danger">Delete Submission</button>
             </div>
-            <form method="POST" action="{{ route('reports.submissions.delete', ['report' => $report, 'submission' => $submission]) }}">
-                @csrf
-                @method('DELETE')
-                <input type="hidden" name="submission_id" value="{{ $submission->id }}">
-                <button type="submit" class="btn btn-danger">Yes</button>
-            </form>
         </div>
+
+    <!-- End of Show Modal -->
+
+        </div>
+    </div>
+    </div>
+
+    </div>
+        <!------- Record Slip Delete Modal ------->
+
+        <div style="width:80%; margin: 0 auto;" id="delete-modal-{{ $submission->id }}" tabindex="-1" aria-hidden="true" class="fixed top-0 left-0 right-0 z-50 hidden w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full">
+            <div class="relative bg-white rounded-lg shadow dark:bg-gray-700">
+                <button type="button" class="absolute top-3 right-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ml-auto inline-flex justify-center items-center dark:hover:bg-gray-600 dark:hover:text-white" data-modal-hide="delete-modal">
+                    <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
+                    </svg>
+                    <span class="sr-only">Close modal</span>
+                </button>
+
+                <div class="px-6 py-6 lg:px-8">
+                    <h3  style="text-align: center; padding-top: 10px;" class="mt-4 text-xl font-medium text-gray-900 dark:text-white">Do you want to delete this record slip?</h3>
+                </div>
+                <form method="POST" action="{{ route('reports.submissions.delete', ['report' => $report, 'submission' => $submission]) }}">
+                    @csrf
+                    @method('DELETE')
+                    <input type="hidden" name="submission_id" value="{{ $submission->id }}">
+                    <button type="submit" class="btn btn-danger">Yes</button>
+                </form>
+            </div>
+        </div>
+
+
+        </tr>
+    </tbody>
+</table>
+         @endforeach
+    </div>
+  </div>
 </div>
-@endforeach
+
+<!-- End of Record Slip Delete Modal -->
+
 
 <!-- Main modal (create forms of record slip) -->
 <div style="width:80%; margin: 0 auto;" id="authentication-modal" tabindex="-1" aria-hidden="true" class="fixed top-0 left-0 right-0 z-50 hidden  p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full">
@@ -248,24 +324,10 @@
     </div>
 </div> 
 </div> 
-        <!-- Right Side (Map) -->
-        <div class="w-1/2 p-4">
-            <div class="border rounded-lg shadow-lg p-6">
-                <h1 class="text-xl font-bold text-primary">{{ trans('report.location') }}</h1>
-                @if ($report->coordinate)
-                    <div id="mapid" class="h-80 z-0"></div>
-                @else
-                    <p>{{ __('report.no_coordinate') }}</p>
-                @endif
-            </div>
-        </div>
-    </div>
-</div>
-</div>
-</div>
-
+    
 
 @endsection
+
 
 @section('styles')
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
@@ -278,6 +340,8 @@
 </style>
 
 @endsection
+
+
 @push('scripts')
 
 <!-- Make sure you put this AFTER Leaflet's CSS -->
