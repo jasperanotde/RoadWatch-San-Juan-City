@@ -143,25 +143,37 @@
                                     @enderror
                                 </div>
 
-                                <div class="mb-4">
-                                    <label for="photo" class="block text-sm font-medium text-gray-600">{{ __('report.photo') }}</label>
+                                <div class="p-2 w-full">
+                                    <div class="relative">
+                                    <label for="photo" class="leading-7 text-sm text-gray-600">Photo</label>
                                     <input
-                                        id="photo"
+                                        class="w-full bg-gray-100 bg-opacity-50 rounded border border-gray-300 focus:border-indigo-500 focus:bg-white focus:ring-2 focus:ring-indigo-200 text-base outline-none text-gray-700 py-1 px-3 leading-8 transition-colors duration-200 ease-in-out"
+                                        name="photo[]"
                                         type="file"
-                                        class="mt-1 p-2 w-full rounded-md transition duration-150 ease-in-out sm:text-sm sm:leading-5 {{ $errors->has('photo') ? 'border-red-500' : 'border-gray-300' }}"
-                                        name="photo"
-                                    >
-                                    @error('photo')
-                                        <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
-                                    @enderror
-
-                                    @if ($report->photo)
-                                        <div class="mt-2">
-                                            <img src="{{ asset($report->photo) }}" alt="Current Photo" class="max-w-xs">
+                                        id="photo"
+                                        multiple>
+                                        <div class="flex items-center place-content-center px-4 py-4 bg-gray-100 hover:bg-gray-200">
+                                            @if (!is_null($report->photo))
+                                                @foreach (json_decode($report->photo) as $image)
+                                                    <a href="{{ asset($image) }}" data-fancybox="gallery" class="mr-4">
+                                                        <img src="{{ asset($image) }}" width="100" height="100" class="rounded-lg border-solid border-2 border-primary" />
+                                                    </a>
+                                                @endforeach
+                                            @else
+                                                {{ __('report.no_photo') }}
+                                            @endif
                                         </div>
-                                    @endif
+                                        <div class="px-4 py-4 bg-gray-100 hover:bg-gray-200" id="newImagesContainer" hidden>
+                                            <div class="block text-sm font-medium text-gray-600">
+                                                New Images
+                                                <div class="flex items-center place-content-center">
+                                                    <div id="photoPreviews"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        {!! $errors->first('photo', '<span class="text-red-500 text-sm">:message</span>') !!}
+                                    </div>
                                 </div>
-
                                 <div class="mb-4">
                                     <label for="severity" class="block text-sm font-medium text-gray-600">{{ __('report.severity') }}</label>
                                     <select
@@ -267,15 +279,15 @@
         }, 5000);
     };
 
-    // This is for the pin of the report
-    // Get the image URL from the URL parameters
-    var imageUrl = '{{ request()->query('image') }}';
-
     // Create the custom icon
     var customIcon = L.icon({
-        iconUrl: imageUrl, // Replace with your custom icon image URL
+        iconUrl: '{{ $firstImageUrl }}', // Replace with your custom icon image URL
         iconSize: [35, 35], // Customize icon size if needed
     });
+
+    // Add CSS classes and styles to the custom icon
+    customIcon.options.className = 'custom-pin'; // Add your custom CSS class
+    customIcon.options.iconSize = [35, 35]; // Modify icon size
 
     // Add CSS classes and styles to the custom icon
     customIcon.options.className = 'custom-pin'; // Add your custom CSS class
@@ -292,25 +304,99 @@
 
     var geocoder = L.Control.Geocoder.nominatim();
 
-map.on('click', function(e) {
-  let latitude = e.latlng.lat.toString().substring(0, 15);
-  let longitude = e.latlng.lng.toString().substring(0, 15);
+    map.on('click', function(e) {
+    let latitude = e.latlng.lat.toString().substring(0, 15);
+    let longitude = e.latlng.lng.toString().substring(0, 15);
 
-    geocoder.reverse(e.latlng, map.options.crs.scale(map.getZoom()), function(results) {
-    let address = results[0] ? results[0].name : "Address not found";
-      $('#address').val(address);
-      $('#latitude').val(latitude);
-      $('#longitude').val(longitude);
-      updateMarker(latitude, longitude, address);
-  });
-});
+        geocoder.reverse(e.latlng, map.options.crs.scale(map.getZoom()), function(results) {
+        let address = results[0] ? results[0].name : "Address not found";
+        $('#address').val(address);
+        $('#latitude').val(latitude);
+        $('#longitude').val(longitude);
+        updateMarker(latitude, longitude, address);
+    });
+    });
 
-var updateMarkerByInputs = function() {
-    return updateMarker( $('#latitude').val() , $('#longitude').val() , $('#address').val(address) );
-}
-$('#latitude').on('input', updateMarkerByInputs);
-$('#longitude').on('input', updateMarkerByInputs);
-$('#address').on('input', updateMarkerByInputs);
+    var updateMarkerByInputs = function() {
+        return updateMarker( $('#latitude').val() , $('#longitude').val() , $('#address').val(address) );
+    }
+    $('#latitude').on('input', updateMarkerByInputs);
+    $('#longitude').on('input', updateMarkerByInputs);
+    $('#address').on('input', updateMarkerByInputs);
+
+    // Image Handler   
+    // Get references to the input field and image previews container
+    var imageInput = document.getElementById('photo');
+    var imagePreviews = document.getElementById('photoPreviews');
+    var newImagesContainer = document.getElementById('newImagesContainer');
+
+    // Add an event listener to the input field
+    imageInput.addEventListener('change', function () {
+        // Clear any existing image previews
+        imagePreviews.innerHTML = '';
+        imagePreviews.classList.add('flex', 'items-center', 'place-justify-center');
+
+        // Create a Fancybox gallery
+        var galleryId = 'gallery-' + Math.random(); // Generate a unique gallery ID
+        var galleryItems = [];
+
+        // Check if files are selected
+        if (imageInput.files.length > 0) {
+            newImagesContainer.removeAttribute('hidden'); // Show the container
+            //selectedImagesContainer.setAttribute('hidden', 'false'); // Hide the container
+        } else {
+            newImagesContainer.setAttribute('hidden', 'true'); // Hide the container
+        }
+
+        // Loop through selected files
+        for (var i = 0; i < imageInput.files.length; i++) {
+            (function (file) { // Use an IIFE to capture the current file
+                if (file) {
+                    var reader = new FileReader();
+
+                    // Create a new image element for the preview
+                    var previewImage = document.createElement('a'); // Wrap the image in an anchor
+                    previewImage.classList.add('mr-4');
+                    var image = document.createElement('img');
+                    image.style.maxWidth = '100px'; // Set maximum width for the preview
+                    image.style.maxHeight = '100px'; // Set maximum height for the preview
+                    image.classList.add('rounded-lg', 'border-solid', 'border-2', 'border-primary');
+                    
+  
+                    // Set up the reader to load when the file is loaded
+                    reader.onload = function (e) {
+                        // Display the image preview
+                        image.src = e.target.result;
+
+                        // Add the image to the Fancybox gallery
+                        var galleryItem = {
+                            src: e.target.result,
+                            opts: {
+                                caption: 'Image ' + (i + 1) // Add a caption for each image
+                            }
+                        };
+                        galleryItems.push(galleryItem);
+
+                        // Set Fancybox attributes
+                        previewImage.href = e.target.result; // Set the href attribute for the anchor
+                        previewImage.setAttribute('data-fancybox', galleryId); // Set Fancybox attribute
+
+                        previewImage.appendChild(image); // Append the image to the anchor
+                        imagePreviews.appendChild(previewImage); // Append the anchor to the container
+                    };
+
+                    // Read the current file as a data URL
+                    reader.readAsDataURL(file);
+                }
+            })(imageInput.files[i]);
+        }
+
+        // Initialize Fancybox for the gallery
+        $('[data-fancybox="' + galleryId + '"]').fancybox({
+            loop: true, // Enable looping through images
+            // Add any additional Fancybox options here
+        });
+    });
 
 </script>
 @endpush

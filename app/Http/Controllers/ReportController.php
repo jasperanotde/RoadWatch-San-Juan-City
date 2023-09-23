@@ -21,10 +21,8 @@ class ReportController extends Controller
          $this->middleware('permission:report-list|report-create|report-edit|report-delete', ['only' => ['index','show']]);
          $this->middleware('permission:report-create', ['only' => ['create','store']]);
          $this->middleware('permission:report-edit', ['only' => ['edit','update']]);
-         $this->middleware('permission:report-delete', ['only' => ['destroy']]);
+         $this->middleware('permission:report-delete', ['only' => ['destroy','deleteSubmissions']]);
     }
-
-
 
     public function index()
     {
@@ -63,7 +61,7 @@ class ReportController extends Controller
             'name'      => 'required|max:60',
             'address'   => 'nullable|max:255',
             'details'  => 'nullable|max:255',
-            'photo' => 'required|image|mimes:png,jpg,jpeg|max:2048',
+            'photo.*' => 'required|image|mimes:png,jpg,jpeg|max:2048',
             'severity'  => 'nullable|max:255',
             'urgency'  => 'nullable|max:255',
             'status'  => 'nullable|max:255',
@@ -71,10 +69,19 @@ class ReportController extends Controller
             'longitude' => 'nullable|required_with:latitude|max:15',
         ]);
 
-      
-        $fileName = time().$request->file('photo')->getClientOriginalName();
-        $path = $request->file('photo')->storeAs('images', $fileName, 'public'); 
-        $newReport["photo"] = '/storage/'.$path;
+        // Set the "status" field to "Pending"
+        $newReport['status'] = 'PENDING';
+
+        $imagePaths = [];
+
+        foreach($request->file('photo') as $v) {
+            $fileName = time() . '_' . $v->getClientOriginalName();
+            $path = $v->storeAs('images', $fileName, 'public');
+            $imagePaths[] = '/storage/'.$path;
+        }
+
+        $newReport['photo'] = json_encode($imagePaths);
+
         $newReport['creator_id'] = auth()->id();
         $report = Report::create($newReport);
         return redirect()->route('reports.show', $report);
@@ -89,7 +96,13 @@ class ReportController extends Controller
      */
     public function show(Report $report)
     {
-        return view('reports.show', compact('report'));
+        // Assuming $report->photo contains a JSON-encoded array of image URLs
+        $imageUrls = json_decode($report->photo);
+
+        // Get the first image URL or set a default value if no images are available
+        $firstImageUrl = !empty($imageUrls) ? $imageUrls[0] : 'default-image-url.jpg';
+
+        return view('reports.show', compact('report', 'firstImageUrl'));
     }
 
 
@@ -121,22 +134,23 @@ class ReportController extends Controller
         return back();
     }
 
-
     public function deleteSubmissions(Request $request, Report $report)
     {
+        $this->authorize('delete', $report);
+
         $submissionId = $request->input('submission_id');
-    
+
         // Find the specific submission associated with the report by its ID
         $submission = $report->submissions()->find($submissionId);
-    
+
         if (!$submission) {
-            return redirect()->route('route_name_for_show_page', ['report' => $report])
+            return redirect()->route('reports.show',['report' => $report])
                 ->with('error', 'Submission not found');
         }
-    
+
         // Delete the found submission
         $submission->delete();
-
+        
         return back()->with('success', 'Submissions for the report have been deleted successfully');
     }
 
@@ -147,10 +161,15 @@ class ReportController extends Controller
      * @return \Illuminate\View\View
      */
     public function edit(Report $report)
-    {
+    {      
+         // Assuming $report->photo contains a JSON-encoded array of image URLs
+         $imageUrls = json_decode($report->photo);
+
+         // Get the first image URL or set a default value if no images are available
+         $firstImageUrl = !empty($imageUrls) ? $imageUrls[0] : 'default-image-url.jpg';
         $this->authorize('update', $report);
 
-        return view('reports.edit', compact('report'));
+        return view('reports.edit', compact('report','firstImageUrl'));
     }
 
     /**
@@ -168,7 +187,7 @@ class ReportController extends Controller
             'name'      => 'required|max:60',
             'address'   => 'nullable|max:255',
             'details'  => 'nullable|max:255',
-            'photo' => 'required|image|mimes:png,jpg,jpeg|max:2048',
+            'photo.*' => 'required|image|mimes:png,jpg,jpeg|max:2048',
             'severity'  => 'nullable|max:255',
             'urgency'  => 'nullable|max:255',
             'status'  => 'nullable|max:255',
@@ -177,11 +196,25 @@ class ReportController extends Controller
 
         ]);
         
-        $fileName = time().$request->file('photo')->getClientOriginalName();
-        $path = $request->file('photo')->storeAs('images', $fileName, 'public'); 
-        $reportData["photo"] = '/storage/'.$path;
-        $reportData['creator_id'] = auth()->id();
+        // Set the "status" field to "Pending"
+        $reportData['status'] = 'PENDING';
+
+        $imagePaths = [];
         
+        // Check if there are existing images
+        if (!is_null($report->photo)) {
+            // If there are existing images, use them
+            $imagePaths = json_decode($report->photo, true);
+        } else {
+            // If there are no existing images, upload new ones
+            foreach ($request->file('photo') as $v) {
+                $fileName = time() . '_' . $v->getClientOriginalName();
+                $path = $v->storeAs('images', $fileName, 'public');
+                $imagePaths[] = '/storage/' . $path;
+            }
+        }
+
+        $reportData['photo'] = json_encode($imagePaths);
         
         $report->update($reportData);
 

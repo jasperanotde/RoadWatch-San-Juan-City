@@ -29,6 +29,13 @@
             </div>
 
             <div class="w-full mt-4">
+                <input id="number" type="text" class="block w-full px-4 py-2 mt-2 text-gray-700 placeholder-gray-500 bg-white border rounded-lg focus:border-blue-400 focus:ring-opacity-40 focus:outline-none focus:ring focus:ring-blue-300 @error('email') is-invalid @enderror" name="number" placeholder="(+63) Contact Number" value="{{ old('number') }}" required autocomplete="number" autofocus aria-label="Contact Number" />
+                @error('number')
+                    <p class="text-red-500 mt-1">{{ $message }}</p>
+                @enderror   
+            </div>
+
+            <div class="w-full mt-4">
                 <input id="password" type="password" class="block w-full px-4 py-2 mt-2 text-gray-700 placeholder-gray-500 bg-white border rounded-lg focus:border-blue-400 focus:ring-opacity-40 focus:outline-none focus:ring focus:ring-blue-300 @error('password') is-invalid @enderror" name="password" placeholder="Password" required autocomplete="current-password" aria-label="Password"/>
                 @error('password')
                     <p class="text-red-500 mt-1">{{ $message }}</p>

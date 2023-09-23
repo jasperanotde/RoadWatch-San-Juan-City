@@ -44,8 +44,6 @@ class Report extends Model
         return $this->hasMany(ReportSubmission::class);
     }
     
-
-
     /**
      * report belongs to User model relation.
      *
@@ -130,12 +128,13 @@ class Report extends Model
 
          // Display the image using an <img> tag
          if ($this->photo) {
-            $imagePath = asset($this->photo); // Replace with the actual path
+            $imagePath = json_decode($this->photo); // Replace with the actual path
+            $firstImageUrl = !empty($imagePath) ? $imagePath[0] : 'default-image-url.jpg';
             // Add custom styling with Tailwind CSS classes
         $mapPopupContent .= '<div class="p-4 border rounded-lg bg-white shadow">';
         $mapPopupContent .= '<div class="relative w-32 h-32 mx-auto">';
         $mapPopupContent .= '<div class="absolute w-4 h-4 -bottom-2 left-1/2 transform -translate-x-2 bg-white border-t-2 border-l-2 border-gray-300 rotate-45"></div>';
-        $mapPopupContent .= '<img src="'.$imagePath.'" alt="Report Photo" class="rounded-lg w-full h-full object-cover">';
+        $mapPopupContent .= '<img src="'.$firstImageUrl.'" alt="Report Photo" class="rounded-lg w-full h-full object-cover">';
         $mapPopupContent .= '</div>';
         $mapPopupContent .= '</div>';
         }
@@ -145,7 +144,7 @@ class Report extends Model
         $mapPopupContent .= '<div class="my-2 text-slate-800"><strong>'.__('report.severity').':</strong><br>'.$this->severity.'</div>';
         $mapPopupContent .= '<div class="my-2 text-slate-800"><strong>'.__('report.urgency').':</strong><br>'.$this->urgency.'</div>';
         // $mapPopupContent .= '<div class="my-2"><strong>'.__('report.coordinate').':</strong><br>'.$this->coordinate.'</div>';
-        $mapPopupContent .= '<div class="my-2 text-slate-800"><strong>'.__('report.status').':</strong><br>'.$this->status.'</div>';
+        $mapPopupContent .= '<div class="my-2 text-slate-800 "><strong>'.__('report.status').':<br><div class="text-lime-600">'.$this->status.'</div></strong></div>';
 
         return $mapPopupContent;
     }
