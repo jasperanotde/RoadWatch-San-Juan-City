@@ -172,7 +172,9 @@
         </script>
     @endpush
 
-<div class="max-w-6xl mx-auto">
+<div class="max-w-6xl mx-auto"> 
+
+
     <div class="flex justify-between items-center">
         <h1 class="font-josefinsans font-bold flex-grow text-4xl font-normal leading-none tracking-tight font-poppins text-primary"><span class="font-josefinsans font-bold underline underline-offset-3 decoration-7 decoration-secondary">{{ __('app.total') }}:<small> {{ $reports->total() }} Reports </small></h1>
     </div>
@@ -259,8 +261,8 @@
                             {{ __('report.no_photo') }}
                         @endif
                         </td>
-                        <td class="px-6 py-4 text-lime-600">
-                            <Strong>{{ $report->status }}</strong>
+                        <td class="px-6 py-4">
+                            <div class="status-label font-bold">{{ $report->status }}</div>
                         </td>
                         <td class="px-6 py-4">
                             <a href="{{ route('reports.show', ['report' => $report, 'image' => $report->getPhoto()]) }}" id="show-report-{{ $report->id }}">										{{ __('app.show') }}

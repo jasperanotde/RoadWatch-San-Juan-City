@@ -48,6 +48,8 @@ Route::group(['middleware' => ['auth']], function() {
     Route::resource('roles', RoleController::class);
     Route::resource('users', UserController::class);
     Route::resource('reports', ReportController::class);
+    Route::post('/reports/approve/{report}', 'ReportController@approveReport')->name('approve.report');
+    Route::post('/reports/{report}/decline', [ReportController::class, 'declineReport'])->name('reports.declineReport');
     Route::resource('action_slips', ActionSlipController::class);
     Route::post('/reports/{report}/submit', [ReportController::class, 'submit'])->name('reports.submit');
     Route::delete('/reports/{report}/submissions', 'ReportController@deleteSubmissions')->name('reports.submissions.delete');

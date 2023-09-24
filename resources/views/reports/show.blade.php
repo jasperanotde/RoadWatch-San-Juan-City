@@ -48,10 +48,68 @@
                         </tr>
                         <tr class="bg-blue-100 hover:bg-blue-200 border-b">
                             <td class="px-6 py-4 w-2/5 border-r">Status :</td>
-                            <td class="px-6 py-4 w-3/5 bg-gray-100 hover:bg-gray-200 text-lime-600 font-bold">{{ $report->status }}
-                                <a href="#" id="#" class="inline-flex items-center ml-4 px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded-md" type="button" data-te-target="#" data-te-toggle="#" data-te-ripple-init data-te-ripple-color="light">Approve</a>
-                                <a href="#" id="#" class="inline-flex items-center px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded-md" type="button" data-te-target="#" data-te-toggle="#" data-te-ripple-init data-te-ripple-color="light">Decline</a>
+                            <td class="items-center px-6 py-4 w-3/5 bg-gray-100 hover:bg-gray-200 font-bold">
+                                <div class="inline-block mr-2 status-label">{{ $report->status }}</div>
+                                <!-- IF APPROVED AND IN PROGRESS -->
+                                @if ($report->status === 'PENDING')
+                                    <button class="inline-flex items-center px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded-md"
+                                        type="button" 
+                                        data-te-target="#assignModal" 
+                                        data-te-toggle="modal" 
+                                        data-te-ripple-init 
+                                        data-te-ripple-color="light">Approve</button>
+
+                                    <button class="inline-flex items-center px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded-md"
+                                        type="button" 
+                                        data-te-target="#declineModal" 
+                                        data-te-toggle="modal" 
+                                        data-te-ripple-init 
+                                        data-te-ripple-color="light">Decline</button>
+                                @elseif($report->status === 'INPROGRESS')
+                                    <button class="px-4 py-2 bg-green-400 hover:bg-green-500 text-white text-sm font-medium rounded-md"
+                                        type="button" 
+                                        data-te-target="" 
+                                        data-te-toggle="modal" 
+                                        data-te-ripple-init 
+                                        data-te-ripple-color="light">Mark as Done</button>
+                                @else
+                                    <!-- NO BUTTON -->
+                                @endif
                             </td>
+
+                            <!-- APPROVE THE REPORT -->
+                            @include('reports.assignReport')
+
+                            <!-- DECLINE THE REPORT -->
+                            <form action="{{ route('reports.declineReport', $report->id)  }}" method="POST" enctype="muiltipart/form-data">
+                                {{ csrf_field() }}
+                                <div data-te-modal-init class="bg-black bg-opacity-50 fixed left-0 top-0 z-[1055] hidden h-full w-full overflow-y-auto overflow-x-hidden outline-none" id="declineModal" tabindex="-1" aria-modal="true" role="dialog">
+                                    <div data-te-modal-dialog-ref class="pointer-events-none relative flex min-h-[calc(100%-1rem)] w-auto translate-y-[-50px] items-center opacity-0 transition-all duration-300 ease-in-out min-[576px]:mx-auto min-[576px]:mt-7 min-[576px]:min-h-[calc(100%-3.5rem)] min-[576px]:max-w-[500px]">
+                                        <div class="pointer-events-auto relative flex w-full flex-col rounded-md border-none bg-white bg-clip-padding text-current shadow-lg outline-none dark:bg-neutral-600">
+                                            <div class="flex flex-shrink-0 items-center justify-between rounded-t-md border-b-2 border-neutral-100 border-opacity-100 p-4 dark:border-opacity-50">
+                                                <!--Modal title-->
+                                                <h5 class="text-xl font-medium leading-normal text-neutral-800 dark:text-neutral-200">
+                                                Decline Report
+                                                </h5>
+                                            </div>
+                                            <!--Modal body-->
+                                            <div class="relative p-4">
+                                                <p>Are you sure you want to decline the selected report?</p>
+                                            </div>
+                                            <!--Modal footer-->
+                                            <div class="flex flex-shrink-0 flex-wrap items-center justify-end rounded-b-md border-t-2 border-neutral-100 border-opacity-100 p-4 dark:border-opacity-50">
+                                                <button type="button" class="px-4 py-2 bg-gray-300 hover:bg-gray-400 text-gray-700 rounded-md" data-te-modal-dismiss data-te-ripple-init data-te-ripple-color="light">
+                                                    Cancel
+                                                </button>
+                                                <input type="hidden" name="report_id" value="{{ $report->id }}">
+                                                <button type="submit" class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white ml-2 rounded-md" data-te-ripple-init data-te-ripple-color="light">
+                                                    Decline
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
                         </tr>
                     </tbody>
                 </table>
@@ -88,8 +146,14 @@
     </div>
 </div>
 
+@if ($report->assignedUser)
+    Assigned to: {{ $report->assignedUser->name }}
+@else
+    Not assigned yet
+@endif
+
 <!------- Record Slip Index ------->
-<div id="glass" class="flex justify-center m-20 rounded-lg">
+<div id="" class="flex justify-center m-20 rounded-lg">
     <div class="w-full shadow-lg max-w-screen-xl">
         <div style="background: rgba(17,63,103); border-top-left-radius: 8px; border-top-right-radius: 8px; display: flex; justify-content: space-between; align-items: center;" class="text-white rounded-sm p-4">
             <h1 class="text-xl font-bold text-white">Action Slips</h1>
@@ -181,52 +245,52 @@
                                     </div>
 
                                     <div class="relative flex-auto p-4">
-                                    <div class="submission">
-                                        <div class="mb-3">
-                                            <p><strong>Report Name:</strong>
-                                            {{ $submission->new_field }}</p>
-                                        </div>
-                                        <div class="mb-3">
-                                            <p><strong>Action Slip Date:</strong>
-                                            {{ $submission->date }}</p>
-                                        </div>
-                                        <div class="mb-3">
-                                            <p><strong>Location:</strong>
-                                            {{ $submission->location }}</p>
-                                        </div>
-                                        <div class="mb-3">
-                                            <p><strong>Materials:</strong></p>
-                                            <ul class="ml-5 list-disc">
-                                                <!-- removing array brackets -->
-                                                @foreach (json_decode($submission->materials) as $material)
-                                                    <li>{{ $material }}</li>
-                                                @endforeach
-                                            </ul>
-                                        </div>
-                                        <div class="mb-3">
-                                            <p><strong>Personnel:</strong></p>
-                                            <ul class="ml-5 list-disc">
-                                                <!-- removing array brackets -->
-                                                @foreach (json_decode($submission->personnel) as $person)
-                                                    <li>{{ $person }}</li>
-                                                @endforeach
-                                            </ul>
-                                        </div>
-                                        <div class="mb-3">
-                                            <p><strong>Actions Taken:</strong></p>
-                                            <ul>
-                                                @foreach ($submission->actionsTakenArray() as $action)
-                                                    <li>
-                                                        <input type="checkbox" disabled {{ in_array($action, $submission->actionsTakenArray()) ? 'checked' : '' }}>
-                                                        {{ $action }}
-                                                    </li>
-                                                @endforeach
-                                            </ul>
-                                        </div>
-                                        <div class="mb-3">
-                                            <p><strong>Remarks:</strong>
-                                            {{ $submission->remarks }}</p>
-                                        </div>
+                                        <div class="submission">
+                                            <div class="mb-3">
+                                                <p><strong>Report Name:</strong>
+                                                {{ $submission->new_field }}</p>
+                                            </div>
+                                            <div class="mb-3">
+                                                <p><strong>Action Slip Date:</strong>
+                                                {{ $submission->date }}</p>
+                                            </div>
+                                            <div class="mb-3">
+                                                <p><strong>Location:</strong>
+                                                {{ $submission->location }}</p>
+                                            </div>
+                                            <div class="mb-3">
+                                                <p><strong>Materials:</strong></p>
+                                                <ul class="ml-5 list-disc">
+                                                    <!-- removing array brackets -->
+                                                    @foreach (json_decode($submission->materials) as $material)
+                                                        <li>{{ $material }}</li>
+                                                    @endforeach
+                                                </ul>
+                                            </div>
+                                            <div class="mb-3">
+                                                <p><strong>Personnel:</strong></p>
+                                                <ul class="ml-5 list-disc">
+                                                    <!-- removing array brackets -->
+                                                    @foreach (json_decode($submission->personnel) as $person)
+                                                        <li>{{ $person }}</li>
+                                                    @endforeach
+                                                </ul>
+                                            </div>
+                                            <div class="mb-3">
+                                                <p><strong>Actions Taken:</strong></p>
+                                                <ul>
+                                                    @foreach ($submission->actionsTakenArray() as $action)
+                                                        <li>
+                                                            <input type="checkbox" disabled {{ in_array($action, $submission->actionsTakenArray()) ? 'checked' : '' }}>
+                                                            {{ $action }}
+                                                        </li>
+                                                    @endforeach
+                                                </ul>
+                                            </div>
+                                            <div class="mb-3">
+                                                <p><strong>Remarks:</strong>
+                                                {{ $submission->remarks }}</p>
+                                            </div>
                                             <div class="flex items-center justify-end">
                                                 <button class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white ml-2 rounded-md" data-te-toggle="modal" data-te-target="#deleteModal{{ $submission->id }}" data-te-ripple-init data-te-ripple-color="light" type="button">Delete Action Slip</button>
                                             </div>
@@ -236,9 +300,9 @@
                             </div>
                         </div>
                     </tr>
+                @endforeach
                 </tbody>
             </table>
-            @endforeach
         </div>
     </div>
 </div>
@@ -392,8 +456,8 @@
         </div>
     </div>
 </div>
-
 @endsection
+
 @section('styles')
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
     integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="

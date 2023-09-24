@@ -17,6 +17,6 @@
     "dependencies": {
         "@fancyapps/fancybox": "^3.5.7",
         "flowbite": "^1.7.0",
-        "tw-elements": "^1.0.0-beta3"
+        "tw-elements": "^1.0.0"
     }
 }

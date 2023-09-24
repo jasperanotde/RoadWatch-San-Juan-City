@@ -44,6 +44,11 @@ class Report extends Model
         return $this->hasMany(ReportSubmission::class);
     }
     
+    public function assignedUser()
+    {
+        return $this->belongsTo(User::class); // Assuming 'assignedUser' is the foreign key column in the 'reports' table
+    }
+
     /**
      * report belongs to User model relation.
      *

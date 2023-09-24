@@ -829,10 +829,10 @@
   "resolved" "https://registry.npmjs.org/ts-interface-checker/-/ts-interface-checker-0.1.13.tgz"
   "version" "0.1.13"
 
-"tw-elements@^1.0.0-beta3":
-  "integrity" "sha512-fz4zIsetP4KGDjMXWWpcUs8avteMnSu8ilGvo8LGgixeIlcwl2ZEOpK93HfVFYmTCO4N0YdpZ5quNNom67xxFw=="
-  "resolved" "https://registry.npmjs.org/tw-elements/-/tw-elements-1.0.0-beta3.tgz"
-  "version" "1.0.0-beta3"
+"tw-elements@^1.0.0":
+  "integrity" "sha512-pD2bA1bTGzvigU79dz4pGvO207CCOpzhwlxzb7hswx40SMMkJISOkoDxU2ot3OQ7LTZM5GwuLDkZ+dquK0wdYQ=="
+  "resolved" "https://registry.npmjs.org/tw-elements/-/tw-elements-1.0.0.tgz"
+  "version" "1.0.0"
   dependencies:
     "@popperjs/core" "^2.6.0"
     "chart.js" "^3.7.1"

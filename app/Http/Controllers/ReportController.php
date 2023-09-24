@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Report;
 use App\Models\ReportSubmission;
+use App\Models\User;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -31,7 +32,7 @@ class ReportController extends Controller
         $reportQuery = Report::query();
         $reportQuery->where('name', 'like', '%'.request('q').'%');
         $reports = $reportQuery->paginate(25);
-
+        
         return view('reports.index', compact('reports'));
     }
 
@@ -102,7 +103,11 @@ class ReportController extends Controller
         // Get the first image URL or set a default value if no images are available
         $firstImageUrl = !empty($imageUrls) ? $imageUrls[0] : 'default-image-url.jpg';
 
-        return view('reports.show', compact('report', 'firstImageUrl'));
+        $cityEngineers = User::whereHas('roles', function ($query) {
+            $query->where('name', 'City Engineer');
+        })->get();
+
+        return view('reports.show', compact('report', 'firstImageUrl', 'cityEngineers'));
     }
 
 
@@ -241,4 +246,30 @@ class ReportController extends Controller
         return back();
     }
     
+    public function approveReport(Request $request, Report $report)
+    {
+        // Validate and authorize the request here, ensuring it's a City Engineer making the request
+    
+        $assignedUserId = $request->input('assignedUser');
+
+        // Update the report status to "Pending"
+        $report->status = 'INPROGRESS';
+    
+        // Update the report to assign it to the selected user
+        $report->assigned_user_id = $assignedUserId;
+        $report->save();
+    
+        return back();
+    }
+
+    public function declineReport(Request $request, Report $report)
+    {
+        // Validate and authorize the request here
+
+        $report->status = 'DECLINED';
+        $report->save();
+
+        return back();
+    }
+
 }
