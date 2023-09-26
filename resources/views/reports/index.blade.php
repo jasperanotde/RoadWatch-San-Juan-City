@@ -25,165 +25,353 @@
     @endsection
 
     @push('scripts')
-        <!-- Make sure you put this AFTER Leaflet's CSS -->
-        <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
-        crossorigin=""></script>
-        <script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"></script>
-        <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-        <script src="https://unpkg.com/flowbite@1.3.4/dist/flowbite.js"></script>
-        <script>
-            var map = L.map('mapid').setView([{{ config('leaflet.map_center_latitude') }}, {{ config('leaflet.map_center_longitude') }}], {{ config('leaflet.zoom_level') }});
+    <!-- Make sure you put this AFTER Leaflet's CSS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+    crossorigin=""></script>
+    <script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"></script>
+    <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://unpkg.com/flowbite@1.3.4/dist/flowbite.js"></script>
 
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-            }).addTo(map);
+    <script>
+        var map = L.map('mapid').setView([{{ config('leaflet.map_center_latitude') }}, {{ config('leaflet.map_center_longitude') }}], {{ config('leaflet.zoom_level') }});
 
-            L.Control.geocoder().addTo(map);
-            if (!navigator.geolocation) {
-                console.log("Your browser doesn't support geolocation feature!")
-            } else {
-                setInterval(() => {
-                    navigator.geolocation.getCurrentPosition(getPosition)
-                }, 5000);
-            };
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
 
-            // Getting user location and max radius (500 meter)
-            var marker, circle, lat, long, accuracy;
-            var featureGroup;
+        L.Control.geocoder().addTo(map);
+        if (!navigator.geolocation) {
+            console.log("Your browser doesn't support geolocation feature!")
+        } else {
+            setInterval(() => {
+                navigator.geolocation.getCurrentPosition(getPosition)
+            }, 5000);
+        };
 
-            function getPosition(position) {
-                lat = position.coords.latitude
-                long = position.coords.longitude
-                accuracy = position.coords.accuracy
+        // Getting user location and max radius (500 meter)
+        var marker, circle, lat, long, accuracy;
+        var featureGroup;
 
-                if (marker) {
-                    map.removeLayer(marker)
-                }
+        function getPosition(position) {
+            lat = position.coords.latitude
+            long = position.coords.longitude
+            accuracy = position.coords.accuracy
 
-                if (circle) {
-                    map.removeLayer(circle)
-                }
-
-                marker = L.marker([lat, long])
-                circle = L.circle([lat, long], { radius: 500 })
-
-                featureGroup = L.featureGroup([marker, circle]).addTo(map)
-                console.log("Your coordinate is: Lat: " + lat + " Long: " + long + " Accuracy: " + accuracy)
-
-                // Set a custom zoom level when getting user's location
-                // map.setView([lat, long], 10); // Adjust the zoom level (15 in this example)
+            if (marker) {
+                map.removeLayer(marker)
             }
 
-            //Get back to user location
-            document.getElementById('myButton').addEventListener('click', function() {
-                    if(featureGroup) {
-                        map.fitBounds(featureGroup.getBounds())
-                    }
-                    event.stopPropagation();
-                });
-        
-            // Create a marker cluster group with appropriate maxClusterRadius
-            var markers = L.markerClusterGroup({
-            maxClusterRadius: 50 // Adjust this value to control when clustering occurs
-            });
+            if (circle) {
+                map.removeLayer(circle)
+            }
 
-            // Make an asynchronous GET request to the API endpoint
-            axios.get('{{ route('api.reports.index') }}')
-            .then(function (response) {
-                // Extract GeoJSON features from the response data
-                var geojsonFeatures = response.data.features;
+            marker = L.marker([lat, long])
+            circle = L.circle([lat, long], { radius: 500 })
 
-                // Loop through each GeoJSON feature
-                geojsonFeatures.forEach(function (feature) {
-                // Decode the JSON-encoded photo path
-                var photos = JSON.parse(feature.properties.photo);
+            featureGroup = L.featureGroup([marker, circle]).addTo(map)
+            console.log("Your coordinate is: Lat: " + lat + " Long: " + long + " Accuracy: " + accuracy)
 
-                // Get the first photo
-                var firstPhoto = photos[0];
-
-                // Create a custom icon for the marker
-                var customIcon = L.icon({
-                    iconUrl: firstPhoto, // Use the photo URL for the image URL
-                    iconSize: [35, 35], // Customize icon size if needed
-                    className: 'custom-pin' // Add your custom CSS class
-                });
-
-                // Create a marker with the custom icon and bind a popup
-                var marker = L.marker(
-                    [feature.geometry.coordinates[1], feature.geometry.coordinates[0]],
-                    { icon: customIcon }
-                ).bindPopup(feature.properties.map_popup_content);
-
-                // Add the marker to the marker cluster group
-                markers.addLayer(marker);
-                });
-
-                // Add the main marker cluster group to the map
-                map.addLayer(markers);
-            })
-            .catch(function (error) {
-                console.error(error); // Log any errors to the console
-            });
-
-    // Sattelite layer
-    var satelliteLayer = L.tileLayer('http://mt0.google.com/vt/lyrs=s&hl=en&x={x}&y={y}&z={z}', {
-        maxZoom: 20,
-        subdomains: ['mt0', 'mt1', 'mt2', 'mt3']
-    });
-    var baseMaps = {
-        "Street": L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'),
-        "Satellite": satelliteLayer
-    };
-    L.control.layers(baseMaps).addTo(map);
-
-    // Manually Pin on Map to create report
-    @can('create', new App\Models\Report)
-    var theMarker;
-    var geocoder = L.Control.Geocoder.nominatim();
-
-    map.on('click', function(e) {
-        let latitude = e.latlng.lat.toString().substring(0, 15);
-        let longitude = e.latlng.lng.toString().substring(0, 15);
-
-        if (theMarker != undefined) {
-            map.removeLayer(theMarker);
+            // Set a custom zoom level when getting user's location
+            // map.setView([lat, long], 10); // Adjust the zoom level (15 in this example)
         }
 
-        geocoder.reverse(e.latlng, map.options.crs.scale(map.getZoom()), function(results) {
-        var address = results[0] ? results[0].name : "Address not found";
-        var popupContent = "Your location: " + address;
-        popupContent += '<br><a href="{{ route('reports.create') }}?latitude=' + latitude + '&longitude=' + longitude + 
-        '&address=' + address + '">Add new report here</a>';
-
-        theMarker = L.marker(e.latlng).addTo(map);
-        theMarker.bindPopup(popupContent).openPopup();
-
-        // Remove the marker after 5 seconds
-            setTimeout(function() {
-                if (theMarker) {
-                    map.removeLayer(theMarker);
+        //Get back to user location
+        document.getElementById('myButton').addEventListener('click', function() {
+                if(featureGroup) {
+                    map.fitBounds(featureGroup.getBounds())
                 }
-            }, 5000);
+                event.stopPropagation();
+            });
+    
+        // Create a marker cluster group with appropriate maxClusterRadius
+        var markers = L.markerClusterGroup({
+        maxClusterRadius: 50 // Adjust this value to control when clustering occurs
         });
-    });
-    @endcan
-        </script>
-    @endpush
 
-<div class="max-w-6xl mx-auto"> 
+        // Make an asynchronous GET request to the API endpoint
+        axios.get('{{ route('api.reports.index') }}')
+        .then(function (response) {
+            // Extract GeoJSON features from the response data
+            var geojsonFeatures = response.data.features;
+
+            // Loop through each GeoJSON feature
+            geojsonFeatures.forEach(function (feature) {
+            // Decode the JSON-encoded photo path
+            var photos = JSON.parse(feature.properties.photo);
+
+            // Get the first photo
+            var firstPhoto = photos[0];
+
+            // Create a custom icon for the marker
+            var customIcon = L.icon({
+                iconUrl: firstPhoto, // Use the photo URL for the image URL
+                iconSize: [35, 35], // Customize icon size if needed
+                className: 'custom-pin' // Add your custom CSS class
+            });
+
+            // Create a marker with the custom icon and bind a popup
+            var marker = L.marker(
+                [feature.geometry.coordinates[1], feature.geometry.coordinates[0]],
+                { icon: customIcon }
+            ).bindPopup(feature.properties.map_popup_content);
+
+            // Add the marker to the marker cluster group
+            markers.addLayer(marker);
+            });
+
+            // Add the main marker cluster group to the map
+            map.addLayer(markers);
+        })
+        .catch(function (error) {
+            console.error(error); // Log any errors to the console
+        });
+
+        // Sattelite layer
+        var satelliteLayer = L.tileLayer('http://mt0.google.com/vt/lyrs=s&hl=en&x={x}&y={y}&z={z}', {
+            maxZoom: 20,
+            subdomains: ['mt0', 'mt1', 'mt2', 'mt3']
+        });
+        var baseMaps = {
+            "Street": L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'),
+            "Satellite": satelliteLayer
+        };
+        L.control.layers(baseMaps).addTo(map);
+
+        // Manually Pin on Map to create report
+        @can('create', new App\Models\Report)
+        var theMarker;
+        var geocoder = L.Control.Geocoder.nominatim();
+
+        map.on('click', function(e) {
+            let latitude = e.latlng.lat.toString().substring(0, 15);
+            let longitude = e.latlng.lng.toString().substring(0, 15);
+
+            if (theMarker != undefined) {
+                map.removeLayer(theMarker);
+            }
+
+            geocoder.reverse(e.latlng, map.options.crs.scale(map.getZoom()), function(results) {
+            var address = results[0] ? results[0].name : "Address not found";
+            var popupContent = "Your location: " + address;
+            popupContent += '<br><a href="{{ route('reports.create') }}?latitude=' + latitude + '&longitude=' + longitude + 
+            '&address=' + address + '">Add new report here</a>';
+
+            theMarker = L.marker(e.latlng).addTo(map);
+            theMarker.bindPopup(popupContent).openPopup();
+
+            // Remove the marker after 5 seconds
+                setTimeout(function() {
+                    if (theMarker) {
+                        map.removeLayer(theMarker);
+                    }
+                }, 5000);
+            });
+        });
+        @endcan
+
+    function updateTable(status, button) {
+        // Hover state when Clicked
+        var buttons = document.querySelectorAll('ul li a');
+        buttons.forEach(function (btn) {
+            btn.classList.remove('active', 'text-blue-600', 'border-b-2', 'border-blue-600', 'rounded-t-lg');
+        });
+
+        // Add the "active-tab" class to the clicked button
+        button.classList.add('active', 'text-blue-600', 'border-b-2', 'border-blue-600', 'rounded-t-lg');
+
+        // Add CSRF protection header.
+        var header = {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')};
+
+        if (status.toUpperCase() === "ALL") {
+        window.location.href = '/reports'; // Redirect to reports.index
+        return; // Exit the function
+        } else if (status.toUpperCase() === "MY_REPORTS") {
+        // Make an Ajax request to fetch "Your Reports" data.
+        fetch('/my-reports')
+            .then(response => response.json())
+            .then(data => {
+                // Update the table with the fetched data.
+                updateTableWithData(data);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        return; // Exit the function
+        }
+
+        // Make an Ajax request to the server to get the list of reports for the specified status.
+        var request = new XMLHttpRequest();
+        request.open('GET', '/reports/report/' + status.toUpperCase());
+        request.setRequestHeader('X-CSRF-TOKEN', header['X-CSRF-TOKEN']);
+
+        request.onload = function() {
+            if (request.status === 200) {
+            // The request was successful.
+            var responseData = JSON.parse(request.responseText);
+            var reports = responseData.reports; // Extract reports array from response
+            var count = responseData.count; // Extract count from response
+
+            // Update the table with the new data.
+            var tableBody = document.querySelector('table tbody');
+            tableBody.innerHTML = '';
+            
+            var rowNumber = 1;
+
+            for (var i = 0; i < reports.length; i++) {
+                var report = reports[i];
+
+                // Create a new table row for the report.
+                var row = document.createElement('tr');
+                row.classList.add('bg-white', 'border-b', 'hover:bg-gray-50')
+
+                // Create a new table cell for each field of the report.
+                var idCell = document.createElement('td');
+                idCell.classList.add('px-6', 'py-4');
+                idCell.textContent = rowNumber;
+                rowNumber++;
+
+                var nameCell = document.createElement('td');
+                nameCell.classList.add('px-6', 'py-4');
+                nameCell.innerHTML = report.name;
+
+                var addressCell = document.createElement('td');
+                addressCell.classList.add('px-6', 'py-4');
+                addressCell.textContent = report.address;
+
+                var severityCell = document.createElement('td');
+                severityCell.classList.add('px-6', 'py-4');
+                severityCell.textContent = report.severity;
+
+                var urgencyCell = document.createElement('td');
+                urgencyCell.classList.add('px-6', 'py-4');
+                urgencyCell.textContent = report.urgency;
+
+                var photoCell = document.createElement('td');
+                photoCell.classList.add('px-6', 'py-4');
+                if (report.photo !== null) {
+                    var images = JSON.parse(report.photo); // Parse the JSON-encoded data to an array of image paths.
+
+                    if (images.length > 0) {
+                        // Create a div element to hold the images.
+                        var imageContainer = document.createElement('div');
+
+                        for (var j = 0; j < images.length; j++) {
+                            // Create an image element for each image URL.
+                            var imgElement = document.createElement('img');
+                            imgElement.src = images[0]; // Use the image URL directly.
+                            imgElement.width = 50;
+                            imgElement.height = 50;
+                            imgElement.className = 'img img-responsive';
+
+                            // Append the image element to the image container.
+                            imageContainer.appendChild(imgElement);
+                        }
+
+                        // Append the image container to the cell.
+                        photoCell.appendChild(imageContainer);
+                    } else {
+                        photoCell.textContent = 'No photo';
+                    }
+                } else {
+                    photoCell.textContent = 'No photo';
+                }
+
+                var statusCell = document.createElement('td');
+                statusCell.classList.add('px-6', 'py-4');
+
+                // Create a new div element.
+                var statusDiv = document.createElement('div');
+                statusDiv.classList.add('status-label', 'font-bold');
+                statusDiv.textContent = report.status;
+                statusCell.appendChild(statusDiv);
+
+                var editCell = document.createElement('td');
+                var routeUrl = '/reports/' + report.id;
+
+                // Create a new editLink element
+                var editLink = document.createElement('a');
+                editLink.href = routeUrl; //
+                editLink.textContent = '{{ __('app.show') }}';
+
+                // Append the editLink to the editCell
+                editCell.innerHTML = ''; // Clear the existing content
+                editCell.appendChild(editLink);
 
 
-    <div class="flex justify-between items-center">
-        <h1 class="font-josefinsans font-bold flex-grow text-4xl font-normal leading-none tracking-tight font-poppins text-primary"><span class="font-josefinsans font-bold underline underline-offset-3 decoration-7 decoration-secondary">{{ __('app.total') }}:<small> {{ $reports->total() }} Reports </small></h1>
+                // Append the table cells to the table row.
+                row.appendChild(idCell);
+                row.appendChild(nameCell);
+                row.appendChild(addressCell);
+                row.appendChild(severityCell);
+                row.appendChild(urgencyCell);
+                row.appendChild(photoCell);
+                row.appendChild(statusCell);
+                row.appendChild(editCell);
+
+
+                // Append the table row to the table body.
+                tableBody.appendChild(row);
+                console.log('Reports length:', reports.length);
+            }
+        }
+
+        var countElement = document.getElementById('count-display');
+        if (countElement) {
+            var report;
+            for(var r=0; r < reports.lenght; r++) {
+                report = reports[r];
+            }
+            if (report == null){
+                countElement.textContent = 'No reports';
+            } else {
+                var formattedStatus = report.status.charAt(0).toUpperCase() + report.status.slice(1).toLowerCase();
+                countElement.textContent = count + ' ' + formattedStatus + ' Reports';
+            }
+        }
+    };
+    request.send();
+};
+
+    function updateTableWithData(reports) {
+        // Update the table with the new data.
+        var tableBody = document.querySelector('table tbody');
+        tableBody.innerHTML = '';
+
+        // Iterate through the reports and create table rows as needed.
+        for (var i = 0; i < reports.length; i++) {
+            var report = reports[i];
+
+            // Create and append table rows, similar to your existing code.
+            
+        }
+    }
+
+    window.onload = function() {
+    // Get a reference to the element you want to scroll to
+    var datatable = document.getElementById('reportTable');
+
+    // Check if the element exists
+    if (datatable) {
+        // Scroll to the element using the `scrollIntoView` method
+        datatable.scrollIntoView({ behavior: 'smooth' }); // You can use 'auto' or 'smooth' for scrolling behavior
+    }
+    };
+</script>
+@endpush
+
+<div class="max-w-6xl mx-auto" id="reportTable"> 
+
+     <div class="flex justify-between items-center">
+        <h1 class="font-josefinsans font-bold flex-grow text-4xl font-normal leading-none tracking-tight font-poppins text-primary"><span class="font-josefinsans font-bold underline underline-offset-3 decoration-7 decoration-secondary">{{ __('app.total') }}: <small><span id="count-display">{{ $reports->total() }} Total Reports </span> </span></small></h1>
     </div>
 
-    <div class="mb-20 relative overflow-x-auto shadow-md sm:rounded-lg">
+    <div class="mb-20 overflow-x-auto shadow-md sm:rounded-lg">
         <div class="p-4">
-        <label for="datatable-search-input" class="sr-only">Search</label>
-            <div class="relative mt-1">
-                <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+            <label for="datatable-search-input" class="sr-only">Search</label>
+            <div class="flex items-center justify-between mt-1">
+                <div class="pl-3 pointer-events-none">
                     <svg class="w-5 h-5 text-gray-500 dark:text-gray-400" fill="currentColor" viewBox="0 0 20 20"
                         xmlns="http://www.w3.org/2000/svg">
                         <path fill-rule="evenodd"
@@ -191,22 +379,42 @@
                             clip-rule="evenodd"></path>
                     </svg>
                 </div>
-                <input type="search" id="datatable-search-input" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-80 pl-10 p-2.5  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Search for items">
-                <div class="absolute top-0 right-0  ml-4">
+                <input type="search" id="datatable-search-input" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-50 pl-10 p-2.5" placeholder="Search for items">
+                <div class="flex justify-center text-sm font-medium text-center text-gray-500 border-b border-gray-200 dark:text-gray-400 dark:border-gray-700">
+                    <ul class="font-bold flex flex-wrap -mb-px">
+                        <li class="mr-2">
+                            <a type="button" onclick="updateTable('all', this)" class="cursor-pointer inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300">ALL REPORTS</a>
+                        </li>
+                        <li class="mr-2">
+                            <a type="button" onclick="updateTable('pending', this)" class="cursor-pointer inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300">PENDING</a>
+                        </li>
+                        <li class="mr-2">
+                            <a type="button" onclick="updateTable('inprogress', this)" class="cursor-pointer inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300">INPROGRESS</a>
+                        </li>
+                        <li class="mr-2">
+                            <a type="button" onclick="updateTable('finished', this)" class="cursor-pointer inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300">FINISHED</a>
+                        </li>
+                        <li class="mr-2">
+                            <a type="button" onclick="updateTable('declined', this)" class="cursor-pointer inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300">DECLINED</a>
+                        </li>
+                        <li class="mr-2">
+                            <a type="button" onclick="updateTable('my_reports', this)" class="cursor-pointer inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300">My Reports</a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="">
                     <a href="{{ route('reports.create') }}">
                 <button class="bg-primary text-white p-2 rounded hover:bg-secondary m-2 font-bold py-2 px-4 rounded">
                     Create New Report
                 </button></a>
                 </div>
-
             </div>
-         </div>
-        <div style="padding: 14px;"id="datatable">
+        </div>
+        <div style="padding: 14px;" id="datatable">
             <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
                 <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-                    <tr>
-                        
-                    <th scope="col" class="px-6 py-3">
+                    <tr>   
+                        <th scope="col" class="px-6 py-3">
                             {{ __('app.table_no') }}
                         </th>
                         <th scope="col" class="px-6 py-3">
@@ -264,8 +472,9 @@
                         <td class="px-6 py-4">
                             <div class="status-label font-bold">{{ $report->status }}</div>
                         </td>
-                        <td class="px-6 py-4">
-                            <a href="{{ route('reports.show', ['report' => $report, 'image' => $report->getPhoto()]) }}" id="show-report-{{ $report->id }}">										{{ __('app.show') }}
+                        <td class="px-6 py-4" data-image="{{ $report->getPhoto() }}">
+                            <a href="{{ route('reports.show', ['report' => $report]) }}">
+                                {{ __('app.show') }}
                             </a>
                         </td>
                     </tr>
@@ -273,7 +482,7 @@
                 </tbody>
             </table>
         </div>
-                <div class="card-body">{{ $reports->appends(Request::except('page'))->render() }}</div>
+            <div class="card-body">{{ $reports->appends(Request::except('page'))->render() }}</div>
         </div>
         <script src="https://unpkg.com/flowbite@1.3.4/dist/flowbite.js"></script>
     </div>

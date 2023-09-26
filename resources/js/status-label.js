@@ -1,4 +1,4 @@
-$(function() {
+$(document).on('DOMContentLoaded', function() {
     $('.status-label').each(function() {
         var status = $(this).text().trim();
 

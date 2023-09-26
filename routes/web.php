@@ -50,12 +50,17 @@ Route::group(['middleware' => ['auth']], function() {
     Route::resource('reports', ReportController::class);
     Route::post('/reports/approve/{report}', 'ReportController@approveReport')->name('approve.report');
     Route::post('/reports/{report}/decline', [ReportController::class, 'declineReport'])->name('reports.declineReport');
+    Route::post('/reports/{report}/finished', [ReportController::class, 'finishedReport'])->name('reports.finishedReport');
     Route::resource('action_slips', ActionSlipController::class);
     Route::post('/reports/{report}/submit', [ReportController::class, 'submit'])->name('reports.submit');
     Route::delete('/reports/{report}/submissions', 'ReportController@deleteSubmissions')->name('reports.submissions.delete');
 
     // Add the 'gallery' route here
     Route::get('/gallery', 'GalleryController@index')->name('gallery.index');
+
+    Route::get('/reports/report/{status}', [ReportController::class, 'getReportsByStatus']);
+    Route::get('/my-reports', 'ReportController@myReports')->name('reports.myReports');
+
 });
 
 

@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 class Report extends Model
 {
     protected $fillable = [
-        'name', 'address', 'latitude', 'longitude', 'creator_id', 'details','photo', 'severity', 'urgency','status'
+        'name', 'address', 'latitude', 'longitude', 'creator_id', 'details','photo', 'severity', 'urgency','status', 'assigned_user_id', 'finished_photo'
     ];
 
     /**
@@ -118,8 +118,6 @@ class Report extends Model
             return $this->status;
         }
     }
-
-    
 
     /**
      * Get report map_popup_content attribute.

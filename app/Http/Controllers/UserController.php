@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Models\Report;
 use Spatie\Permission\Models\Role;
 use DB;
 use Hash;
@@ -145,9 +146,26 @@ class UserController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function destroy($id): RedirectResponse
-    {
-        User::find($id)->delete();
-        return redirect()->route('users.index')
-                        ->with('success','User deleted successfully');
+{
+    // Find the user
+    $user = User::find($id);
+
+    if (!$user) {
+        return redirect()->route('users.index')->with('error', 'User not found');
     }
+
+    // Get the reports created by the user
+    $reports = $user->reports;
+
+    // Delete the reports associated with the user
+    foreach ($reports as $report) {
+        $report->delete();
+    }
+
+    // Delete the user
+    $user->delete();
+
+    return redirect()->route('users.index')->with('success', 'User and associated reports deleted successfully');
+}
+
 }

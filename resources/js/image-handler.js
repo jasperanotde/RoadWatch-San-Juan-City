@@ -1,8 +1,11 @@
+document.addEventListener('DOMContentLoaded', function() {
+    // Image Handler
     // Get references to the input field and image previews container
+
     var imageInput = document.getElementById('photo');
     var imagePreviews = document.getElementById('photoPreviews');
-    var selectedImagesContainer = document.getElementById('selectedImagesContainer');
-
+    var newImagesContainer = document.getElementById('newImagesContainer');
+    
     // Add an event listener to the input field
     imageInput.addEventListener('change', function () {
         // Clear any existing image previews
@@ -15,9 +18,10 @@
 
         // Check if files are selected
         if (imageInput.files.length > 0) {
-            selectedImagesContainer.removeAttribute('hidden'); // Show the container
+            newImagesContainer.removeAttribute('hidden'); // Show the container
+            //selectedImagesContainer.setAttribute('hidden', 'false'); // Hide the container
         } else {
-            selectedImagesContainer.setAttribute('hidden', 'true'); // Hide the container
+            newImagesContainer.setAttribute('hidden', 'true'); // Hide the container
         }
 
         // Loop through selected files
@@ -68,4 +72,5 @@
             loop: true, // Enable looping through images
             // Add any additional Fancybox options here
         });
-    });
+    })
+});

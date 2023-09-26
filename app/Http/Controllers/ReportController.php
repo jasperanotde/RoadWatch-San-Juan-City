@@ -36,6 +36,37 @@ class ReportController extends Controller
         return view('reports.index', compact('reports'));
     }
 
+    public function getReportsByStatus($status)
+    {
+        // Validate that the status is one of the allowed values (e.g., 'PENDING', 'INPROGRESS', etc.).
+        $allowedStatus = ['PENDING', 'INPROGRESS', 'FINISHED', 'DECLINED'];
+        if (!in_array($status, $allowedStatus)) {
+            abort(404); // Return a 404 response for invalid statuses.
+        }
+
+        // Filter reports based on the selected status.
+        $reports = Report::where('status', strtoupper($status))->get();
+
+        $count = Report::where('status', strtoupper($status))->count();
+
+        // Create an associative array containing both reports and count.
+        $data = [
+            'reports' => $reports,
+            'count' => $count,
+        ];
+
+        return response()->json($data);
+    }
+
+    public function myReports()
+    {
+        // Retrieve reports created by the currently logged-in user.
+        $user = auth()->user();
+        $reports = $user->reports; // Assuming you have a relationship set up.
+
+        return view('reports.your_reports', compact('reports'));
+    }
+
     /**
      * Show the form for creating a new report.
      *
@@ -267,6 +298,30 @@ class ReportController extends Controller
         // Validate and authorize the request here
 
         $report->status = 'DECLINED';
+        $report->save();
+
+        return back();
+    }
+
+    public function finishedReport(Request $request, Report $report)
+    {
+        // Validate and authorize the request here
+        $request->validate([
+            'finished_photo.*' => 'required|mimes:png,jpg,jpeg|max:2048', // Adjust validation rules as needed
+        ]);
+
+        $report->status = 'FINISHED';
+
+        $imagePaths = [];
+
+        foreach($request->file('finished_photo') as $v) {
+            $fileName = time() . '_' . $v->getClientOriginalName();
+            $path = $v->storeAs('images', $fileName, 'public');
+            $imagePaths[] = '/storage/'.$path;
+        }
+
+        $report['finished_photo'] = json_encode($imagePaths);
+
         $report->save();
 
         return back();

@@ -51,32 +51,49 @@
                             <td class="items-center px-6 py-4 w-3/5 bg-gray-100 hover:bg-gray-200 font-bold">
                                 <div class="inline-block mr-2 status-label">{{ $report->status }}</div>
                                 <!-- IF APPROVED AND IN PROGRESS -->
-                                @if ($report->status === 'PENDING')
-                                    <button class="inline-flex items-center px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded-md"
-                                        type="button" 
-                                        data-te-target="#assignModal" 
-                                        data-te-toggle="modal" 
-                                        data-te-ripple-init 
-                                        data-te-ripple-color="light">Approve</button>
+                                @if (!auth()->user()->hasRole(['City Engineer', 'Normal User']))
+                                    @if ($report->status === 'PENDING')
+                                        <button class="inline-flex items-center px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded-md"
+                                            type="button" 
+                                            data-te-target="#assignModal" 
+                                            data-te-toggle="modal" 
+                                            data-te-ripple-init 
+                                            data-te-ripple-color="light">Approve</button>
 
-                                    <button class="inline-flex items-center px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded-md"
-                                        type="button" 
-                                        data-te-target="#declineModal" 
-                                        data-te-toggle="modal" 
-                                        data-te-ripple-init 
-                                        data-te-ripple-color="light">Decline</button>
-                                @elseif($report->status === 'INPROGRESS')
-                                    <button class="px-4 py-2 bg-green-400 hover:bg-green-500 text-white text-sm font-medium rounded-md"
-                                        type="button" 
-                                        data-te-target="" 
-                                        data-te-toggle="modal" 
-                                        data-te-ripple-init 
-                                        data-te-ripple-color="light">Mark as Done</button>
-                                @else
-                                    <!-- NO BUTTON -->
+                                        <button class="inline-flex items-center px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded-md"
+                                            type="button" 
+                                            data-te-target="#declineModal" 
+                                            data-te-toggle="modal" 
+                                            data-te-ripple-init 
+                                            data-te-ripple-color="light">Decline</button>
+                                    @elseif($report->status === 'INPROGRESS')
+                                        <button class="px-4 py-2 bg-green-400 hover:bg-green-500 text-white text-sm font-medium rounded-md"
+                                            type="button" 
+                                            data-te-target="#finishedModal" 
+                                            data-te-toggle="modal" 
+                                            data-te-ripple-init 
+                                            data-te-ripple-color="light">Mark as Done</button>
+                                            @if ($report->assignedUser)
+                                                <span class="italic font-normal"><strong>Assigned to:</strong> {{ $report->assignedUser->name }}</span>
+                                            @else
+                                                <span>Not assigned yet</span>
+                                            @endif
+                                    @else
+                                        <!-- NO BUTTON -->
+                                    @endif
+                                @endif
+
+                                @if(auth()->user()->hasRole('City Engineer'))
+                                    @if($report->status === 'INPROGRESS')
+                                        <button class="px-4 py-2 bg-green-400 hover:bg-green-500 text-white text-sm font-medium rounded-md"
+                                            type="button" 
+                                            data-te-target="#finishedModal" 
+                                            data-te-toggle="modal" 
+                                            data-te-ripple-init 
+                                            data-te-ripple-color="light">Mark as Done</button>
+                                    @endif
                                 @endif
                             </td>
-
                             <!-- APPROVE THE REPORT -->
                             @include('reports.assignReport')
 
@@ -110,13 +127,36 @@
                                     </div>
                                 </div>
                             </form>
+
+                            <!-- MARK AS FINISHED THE REPORT -->
+                            @include('reports.finishedReport')
                         </tr>
+                        @if($report->status === 'FINISHED')
+                        <tr class="bg-blue-100 hover:bg-blue-200 border-b">
+                            <td class="px-6 py-4 w-2/5 border-r">Updated Photo : </td>
+                            <td class="flex items-center place-content-center px-4 py-4 bg-gray-100 hover:bg-gray-200">
+                                @if (!is_null($report->finished_photo))
+                                    @foreach (json_decode($report->finished_photo) as $image)
+                                        <a href="{{ asset($image) }}" data-fancybox="gallery" class="mr-4">
+                                            <img src="{{ asset($image) }}" width="100" height="100" class="rounded-lg border-solid border-2 border-primary img img-responsive" />
+                                            </a>
+                                        @endforeach
+                                @else
+                                    {{ __('report.no_photo') }}
+                                @endif
+                            </td>
+                        </tr>
+                        @endif
                     </tbody>
                 </table>
                 <div class="flex items-center justify-between p-4">
-                    @can('update', $report)
-                        <a href="{{ route('reports.edit', ['report' => $report, 'image' => $report->getPhoto()]) }}" id="edit-report-{{ $report->id }}" class="float-right mt-1 mx-2 md:mt-4 md:mx-3 px-4 py-1.5 md:px-9 md:py-2.5 bg-primary text-white text-xxs md:text-xs font-poppins font-normal rounded hover:bg-secondary hover:text-white focus:outline-none focus:bg-primary transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110 duration-300">Edit Report</a>
-                    @endcan
+                    @if(auth()->user()->hasRole(['Normal User', 'Admin']))
+                        @can('update', $report)
+                        @if(auth()->user()->id === $report->creator_id)
+                            <a href="{{ route('reports.edit', ['report' => $report, 'image' => $report->getPhoto()]) }}" id="edit-report-{{ $report->id }}" class="float-right mt-1 mx-2 md:mt-4 md:mx-3 px-4 py-1.5 md:px-9 md:py-2.5 bg-primary text-white text-xxs md:text-xs font-poppins font-normal rounded hover:bg-secondary hover:text-white focus:outline-none focus:bg-primary transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110 duration-300">Edit Report</a>
+                        @endif
+                        @endcan
+                    @endif
                     @if(auth()->check())
                         <a href="{{ route('reports.index') }}" class=" mt-1 mx-2 md:mt-4 md:mx-3 px-4 py-1.5 md:px-9 md:py-2.5 bg-white text-primary text-xxs md:text-xs font-poppins font-normal rounded hover:bg-secondary hover:text-white focus:outline-none focus:bg-primary transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110 duration-300 hover:underline">Back to Reports</a>
                     @else
@@ -136,22 +176,19 @@
             @else
                 <p>{{ __('report.no_coordinate') }}</p>
             @endif
-            <div class="my-5">
-                <label for="remarks" class="block text-sm font-medium text-gray-900 ">Report Remarks</label>
-                <textarea name="remarks" id="remarks" rows="4"
-                    class="block w-full px-4 py-2 mt-1 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 "
-                    placeholder="Enter Remarks"></textarea>
-            </div>
+            @if(auth()->user()->id === $report->creator_id)
+                <div class="my-5">
+                    <label for="remarks" class="block text-sm font-medium text-gray-900 ">Report Remarks</label>
+                    <textarea name="remarks" id="remarks" rows="4"
+                        class="block w-full px-4 py-2 mt-1 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 "
+                        placeholder="Enter Remarks"></textarea>
+                </div>
+            @endif
         </div>
     </div>
 </div>
 
-@if ($report->assignedUser)
-    Assigned to: {{ $report->assignedUser->name }}
-@else
-    Not assigned yet
-@endif
-
+@role('Admin|City Engineer Supervisor|City Engineer')
 <!------- Record Slip Index ------->
 <div id="" class="flex justify-center m-20 rounded-lg">
     <div class="w-full shadow-lg max-w-screen-xl">
@@ -306,6 +343,8 @@
         </div>
     </div>
 </div>
+@endrole
+
 
 <!-- New Create Action Slip Modal -->
 <div data-te-modal-init class="bg-black bg-opacity-50 fixed left-0 top-0 z-[1055] hidden h-full w-full overflow-y-auto overflow-x-hidden outline-none" data-te-modal-init id="authentication-modal"  tabindex="-1" aria-hidden="true" role="dialog">
@@ -475,7 +514,7 @@
     integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
     crossorigin=""></script>
     <script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>    
 <script>
 
 var map = L.map('mapid').setView([{{ $report->latitude }}, {{ $report->longitude }}], {{ config('leaflet.detail_zoom_level') }});
