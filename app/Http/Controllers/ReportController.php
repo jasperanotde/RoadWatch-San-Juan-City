@@ -29,43 +29,68 @@ class ReportController extends Controller
     {
         $this->authorize('manage_report');
 
+        $user = auth()->user();
+        $assignedReports = Report::where('assigned_user_id', $user->id);
+
         $reportQuery = Report::query();
         $reportQuery->where('name', 'like', '%'.request('q').'%');
         $reports = $reportQuery->paginate(25);
         
-        return view('reports.index', compact('reports'));
+        return view('reports.index', compact('reports', 'assignedReports'));
     }
 
-    public function getReportsByStatus($status)
+    public function getReportsByCategory($category)
     {
-        // Validate that the status is one of the allowed values (e.g., 'PENDING', 'INPROGRESS', etc.).
-        $allowedStatus = ['PENDING', 'INPROGRESS', 'FINISHED', 'DECLINED'];
-        if (!in_array($status, $allowedStatus)) {
-            abort(404); // Return a 404 response for invalid statuses.
+        $user = auth()->user();
+        // Validate that the category is one of the allowed values (e.g., 'PENDING', 'INPROGRESS', etc.).
+        $allowedCategories = ['PENDING', 'INPROGRESS', 'FINISHED', 'DECLINED', 'MY_REPORTS', 'ASSIGNED'];
+    
+        if (!in_array(strtoupper($category), $allowedCategories)) {
+            abort(404); // Return a 404 response for invalid categories.
         }
+    
+        // If the category is "MY_REPORTS," retrieve reports created by the currently logged-in user.
+        if (strtoupper($category) === "MY_REPORTS") {
+            $reports = $user->reports; // Assuming you have a relationship set up.
 
-        // Filter reports based on the selected status.
-        $reports = Report::where('status', strtoupper($status))->get();
-
-        $count = Report::where('status', strtoupper($status))->count();
-
+            $count = $reports->count();
+    
         // Create an associative array containing both reports and count.
         $data = [
             'reports' => $reports,
             'count' => $count,
-        ];
+            'user' => $user,
+            ];
+        }
+        // If the category is "ASSIGNED," retrieve reports where user_id matches assigned_user_id.
+        elseif (strtoupper($category) === "ASSIGNED") {
+            $reports = Report::where('assigned_user_id', $user->id)->get();
 
+            $count = $reports->count();
+    
+            // Create an associative array containing both reports and count.
+            $data = [
+                'reports' => $reports,
+                'count' => $count,
+                'user' => $user,
+            ];
+        } else {
+            // Filter reports based on the selected category.
+            $reports = Report::where('status', strtoupper($category))->get();
+
+            $count = $reports->count();
+    
+            // Create an associative array containing both reports and count.
+            $data = [
+                'reports' => $reports,
+                'count' => $count,
+                'user' => $user,
+            ];
+        }
+    
         return response()->json($data);
     }
-
-    public function myReports()
-    {
-        // Retrieve reports created by the currently logged-in user.
-        $user = auth()->user();
-        $reports = $user->reports; // Assuming you have a relationship set up.
-
-        return view('reports.your_reports', compact('reports'));
-    }
+    
 
     /**
      * Show the form for creating a new report.

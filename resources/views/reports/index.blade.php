@@ -171,7 +171,7 @@
         });
         @endcan
 
-    function updateTable(status, button) {
+    function updateTable(category, button) {
         // Hover state when Clicked
         var buttons = document.querySelectorAll('ul li a');
         buttons.forEach(function (btn) {
@@ -184,26 +184,14 @@
         // Add CSRF protection header.
         var header = {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')};
 
-        if (status.toUpperCase() === "ALL") {
+        if (category.toUpperCase() === "ALL") {
         window.location.href = '/reports'; // Redirect to reports.index
-        return; // Exit the function
-        } else if (status.toUpperCase() === "MY_REPORTS") {
-        // Make an Ajax request to fetch "Your Reports" data.
-        fetch('/my-reports')
-            .then(response => response.json())
-            .then(data => {
-                // Update the table with the fetched data.
-                updateTableWithData(data);
-            })
-            .catch(error => {
-                console.error('Error:', error);
-            });
         return; // Exit the function
         }
 
         // Make an Ajax request to the server to get the list of reports for the specified status.
         var request = new XMLHttpRequest();
-        request.open('GET', '/reports/report/' + status.toUpperCase());
+        request.open('GET', '/reports/report/' + category.toUpperCase());
         request.setRequestHeader('X-CSRF-TOKEN', header['X-CSRF-TOKEN']);
 
         request.onload = function() {
@@ -212,6 +200,7 @@
             var responseData = JSON.parse(request.responseText);
             var reports = responseData.reports; // Extract reports array from response
             var count = responseData.count; // Extract count from response
+            var user = responseData.user;
 
             // Update the table with the new data.
             var tableBody = document.querySelector('table tbody');
@@ -319,36 +308,31 @@
 
         var countElement = document.getElementById('count-display');
         if (countElement) {
-            var report;
-            for(var r=0; r < reports.lenght; r++) {
+            var report = null;
+            for (var r = 0; r < reports.length; r++) {
                 report = reports[r];
             }
-            if (report == null){
-                countElement.textContent = 'No reports';
+            
+            if (report !== null) {
+                if (user.id === report.creator_id && category.toUpperCase() === 'MY_REPORTS' && count > 0) {
+                    countElement.textContent = count + ' My Reports';
+                } else if (user.id === report.assigned_user_id && category.toUpperCase() === 'ASSIGNED' && count > 0) {
+                    countElement.textContent = count + ' Assigned Reports';
+                } else if (category.toUpperCase() === 'FINISHED' || category.toUpperCase() === 'PENDING' || category.toUpperCase() === 'INPROGRESS' || category.toUpperCase() === 'DECLINED') {
+                    var formattedStatus = report.status.charAt(0).toUpperCase() + report.status.slice(1).toLowerCase();
+                    countElement.textContent = count + ' ' + formattedStatus + ' Reports';
+                } else {
+                    countElement.textContent = 'No Reports';
+                }
             } else {
-                var formattedStatus = report.status.charAt(0).toUpperCase() + report.status.slice(1).toLowerCase();
-                countElement.textContent = count + ' ' + formattedStatus + ' Reports';
+                countElement.textContent = 'No Reports';
             }
         }
     };
     request.send();
 };
 
-    function updateTableWithData(reports) {
-        // Update the table with the new data.
-        var tableBody = document.querySelector('table tbody');
-        tableBody.innerHTML = '';
-
-        // Iterate through the reports and create table rows as needed.
-        for (var i = 0; i < reports.length; i++) {
-            var report = reports[i];
-
-            // Create and append table rows, similar to your existing code.
-            
-        }
-    }
-
-    window.onload = function() {
+window.onload = function() {
     // Get a reference to the element you want to scroll to
     var datatable = document.getElementById('reportTable');
 
@@ -357,7 +341,7 @@
         // Scroll to the element using the `scrollIntoView` method
         datatable.scrollIntoView({ behavior: 'smooth' }); // You can use 'auto' or 'smooth' for scrolling behavior
     }
-    };
+};
 </script>
 @endpush
 
@@ -386,6 +370,14 @@
                             <a type="button" onclick="updateTable('all', this)" class="cursor-pointer inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300">ALL REPORTS</a>
                         </li>
                         <li class="mr-2">
+                            <a type="button" onclick="updateTable('my_reports', this)" class="cursor-pointer inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300">MY REPORTS</a>
+                        </li>
+                        @if(auth()->check() && $assignedReports->count() > 0)
+                            <li class="mr-2">
+                                <a type="button" onclick="updateTable('assigned', this)" class="cursor-pointer inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300">ASSIGNED REPORTS</a>
+                            </li>
+                        @endif
+                        <li class="mr-2">
                             <a type="button" onclick="updateTable('pending', this)" class="cursor-pointer inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300">PENDING</a>
                         </li>
                         <li class="mr-2">
@@ -397,16 +389,7 @@
                         <li class="mr-2">
                             <a type="button" onclick="updateTable('declined', this)" class="cursor-pointer inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300">DECLINED</a>
                         </li>
-                        <li class="mr-2">
-                            <a type="button" onclick="updateTable('my_reports', this)" class="cursor-pointer inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300">My Reports</a>
-                        </li>
                     </ul>
-                </div>
-                <div class="">
-                    <a href="{{ route('reports.create') }}">
-                <button class="bg-primary text-white p-2 rounded hover:bg-secondary m-2 font-bold py-2 px-4 rounded">
-                    Create New Report
-                </button></a>
                 </div>
             </div>
         </div>
@@ -437,7 +420,7 @@
                             Status
                         </th>
                         <th scope="col" class="px-6 py-3">
-                            Edit
+                            Action
                         </th>
                     </tr>
                 </thead>
@@ -481,6 +464,12 @@
                     @endforeach
                 </tbody>
             </table>
+            <div class="">
+            <a href="{{ route('reports.create') }}">
+                <button class="bg-primary text-white p-2 rounded hover:bg-secondary m-2 font-bold py-2 px-4 rounded">
+                    Create Report
+                </button></a>
+            </div>
         </div>
             <div class="card-body">{{ $reports->appends(Request::except('page'))->render() }}</div>
         </div>

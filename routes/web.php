@@ -58,8 +58,7 @@ Route::group(['middleware' => ['auth']], function() {
     // Add the 'gallery' route here
     Route::get('/gallery', 'GalleryController@index')->name('gallery.index');
 
-    Route::get('/reports/report/{status}', [ReportController::class, 'getReportsByStatus']);
-    Route::get('/my-reports', 'ReportController@myReports')->name('reports.myReports');
+    Route::get('/reports/report/{category}', [ReportController::class, 'getReportsByCategory']);
 
 });
 

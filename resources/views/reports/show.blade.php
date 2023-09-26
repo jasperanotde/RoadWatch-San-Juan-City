@@ -152,7 +152,7 @@
                 <div class="flex items-center justify-between p-4">
                     @if(auth()->user()->hasRole(['Normal User', 'Admin']))
                         @can('update', $report)
-                        @if(auth()->user()->id === $report->creator_id)
+                        @if(auth()->check() && auth()->user()->id === $report->creator_id)
                             <a href="{{ route('reports.edit', ['report' => $report, 'image' => $report->getPhoto()]) }}" id="edit-report-{{ $report->id }}" class="float-right mt-1 mx-2 md:mt-4 md:mx-3 px-4 py-1.5 md:px-9 md:py-2.5 bg-primary text-white text-xxs md:text-xs font-poppins font-normal rounded hover:bg-secondary hover:text-white focus:outline-none focus:bg-primary transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110 duration-300">Edit Report</a>
                         @endif
                         @endcan
