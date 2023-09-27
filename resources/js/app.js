@@ -1,5 +1,7 @@
 import './bootstrap';
 import 'flowbite';
+import Alpine from 'alpinejs'
+ 
 
 // Initialization for ES Users
 // Install: npm install tw-elements -- if encountering error
@@ -16,3 +18,7 @@ document.addEventListener('DOMContentLoaded', function () {
         $('[data-fancybox]').fancybox();
     }
 });
+
+window.Alpine = Alpine
+ 
+Alpine.start()

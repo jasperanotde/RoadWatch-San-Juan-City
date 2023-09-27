@@ -11,6 +11,7 @@
 
   
   @yield('styles')
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 </head>
 
 <body>
@@ -22,5 +23,7 @@
     @include('layout.partials.footer')
 
     @stack('scripts')
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.0/dist/cdn.min.js"></script>
+
 </body>
 </html>
