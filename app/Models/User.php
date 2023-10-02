@@ -10,10 +10,11 @@ use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
+use Usamamuneerchaudhary\Commentify\Traits\HasUserAvatar;
 
 class User extends Authenticatable
 {
-    use HasApiTokens, HasFactory, Notifiable, HasRoles;
+    use HasApiTokens, HasFactory, Notifiable, HasRoles, HasUserAvatar;
 
     /**
      * The attributes that are mass assignable.

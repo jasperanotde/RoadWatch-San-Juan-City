@@ -171,7 +171,7 @@
         </div>
 
         <!-- Right Side (Map) -->
-        <div class="w-1/2 p-4 ">
+        <div class="w-1/2 p-4">
             <div style="background: rgba(17,63,103); border-top-left-radius: 8px; border-top-right-radius: 8px;" class="text-white rounded-sm p-4">
                 <h1 class="text-xl font-bold text-white">{{ trans('report.location') }}</h1>
             </div>
@@ -180,14 +180,7 @@
             @else
                 <p>{{ __('report.no_coordinate') }}</p>
             @endif
-            @if(auth()->user()->id === $report->creator_id)
-                <div class="my-5">
-                    <label for="remarks" class="block text-sm font-medium text-gray-900 ">Report Remarks</label>
-                    <textarea name="remarks" id="remarks" rows="4"
-                        class="block w-full px-4 py-2 mt-1 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 "
-                        placeholder="Enter Remarks"></textarea>
-                </div>
-            @endif
+            <livewire:comments :model="$report"/>
         </div>
     </div>
 </div>

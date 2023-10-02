@@ -6,9 +6,12 @@ use App\Models\User;
 use App\Models\ReportSubmission;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Usamamuneerchaudhary\Commentify\Traits\Commentable;
 
 class Report extends Model
 {
+    use Commentable;
+
     protected $fillable = [
         'name', 'address', 'latitude', 'longitude', 'creator_id', 'details','photo', 'severity', 'urgency','status', 'assigned_user_id', 'finished_photo'
     ];
