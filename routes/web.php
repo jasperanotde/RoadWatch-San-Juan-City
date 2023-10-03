@@ -59,8 +59,5 @@ Route::group(['middleware' => ['auth']], function() {
     Route::get('/gallery', 'GalleryController@index')->name('gallery.index');
 
     Route::get('/reports/report/{category}', [ReportController::class, 'getReportsByCategory']);
-
 });
-
-
 
