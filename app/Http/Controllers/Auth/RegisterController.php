@@ -56,11 +56,9 @@ class RegisterController extends Controller
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
             'contact_number' => [
-                'nullable',
-                'string',
-                'max:255',
-                'unique:users',
-                'regex:/^9\d{9}$/', // Custom validation rule
+                'required',
+                'numeric',
+                'phone'
             ],
         ]);
     }

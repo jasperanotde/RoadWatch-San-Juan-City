@@ -79,9 +79,7 @@
 
                                     @if (auth()->check())
                                         @foreach (auth()->user()->unreadNotifications as $notification)
-                                            <a href="#" class="text-neutral-700"><li class="p-6 text-neutral-700 max-w-sm bg-slate-300"> {{ $notification->data['data'] }}</li></a>
-                                            <a href="#" class="text-neutral-700"><li class="p-6 text-neutral-700 max-w-sm bg-slate-300"> {{ $notification->data['date'] }}</li></a>
-                                            <hr class="h-0 border border-t-0 border-solid border-neutral-700 opacity-25" />
+                                            <a href="#" class="text-neutral-700"><li class="p-6 text-neutral-700 max-w-sm bg-slate-300"> {{ $notification->data['data'] }}</li></a>                                            <hr class="h-0 border border-t-0 border-solid border-neutral-700 opacity-25" />
                                         @endforeach
                                         @foreach (auth()->user()->readNotifications as $notification)
                                             <a href="#" class="pointer-events-none text-neutral-800"><li class="p-6 text-neutral-800 max-w-sm bg-white"> {{ $notification->data['data'] }}</li></a>

@@ -8,6 +8,7 @@ import './modal-init';
 //import './datatable-init';
 import './status-label';
 import './tab-init';
+import './password-validation';
 
 import '@fancyapps/fancybox';
 document.addEventListener('DOMContentLoaded', function () {
