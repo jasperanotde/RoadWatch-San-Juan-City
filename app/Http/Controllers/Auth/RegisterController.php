@@ -55,9 +55,23 @@ class RegisterController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
+            'contact_number' => [
+                'nullable',
+                'string',
+                'max:255',
+                'unique:users',
+                'regex:/^9\d{9}$/', // Custom validation rule
+            ],
         ]);
     }
 
+
+    protected function messages()
+{
+    return [
+        'contact_number.regex' => 'The contact number must start with 9 and have exactly 10 digits.',
+    ];
+}
     /**
      * Create a new user instance after a valid registration.
      *
@@ -70,6 +84,7 @@ class RegisterController extends Controller
     $user = User::create([
         'name' => $data['name'],
         'email' => $data['email'],
+        'contact_number' => $data['contact_number'], 
         'password' => Hash::make($data['password']),
     ]);
 

@@ -11,7 +11,7 @@
 
         <p class="mt-1 text-center text-gray-500 dark:text-gray-400">{{ __('Create new account') }}</p>
 
-        <form method="POST" action="{{ route('register') }}">
+        <form id="phoneForm" method="POST" action="{{ route('register') }}">
             @csrf
 
             <div class="w-full mt-4">
@@ -29,10 +29,12 @@
             </div>
 
             <div class="w-full mt-4">
-                <input id="number" type="text" class="block w-full px-4 py-2 mt-2 text-gray-700 placeholder-gray-500 bg-white border rounded-lg focus:border-blue-400 focus:ring-opacity-40 focus:outline-none focus:ring focus:ring-blue-300 @error('email') is-invalid @enderror" name="number" placeholder="(+63) Contact Number" value="{{ old('number') }}" required autocomplete="number" autofocus aria-label="Contact Number" />
-                @error('number')
-                    <p class="text-red-500 mt-1">{{ $message }}</p>
-                @enderror   
+                <input id="contact_number"class="block w-full px-4 py-2 mt-2 text-gray-700 placeholder-gray-500 bg-white border rounded-lg focus:border-blue-400 focus:ring-opacity-40 focus:outline-none focus:ring focus:ring-blue-300 @error('email') is-invalid @enderror" type="text" class="form-control @error('contact_number') is-invalid @enderror" name="contact_number" value="{{ old('contact_number') }}" placeholder="Contact Number (ex: 91234567890)" required autocomplete="contact_number">
+                @error('contact_number')
+                    <p class="text-red-500 mt-1" role="alert">
+                        <strong>{{ $message }}</strong>
+                    </p>
+                @enderror
             </div>
 
             <div class="w-full mt-4">
@@ -44,7 +46,7 @@
 
             <div class="w-full mt-4">
                 <input id="password-confirm" type="password" class="block w-full px-4 py-2 mt-2 text-gray-700 placeholder-gray-500 bg-white border rounded-lg focus:border-blue-400 focus:ring-opacity-40 focus:outline-none focus:ring focus:ring-blue-300" name="password_confirmation" placeholder="Confirm Password" required autocomplete="new-password">
-            </div>
+         </div>
 
             <div class="flex items-center justify-between mt-4">
                 <button type="submit" class="px-6 py-2 text-sm font-medium tracking-wide text-white capitalize transition-colors duration-300 transform bg-blue-500 rounded-lg hover:bg-blue-400 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-50">
@@ -55,8 +57,13 @@
     </div>
 
     <div class="flex items-center justify-center py-4 text-center bg-gray-50 dark:bg-gray-700">
-        <span class="text-sm text-gray-600 dark:text-gray-200">Already have an account? </span>
+           <span class="text-sm text-gray-600 dark:text-gray-200">Already have an account? </span>
         <a href="{{ route('login') }}" class="mx-2 text-sm font-bold text-blue-500 dark:text-blue-400 hover:underline">Login</a>
     </div>
 </div>
+
+
+   
+
+
 @endsection
