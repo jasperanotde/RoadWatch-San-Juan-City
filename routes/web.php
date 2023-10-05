@@ -23,7 +23,7 @@ Route::get('/', function () {
     if (Auth::check()) {
         return redirect()->route('home'); // Redirect to the home page
     }
-    
+
     return view('auth.login');
 });
 
@@ -55,6 +55,9 @@ Route::group(['middleware' => ['auth']], function() {
     Route::get('/gallery', 'GalleryController@index')->name('gallery.index');
 
     Route::get('/reports/report/{category}', [ReportController::class, 'getReportsByCategory']);
+
+    // For Notification
+    Route::get('/mark-as-read', [App\Http\Controllers\ReportController::class,'markAsRead'])->name('mark-as-read');
 });
 
 

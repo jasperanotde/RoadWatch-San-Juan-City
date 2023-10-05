@@ -12,6 +12,8 @@ class Report extends Model
 {
     use Commentable;
 
+    protected $guarded = [];
+
     protected $fillable = [
         'name', 'address', 'latitude', 'longitude', 'creator_id', 'details','photo', 'severity', 'urgency','status', 'assigned_user_id', 'finished_photo'
     ];

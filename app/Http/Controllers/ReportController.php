@@ -5,10 +5,13 @@ namespace App\Http\Controllers;
 use App\Models\Report;
 use App\Models\ReportSubmission;
 use App\Models\User;
+use App\Notifications\AssignedReport;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Notification;
 
 class ReportController extends Controller
 {
@@ -314,8 +317,25 @@ class ReportController extends Controller
         // Update the report to assign it to the selected user
         $report->assigned_user_id = $assignedUserId;
         $report->save();
+        
+        // Retrieve the user based on the assigned_user_id
+        $assignedUser = User::find($assignedUserId);
+
+        // Check if the user exists and has a name
+        $userName = $assignedUser ? $assignedUser->name : 'Unknown User';
+
+        // Pass the user's name to the notification
+        User::find(Auth::user()->id)->notify(new AssignedReport('Assignment of Report '. $report->name .' to '. $userName .' was successfull.'));
+
+        // Send the notification to the assigned user
+        Notification::send($assignedUser, new AssignedReport('Report '. $report->name .' was assigned to you.'));
     
         return back();
+    }
+
+    public function markAsRead(){
+        Auth::user()->unreadNotifications->markAsRead();
+        return redirect()->back();
     }
 
     public function declineReport(Request $request, Report $report)
