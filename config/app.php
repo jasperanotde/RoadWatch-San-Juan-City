@@ -170,7 +170,6 @@ return [
         App\Providers\RouteServiceProvider::class,
         Spatie\Permission\PermissionServiceProvider::class,
         Usamamuneerchaudhary\Commentify\Providers\CommentifyServiceProvider::class,
-
     ])->toArray(),
 
     /*

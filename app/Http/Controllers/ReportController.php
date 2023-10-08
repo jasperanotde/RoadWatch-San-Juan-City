@@ -5,10 +5,14 @@ namespace App\Http\Controllers;
 use App\Models\Report;
 use App\Models\ReportSubmission;
 use App\Models\User;
+use App\Notifications\AssignedReport;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Notification;
+
 
 class ReportController extends Controller
 {
@@ -305,8 +309,16 @@ class ReportController extends Controller
     public function approveReport(Request $request, Report $report)
     {
         // Validate and authorize the request here, ensuring it's a City Engineer making the request
-    
         $assignedUserId = $request->input('assignedUser');
+
+        // Generate the URL of the report
+        $reportUrl = $reportUrl = url(route('reports.show', ['report' => $report->id]));
+        
+        // Retrieve the creator user based on the report's creator_id
+        $creatorUser = User::find($report->creator_id);
+
+        // Generate the URL of the report
+        $reportUrl = $reportUrl = url(route('reports.show', ['report' => $report->id]));
 
         // Update the report status to "Pending"
         $report->status = 'INPROGRESS';
@@ -314,22 +326,96 @@ class ReportController extends Controller
         // Update the report to assign it to the selected user
         $report->assigned_user_id = $assignedUserId;
         $report->save();
-    
+        
+        // Retrieve the user based on the assigned_user_id
+        $assignedUser = User::find($assignedUserId);
+
+        // Check if the user exists and has a name
+        $userName = $assignedUser ? $assignedUser->name : 'Unknown User';
+
+        // Pass the user's name to the notification
+        User::find(Auth::user()->id)->notify(new AssignedReport($reportUrl, 'Assignment of Report '. $report->name .' to '. $userName .' was successfull.'));
+
+        // Send the notification to the assigned user
+        Notification::send($assignedUser, new AssignedReport($reportUrl, 'Report '. $report->name .' was assigned to you.'));
+
+        // Send the notification to the creator of the report
+        Notification::send($creatorUser, new AssignedReport($reportUrl, 'Your report '. $report->name .' was approved'));
+
+        // Send an SMS using Semaphore API
+        // $apiKey = 'de63e40d8c0adf3b5bf717105371af7f'; // Replace with your Semaphore API key
+        // $phoneNumber = $creatorUser->contact_number; // Replace with the recipient's phone number
+        // $message = 'Status of your report: "'. $report->name .'" was updated to INPROGRESS.' . ' See your report: ' . $reportUrl; // Adjust the message as needed
+        // $senderName = 'SEMAPHORE';
+
+        // $ch = curl_init();
+        // $parameters = [
+        //     'apikey' => $apiKey,
+        //     'number' => $phoneNumber,
+        //     'message' => $message,
+        //     'sendername' => $senderName,
+        // ];
+
+        // curl_setopt($ch, CURLOPT_URL, 'https://semaphore.co/api/v4/priority');
+        // curl_setopt($ch, CURLOPT_POST, 1);
+        // curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($parameters));
+        // curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+
+        // $output = curl_exec($ch);
+        // curl_close($ch);
+
         return back();
+
+    }
+
+    public function markAsRead(){
+        Auth::user()->unreadNotifications->markAsRead();
+        return redirect()->back();
     }
 
     public function declineReport(Request $request, Report $report)
     {
-        // Validate and authorize the request here
+        // Generate the URL of the report
+        $reportUrl = $reportUrl = url(route('reports.show', ['report' => $report->id]));
+        $creatorUser = User::find($report->creator_id);
 
         $report->status = 'DECLINED';
         $report->save();
+
+         // Send the notification to the creator of the report
+        Notification::send($creatorUser, new AssignedReport($reportUrl, 'Your report '. $report->name .' was declined'));
+
+        // Send an SMS using Semaphore API
+        // $apiKey = 'de63e40d8c0adf3b5bf717105371af7f'; // Replace with your Semaphore API key
+        // $phoneNumber = $creatorUser->contact_number; // Replace with the recipient's phone number
+        // $message = 'Status of your report: "'. $report->name .'" was DECLINED.' . ' See your report: ' . $reportUrl; // Adjust the message as needed
+        // $senderName = 'SEMAPHORE';
+
+        // $ch = curl_init();
+        // $parameters = [
+        //     'apikey' => $apiKey,
+        //     'number' => $phoneNumber,
+        //     'message' => $message,
+        //     'sendername' => $senderName,
+        // ];
+
+        // curl_setopt($ch, CURLOPT_URL, 'https://semaphore.co/api/v4/priority');
+        // curl_setopt($ch, CURLOPT_POST, 1);
+        // curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($parameters));
+        // curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+
+        // $output = curl_exec($ch);
+        // curl_close($ch);
 
         return back();
     }
 
     public function finishedReport(Request $request, Report $report)
     {
+        // Generate the URL of the report
+        $reportUrl = $reportUrl = url(route('reports.show', ['report' => $report->id]));
+        $creatorUser = User::find($report->creator_id);
+        
         // Validate and authorize the request here
         $request->validate([
             'finished_photo.*' => 'required|mimes:png,jpg,jpeg|max:2048', // Adjust validation rules as needed
@@ -348,6 +434,31 @@ class ReportController extends Controller
         $report['finished_photo'] = json_encode($imagePaths);
 
         $report->save();
+
+         // Send the notification to the creator of the report
+         Notification::send($creatorUser, new AssignedReport($reportUrl, 'Your report '. $report->name .' was marked as Finished'));
+
+        // Send an SMS using Semaphore API
+        // $apiKey = 'de63e40d8c0adf3b5bf717105371af7f'; // Replace with your Semaphore API key
+        // $phoneNumber = $creatorUser->contact_number; // Replace with the recipient's phone number
+        // $message = 'Status of your report: "'. $report->name .'" was marked as FINISHED.' . ' See your report: ' . $reportUrl; // Adjust the message as needed
+        // $senderName = 'SEMAPHORE';
+
+        // $ch = curl_init();
+        // $parameters = [
+        //     'apikey' => $apiKey,
+        //     'number' => $phoneNumber,
+        //     'message' => $message,
+        //     'sendername' => $senderName,
+        // ];
+
+        // curl_setopt($ch, CURLOPT_URL, 'https://semaphore.co/api/v4/priority');
+        // curl_setopt($ch, CURLOPT_POST, 1);
+        // curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($parameters));
+        // curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+
+        // $output = curl_exec($ch);
+        // curl_close($ch);
 
         return back();
     }

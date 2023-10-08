@@ -19,15 +19,15 @@ use App\Http\Controllers\ActionSlipController;
 */
 
 
-
 Route::get('/', function () {
+    if (Auth::check()) {
+        return redirect()->route('home'); // Redirect to the home page
+    }
+
     return view('auth.login');
 });
 
-Route::get('/home', function () {
-    return view('home');
-})->name('home');
-
+// These routes are accessible to all users
 Route::get('/about', function () {
     return view('about');
 })->name('about');
@@ -38,13 +38,9 @@ Route::get('/contact', function () {
 
 Auth::routes();
 
-Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
-
-// Route::resource('reports', 'ReportController');
-
-/* This is a new route for roles and permission
-    For testing atm */
+// These routes are accessible only to authenticated users
 Route::group(['middleware' => ['auth']], function() {
+    Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
     Route::resource('roles', RoleController::class);
     Route::resource('users', UserController::class);
     Route::resource('reports', ReportController::class);
@@ -60,7 +56,8 @@ Route::group(['middleware' => ['auth']], function() {
 
     Route::get('/reports/report/{category}', [ReportController::class, 'getReportsByCategory']);
 
+    // For Notification
+    Route::get('/mark-as-read', [App\Http\Controllers\ReportController::class,'markAsRead'])->name('mark-as-read');
 });
-
 
 

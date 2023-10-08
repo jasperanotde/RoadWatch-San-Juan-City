@@ -29,19 +29,23 @@ class UserController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function index(Request $request): View
-    {
-        $data = User::orderBy('id','DESC')->paginate(5);
-        $roles = [];
-        $userRole = [];
-        
-        foreach($data as $user) {
-            $roles[$user->id] = Role::pluck('name','name')->all();
-            $userRole[$user->id] = $user->roles->pluck('name','name')->all();
-        }
-  
-        return view('users.index',compact('data','roles','userRole'))
-            ->with('i', ($request->input('page', 1) - 1) * 5);
+{
+    $data = User::orderBy('id', 'DESC')->paginate(5);
+
+    // Initialize empty arrays to store roles and userRoles
+    $roles;
+    $userRole = [];
+
+    foreach ($data as $user) {
+        $roles = Role::pluck('name','name')->all();
+        // Retrieve roles for each user and add them to the $roles array
+        $userRole[$user->id] = $user->getRoleNames()->first();
     }
+
+    return view('users.index', compact('data', 'roles', 'userRole'))
+        ->with('i', ($request->input('page', 1) - 1) * 5);
+}
+
     
     /**
      * Show the form for creating a new resource.
@@ -66,7 +70,9 @@ class UserController extends Controller
             'name' => 'required',
             'email' => 'required|email|unique:users,email',
             'password' => 'required|same:confirm-password',
-            'roles' => 'required'
+            'roles' => 'required',
+            'phone_number' => 'required',
+
         ]);
     
         $input = $request->all();
@@ -100,10 +106,10 @@ class UserController extends Controller
     public function edit($id): View
     {
         $user = User::find($id);
-        $roles = Role::pluck('name','name')->all();
-        $userRole = $user->roles->pluck('name','name')->all();
-    
-        return view('users.edit',compact('user','roles','userRole'));
+        $roleNames = Role::pluck('name','name')->all();
+        $userRole = $user->role;
+
+        return view('users.edit',compact('user','roleNames','userRole'));
     }
     
     /**
@@ -118,8 +124,9 @@ class UserController extends Controller
         $this->validate($request, [
             'name' => 'required',
             'email' => 'required|email|unique:users,email,'.$id,
-            'password' => 'same:confirm-password',
-            'roles' => 'required'
+            'password' => 'nullable|same:confirm-password',
+            'contact_number' => 'nullable',
+            'roles' => 'nullable',
         ]);
     
         $input = $request->all();

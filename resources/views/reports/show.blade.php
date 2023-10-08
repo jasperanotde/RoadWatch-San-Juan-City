@@ -152,9 +152,13 @@
                 <div class="flex items-center justify-between p-4">
                     @if(auth()->user()->hasRole(['Normal User', 'Admin']))
                         @can('update', $report)
-                        @if(auth()->check() && auth()->user()->id === $report->creator_id)
-                            <a href="{{ route('reports.edit', ['report' => $report, 'image' => $report->getPhoto()]) }}" id="edit-report-{{ $report->id }}" class="float-right mt-1 mx-2 md:mt-4 md:mx-3 px-4 py-1.5 md:px-9 md:py-2.5 bg-primary text-white text-xxs md:text-xs font-poppins font-normal rounded hover:bg-secondary hover:text-white focus:outline-none focus:bg-primary transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110 duration-300">Edit Report</a>
-                        @endif
+                            @if(auth()->check() && auth()->user()->id === $report->creator_id)
+                                @if(in_array($report->status, ['INPROGRESS', 'FINISHED', 'DECLINED']))
+
+                                @else
+                                    <a href="{{ route('reports.edit', ['report' => $report, 'image' => $report->getPhoto()]) }}" id="edit-report-{{ $report->id }}" class="float-right mt-1 mx-2 md:mt-4 md:mx-3 px-4 py-1.5 md:px-9 md:py-2.5 bg-primary text-white text-xxs md:text-xs font-poppins font-normal rounded hover:bg-secondary hover:text-white focus:outline-none focus:bg-primary transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110 duration-300">Edit Report</a>
+                                 @endif   
+                            @endif
                         @endcan
                     @endif
                     @if(auth()->check())
@@ -167,7 +171,7 @@
         </div>
 
         <!-- Right Side (Map) -->
-        <div class="w-1/2 p-4 ">
+        <div class="w-1/2 p-4">
             <div style="background: rgba(17,63,103); border-top-left-radius: 8px; border-top-right-radius: 8px;" class="text-white rounded-sm p-4">
                 <h1 class="text-xl font-bold text-white">{{ trans('report.location') }}</h1>
             </div>
@@ -176,176 +180,330 @@
             @else
                 <p>{{ __('report.no_coordinate') }}</p>
             @endif
-            @if(auth()->user()->id === $report->creator_id)
-                <div class="my-5">
-                    <label for="remarks" class="block text-sm font-medium text-gray-900 ">Report Remarks</label>
-                    <textarea name="remarks" id="remarks" rows="4"
-                        class="block w-full px-4 py-2 mt-1 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 "
-                        placeholder="Enter Remarks"></textarea>
-                </div>
-            @endif
+            <livewire:comments :model="$report"/>
         </div>
     </div>
 </div>
 
-@role('Admin|City Engineer Supervisor|City Engineer')
-<!------- Record Slip Index ------->
-<div id="" class="flex justify-center m-20 rounded-lg">
-    <div class="w-full shadow-lg max-w-screen-xl">
-        <div style="background: rgba(17,63,103); border-top-left-radius: 8px; border-top-right-radius: 8px; display: flex; justify-content: space-between; align-items: center;" class="text-white rounded-sm p-4">
-            <h1 class="text-xl font-bold text-white">Action Slips</h1>
-                <!-- Modal toggle -->
-            <button class="float-right block mt-1 mx-2 md:mt-4 md:mx-3 px-4 py-1.5 md:px-9 md:py-2.5 bg-white text-primary text-xxs md:text-xs font-poppins font-normal rounded hover:bg-secondary hover:text-white focus:outline-none focus:bg-primary transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110 duration-300" type="button" data-te-target="#authentication-modal" data-te-toggle="modal" data-te-ripple-init data-te-ripple-color="light">
-                Create Action Slip <span style="font-size: 18px; font-weight: bold; margin-left: 5px;">+</span>
-            </span>
-        </div>
-        
-        <div class="submission">
-            <table class="w-full text-sm text-left text-gray-500">
-                <thead class="text-md text-gray-700 uppercase bg-gray-50">
-                    <tr>
-                        <th scope="col" class="px-6 py-3">
-                            Date
-                        </th>
-                        <th scope="col" class="px-6 py-3">
-                            Action
-                        </th>
-                    </tr>
-                </thead>
-                <tbody>
-                @foreach ($report->submissions as $submission)
-                    <tr class="bg-blue-100 border-b">
-                        <!-- Show Button -->
-                        <td class="px-5 py-4 w-full border-r">
-                            <button data-te-target="#showModal{{ $submission->id }}" data-te-toggle="modal" class="underline text-green-800" type="button" data-te-ripple-init data-te-ripple-color="light">{{ $submission->date }}</button>
-                        </td>  
-                        <!-- Delete Button -->
-                        @can('report-delete')
-                        <td class="px-5 py-4 w-1/2 bg-red-100 hover:bg-gray-200">
-                            <button class="inline-flex items-center px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded-md" data-te-toggle="modal" data-te-target="#deleteModal{{ $submission->id }}" data-te-ripple-init data-te-ripple-color="light" type="button">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                                    <path fill-rule="evenodd" d="M16.5 4.478v.227a48.816 48.816 0 013.878.512.75.75 0 11-.256 1.478l-.209-.035-1.005 13.07a3 3 0 01-2.991 2.77H8.084a3 3 0 01-2.991-2.77L4.087 6.66l-.209.035a.75.75 0 01-.256-1.478A48.567 48.567 0 017.5 4.705v-.227c0-1.564 1.213-2.9 2.816-2.951a52.662 52.662 0 013.369 0c1.603.051 2.815 1.387 2.815 2.951zm-6.136-1.452a51.196 51.196 0 013.273 0C14.39 3.05 15 3.684 15 4.478v.113a49.488 49.488 0 00-6 0v-.113c0-.794.609-1.428 1.364-1.452zm-.355 5.945a.75.75 0 10-1.5.058l.347 9a.75.75 0 101.499-.058l-.346-9zm5.48.058a.75.75 0 10-1.498-.058l-.347 9a.75.75 0 001.5.058l.345-9z"/>
-                                </svg>
-                                Delete
-                            </button>
-                            <!------- Record Slip Delete Modal ------->
-                            <form action="{{ route('reports.submissions.delete', ['report' => $report, 'submission' => $submission])  }}" method="POST" enctype="muiltipart/form-data">
-                                {{ method_field('delete') }}
-                                {{ csrf_field() }}
-                                <div data-te-modal-init class="bg-black bg-opacity-50 fixed left-0 top-0 z-[1055] hidden h-full w-full overflow-y-auto overflow-x-hidden outline-none" id="deleteModal{{ $submission->id }}" tabindex="-1" aria-modal="true" role="dialog">
-                                    <div data-te-modal-dialog-ref class="pointer-events-none relative flex min-h-[calc(100%-1rem)] w-auto translate-y-[-50px] items-center opacity-0 transition-all duration-300 ease-in-out min-[576px]:mx-auto min-[576px]:mt-7 min-[576px]:min-h-[calc(100%-3.5rem)] min-[576px]:max-w-[500px]">
-                                        <div class="pointer-events-auto relative flex w-full flex-col rounded-md border-none bg-white bg-clip-padding text-current shadow-lg outline-none dark:bg-neutral-600">
-                                            <div class="flex flex-shrink-0 items-center justify-between rounded-t-md border-b-2 border-neutral-100 border-opacity-100 p-4 dark:border-opacity-50">
-                                                <!--Modal title-->
-                                                <h5 class="text-xl font-medium leading-normal text-neutral-800 dark:text-neutral-200">
-                                                Delete Action Slip
-                                                </h5>
-                                            </div>
-                                            <!--Modal body-->
-                                            <div class="relative p-4">
-                                                <p>Are you sure you want to delete action slip?</p>
-                                            </div>
-                                            <!--Modal footer-->
-                                            <div class="flex flex-shrink-0 flex-wrap items-center justify-end rounded-b-md border-t-2 border-neutral-100 border-opacity-100 p-4 dark:border-opacity-50">
-                                                <button type="button" class="px-4 py-2 bg-gray-300 hover:bg-gray-400 text-gray-700 rounded-md" data-te-modal-dismiss data-te-ripple-init data-te-ripple-color="light">
-                                                    Cancel
-                                                </button>
-                                                <input type="hidden" name="submission_id" value="{{ $submission->id }}">
-                                                <button type="submit" class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white ml-2 rounded-md" data-te-ripple-init data-te-ripple-color="light">
-                                                    Delete
-                                                </button>
+
+@if (auth()->check())
+    @role('Admin|City Engineer Supervisor|City Engineer')
+    <!------- Record Slip Index ------->
+    <div id="" class="flex justify-center m-20 rounded-lg">
+        <div class="w-full shadow-lg max-w-screen-xl">
+            <div style="background: rgba(17,63,103); border-top-left-radius: 8px; border-top-right-radius: 8px; display: flex; justify-content: space-between; align-items: center;" class="text-white rounded-sm p-4">
+                <h1 class="text-xl font-bold text-white">Action Slips</h1>
+                    <!-- Modal toggle -->
+                <button class="float-right block mt-1 mx-2 md:mt-4 md:mx-3 px-4 py-1.5 md:px-9 md:py-2.5 bg-white text-primary text-xxs md:text-xs font-poppins font-normal rounded hover:bg-secondary hover:text-white focus:outline-none focus:bg-primary transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110 duration-300" type="button" data-te-target="#authentication-modal" data-te-toggle="modal" data-te-ripple-init data-te-ripple-color="light">
+                    Create Action Slip <span styleg="font-size: 18px; font-weight: bold; margin-left: 5px;">+</span>
+                </span>
+            </div>
+                
+            <div class="submission">
+                <table class="w-full text-sm text-left text-gray-500">
+                    <thead class="text-md text-gray-700 uppercase bg-gray-50">
+                        <tr>
+                            <th scope="col" class="px-6 py-3">
+                                Date
+                            </th>
+                            <th scope="col" class="px-6 py-3">
+                                Action
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    @foreach ($report->submissions as $submission)
+                        <tr class="bg-blue-100 border-b">
+                            <!-- Show Button -->
+                            <td class="px-5 py-4 w-full border-r">
+                                <button data-te-target="#showModal{{ $submission->id }}" data-te-toggle="modal" class="underline text-green-800" type="button" data-te-ripple-init data-te-ripple-color="light">{{ $submission->date }}</button>
+                            </td>  
+                            <!-- Delete Button -->
+                            @can('report-delete')
+                            <td class="px-5 py-4 w-1/2 bg-red-100 hover:bg-gray-200">
+                                <button class="inline-flex items-center px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded-md" data-te-toggle="modal" data-te-target="#deleteModal{{ $submission->id }}" data-te-ripple-init data-te-ripple-color="light" type="button">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                                        <path fill-rule="evenodd" d="M16.5 4.478v.227a48.816 48.816 0 013.878.512.75.75 0 11-.256 1.478l-.209-.035-1.005 13.07a3 3 0 01-2.991 2.77H8.084a3 3 0 01-2.991-2.77L4.087 6.66l-.209.035a.75.75 0 01-.256-1.478A48.567 48.567 0 017.5 4.705v-.227c0-1.564 1.213-2.9 2.816-2.951a52.662 52.662 0 013.369 0c1.603.051 2.815 1.387 2.815 2.951zm-6.136-1.452a51.196 51.196 0 013.273 0C14.39 3.05 15 3.684 15 4.478v.113a49.488 49.488 0 00-6 0v-.113c0-.794.609-1.428 1.364-1.452zm-.355 5.945a.75.75 0 10-1.5.058l.347 9a.75.75 0 101.499-.058l-.346-9zm5.48.058a.75.75 0 10-1.498-.058l-.347 9a.75.75 0 001.5.058l.345-9z"/>
+                                    </svg>
+                                    Delete
+                                </button>
+                                <!------- Record Slip Delete Modal ------->
+                                <form action="{{ route('reports.submissions.delete', ['report' => $report, 'submission' => $submission])  }}" method="POST" enctype="muiltipart/form-data">
+                                    {{ method_field('delete') }}
+                                    {{ csrf_field() }}
+                                    <div data-te-modal-init class="bg-black bg-opacity-50 fixed left-0 top-0 z-[1055] hidden h-full w-full overflow-y-auto overflow-x-hidden outline-none" id="deleteModal{{ $submission->id }}" tabindex="-1" aria-modal="true" role="dialog">
+                                        <div data-te-modal-dialog-ref class="pointer-events-none relative flex min-h-[calc(100%-1rem)] w-auto translate-y-[-50px] items-center opacity-0 transition-all duration-300 ease-in-out min-[576px]:mx-auto min-[576px]:mt-7 min-[576px]:min-h-[calc(100%-3.5rem)] min-[576px]:max-w-[500px]">
+                                            <div class="pointer-events-auto relative flex w-full flex-col rounded-md border-none bg-white bg-clip-padding text-current shadow-lg outline-none dark:bg-neutral-600">
+                                                <div class="flex flex-shrink-0 items-center justify-between rounded-t-md border-b-2 border-neutral-100 border-opacity-100 p-4 dark:border-opacity-50">
+                                                    <!--Modal title-->
+                                                    <h5 class="text-xl font-medium leading-normal text-neutral-800 dark:text-neutral-200">
+                                                    Delete Action Slip
+                                                    </h5>
+                                                </div>
+                                                <!--Modal body-->
+                                                <div class="relative p-4">
+                                                    <p>Are you sure you want to delete action slip?</p>
+                                                </div>
+                                                <!--Modal footer-->
+                                                <div class="flex flex-shrink-0 flex-wrap items-center justify-end rounded-b-md border-t-2 border-neutral-100 border-opacity-100 p-4 dark:border-opacity-50">
+                                                    <button type="button" class="px-4 py-2 bg-gray-300 hover:bg-gray-400 text-gray-700 rounded-md" data-te-modal-dismiss data-te-ripple-init data-te-ripple-color="light">
+                                                        Cancel
+                                                    </button>
+                                                    <input type="hidden" name="submission_id" value="{{ $submission->id }}">
+                                                    <button type="submit" class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white ml-2 rounded-md" data-te-ripple-init data-te-ripple-color="light">
+                                                        Delete
+                                                    </button>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
-                            </form>
-                        </td>
-                        @endcan
-                        <!-- End of Record Slip Index -->
-                  
-                        <!-- New Record Slip Show Modal -->
-                        <div data-te-modal-init class="bg-black bg-opacity-50 fixed left-0 top-0 z-[1055] hidden h-full w-full overflow-y-auto overflow-x-hidden outline-none" data-te-modal-init id="showModal{{ $submission->id }}"  tabindex="-1" aria-hidden="true" role="dialog">
-                            <div data-te-modal-dialog-ref class="relative flex min-h-[calc(100%-1rem)] w-auto translate-y-[-50px] items-center opacity-0 transition-all duration-300 ease-in-out min-[576px]:mx-auto min-[576px]:mt-7 min-[576px]:min-h-[calc(100%-3.5rem)] min-[576px]:max-w-[500px]">
-                                <!-- Modal content -->
-                                <div class="relative flex w-full flex-col rounded-md border-none bg-white bg-clip-padding text-current shadow-lg outline-none dark:bg-neutral-600">
-                                    <!-- Modal header/Title -->
-                                    <div class="flex flex-shrink-0 items-center justify-between rounded-t-md border-b-2 border-neutral-100 border-opacity-100 p-4 dark:border-opacity-50">
-                                        <h5 class="text-xl font-medium leading-normal text-neutral-800 dark:text-neutral-200" id="exampleModalCenterTitle">
-                                        Show Action Slip
-                                        </h5>
-                                        <!--Close button-->
-                                        <button type="button" class="box-content rounded-none border-none hover:no-underline hover:opacity-75 focus:opacity-100 focus:shadow-none focus:outline-none" data-te-modal-dismiss aria-label="Close">
-                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-6 w-6">
-                                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-                                            </svg>
-                                        </button>
-                                    </div>
+                                </form>
+                            </td>
+                            @endcan
+                            <!-- End of Record Slip Index -->
 
-                                    <div class="relative flex-auto p-4">
-                                        <div class="submission">
-                                            <div class="mb-3">
-                                                <p><strong>Report Name:</strong>
-                                                {{ $submission->new_field }}</p>
-                                            </div>
-                                            <div class="mb-3">
-                                                <p><strong>Action Slip Date:</strong>
-                                                {{ $submission->date }}</p>
-                                            </div>
-                                            <div class="mb-3">
-                                                <p><strong>Location:</strong>
-                                                {{ $submission->location }}</p>
-                                            </div>
-                                            <div class="mb-3">
-                                                <p><strong>Materials:</strong></p>
-                                                <ul class="ml-5 list-disc">
-                                                    <!-- removing array brackets -->
-                                                    @foreach (json_decode($submission->materials) as $material)
-                                                        <li>{{ $material }}</li>
-                                                    @endforeach
-                                                </ul>
-                                            </div>
-                                            <div class="mb-3">
-                                                <p><strong>Personnel:</strong></p>
-                                                <ul class="ml-5 list-disc">
-                                                    <!-- removing array brackets -->
-                                                    @foreach (json_decode($submission->personnel) as $person)
-                                                        <li>{{ $person }}</li>
-                                                    @endforeach
-                                                </ul>
-                                            </div>
-                                            <div class="mb-3">
-                                                <p><strong>Actions Taken:</strong></p>
-                                                <ul>
-                                                    @foreach ($submission->actionsTakenArray() as $action)
-                                                        <li>
-                                                            <input type="checkbox" disabled {{ in_array($action, $submission->actionsTakenArray()) ? 'checked' : '' }}>
-                                                            {{ $action }}
-                                                        </li>
-                                                    @endforeach
-                                                </ul>
-                                            </div>
-                                            <div class="mb-3">
-                                                <p><strong>Remarks:</strong>
-                                                {{ $submission->remarks }}</p>
-                                            </div>
-                                            <div class="flex items-center justify-end">
-                                                <button class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white ml-2 rounded-md" data-te-toggle="modal" data-te-target="#deleteModal{{ $submission->id }}" data-te-ripple-init data-te-ripple-color="light" type="button">Delete Action Slip</button>
+                            <!-- New Record Slip Show Modal -->
+                            <div data-te-modal-init class="bg-black bg-opacity-50 fixed left-0 top-0 z-[1055] hidden h-full w-full overflow-y-auto overflow-x-hidden outline-none" data-te-modal-init id="showModal{{ $submission->id }}"  tabindex="-1" aria-hidden="true" role="dialog">
+                                <div data-te-modal-dialog-ref class="relative flex min-h-[calc(100%-1rem)] w-auto translate-y-[-50px] items-center opacity-0 transition-all duration-300 ease-in-out min-[576px]:mx-auto min-[576px]:mt-7 min-[576px]:min-h-[calc(100%-3.5rem)] min-[576px]:max-w-[500px]">
+                                    <!-- Modal content -->
+                                    <div class="relative flex w-full flex-col rounded-md border-none bg-white bg-clip-padding text-current shadow-lg outline-none dark:bg-neutral-600">
+                                        <!-- Modal header/Title -->
+                                        <div class="flex flex-shrink-0 items-center justify-between rounded-t-md border-b-2 border-neutral-100 border-opacity-100 p-4 dark:border-opacity-50">
+                                            <h5 class="text-xl font-medium leading-normal text-neutral-800 dark:text-neutral-200" id="exampleModalCenterTitle">
+                                            Show Action Slip
+                                            </h5>
+                                            <!--Close button-->
+                                            <button type="button" class="box-content rounded-none border-none hover:no-underline hover:opacity-75 focus:opacity-100 focus:shadow-none focus:outline-none" data-te-modal-dismiss aria-label="Close">
+                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-6 w-6">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                                </svg>
+                                            </button>
+                                        </div>
+
+                                        <div class="relative flex-auto p-4">
+                                            <div class="submission">
+                                                <div class="mb-3">
+                                                    <p><strong>Report Name:</strong>
+                                                    {{ $submission->new_field }}</p>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <p><strong>Action Slip Date:</strong>
+                                                    {{ $submission->date }}</p>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <p><strong>Location:</strong>
+                                                    {{ $submission->location }}</p>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <p><strong>Materials:</strong></p>
+                                                    <ul class="ml-5 list-disc">
+                                                        <!-- removing array brackets -->
+                                                        @foreach (json_decode($submission->materials) as $material)
+                                                            <li>{{ $material }}</li>
+                                                        @endforeach
+                                                    </ul>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <p><strong>Personnel:</strong></p>
+                                                    <ul class="ml-5 list-disc">
+                                                        <!-- removing array brackets -->
+                                                        @foreach (json_decode($submission->personnel) as $person)
+                                                            <li>{{ $person }}</li>
+                                                        @endforeach
+                                                    </ul>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <p><strong>Actions Taken:</strong></p>
+                                                    <ul>
+                                                        @foreach ($submission->actionsTakenArray() as $action)
+                                                            <li>
+                                                                <input type="checkbox" disabled {{ in_array($action, $submission->actionsTakenArray()) ? 'checked' : '' }}>
+                                                                {{ $action }}
+                                                            </li>
+                                                        @endforeach
+                                                    </ul>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <p><strong>Remarks:</strong>
+                                                    {{ $submission->remarks }}</p>
+                                                </div>
+                                                <div class="flex items-center justify-end">
+                                                    <button class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white ml-2 rounded-md" data-te-toggle="modal" data-te-target="#deleteModal{{ $submission->id }}" data-te-ripple-init data-te-ripple-color="light" type="button">Delete Action Slip</button>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    </tr>
-                @endforeach
-                </tbody>
-            </table>
+                        </tr>
+                    @endforeach
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
-</div>
-@endrole
+@else
+    @if ($report->creator_id === auth()->user()->id)
+        <!------- Record Slip Index ------->
+    <div id="" class="flex justify-center m-20 rounded-lg">
+        <div class="w-full shadow-lg max-w-screen-xl">
+            <div style="background: rgba(17,63,103); border-top-left-radius: 8px; border-top-right-radius: 8px; display: flex; justify-content: space-between; align-items: center;" class="text-white rounded-sm p-4">
+                <h1 class="text-xl font-bold text-white">Action Slips</h1>
+                    <!-- Modal toggle -->
+                <!-- <button class="float-right block mt-1 mx-2 md:mt-4 md:mx-3 px-4 py-1.5 md:px-9 md:py-2.5 bg-white text-primary text-xxs md:text-xs font-poppins font-normal rounded hover:bg-secondary hover:text-white focus:outline-none focus:bg-primary transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110 duration-300" type="button" data-te-target="#authentication-modal" data-te-toggle="modal" data-te-ripple-init data-te-ripple-color="light">
+                    Create Action Slip <span styleg="font-size: 18px; font-weight: bold; margin-left: 5px;">+</span>
+                </span> -->
+            </div>
+                
+            <div class="submission">
+                <table class="w-full text-sm text-left text-gray-500">
+                    <thead class="text-md text-gray-700 uppercase bg-gray-50">
+                        <tr>
+                            <th scope="col" class="px-6 py-3">
+                                Date
+                            </th>
+                            <!-- <th scope="col" class="px-6 py-3">
+                                Action
+                            </th> -->
+                        </tr>
+                    </thead>
+                    <tbody>
+                    @foreach ($report->submissions as $submission)
+                        <tr class="bg-blue-100 border-b">
+                            <!-- Show Button -->
+                            <td class="px-5 py-4 w-full border-r">
+                                <button data-te-target="#showModal{{ $submission->id }}" data-te-toggle="modal" class="underline text-green-800" type="button" data-te-ripple-init data-te-ripple-color="light">{{ $submission->date }}</button>
+                            </td>  
+                            <!-- Delete Button -->
+                            <!-- @can('report-delete')
+                            <td class="px-5 py-4 w-1/2 bg-red-100 hover:bg-gray-200">
+                                <button class="inline-flex items-center px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded-md" data-te-toggle="modal" data-te-target="#deleteModal{{ $submission->id }}" data-te-ripple-init data-te-ripple-color="light" type="button">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                                        <path fill-rule="evenodd" d="M16.5 4.478v.227a48.816 48.816 0 013.878.512.75.75 0 11-.256 1.478l-.209-.035-1.005 13.07a3 3 0 01-2.991 2.77H8.084a3 3 0 01-2.991-2.77L4.087 6.66l-.209.035a.75.75 0 01-.256-1.478A48.567 48.567 0 017.5 4.705v-.227c0-1.564 1.213-2.9 2.816-2.951a52.662 52.662 0 013.369 0c1.603.051 2.815 1.387 2.815 2.951zm-6.136-1.452a51.196 51.196 0 013.273 0C14.39 3.05 15 3.684 15 4.478v.113a49.488 49.488 0 00-6 0v-.113c0-.794.609-1.428 1.364-1.452zm-.355 5.945a.75.75 0 10-1.5.058l.347 9a.75.75 0 101.499-.058l-.346-9zm5.48.058a.75.75 0 10-1.498-.058l-.347 9a.75.75 0 001.5.058l.345-9z"/>
+                                    </svg>
+                                    Delete
+                                </button> -->
+                                <!------- Record Slip Delete Modal ------->
+                                <form action="{{ route('reports.submissions.delete', ['report' => $report, 'submission' => $submission])  }}" method="POST" enctype="muiltipart/form-data">
+                                    {{ method_field('delete') }}
+                                    {{ csrf_field() }}
+                                    <div data-te-modal-init class="bg-black bg-opacity-50 fixed left-0 top-0 z-[1055] hidden h-full w-full overflow-y-auto overflow-x-hidden outline-none" id="deleteModal{{ $submission->id }}" tabindex="-1" aria-modal="true" role="dialog">
+                                        <div data-te-modal-dialog-ref class="pointer-events-none relative flex min-h-[calc(100%-1rem)] w-auto translate-y-[-50px] items-center opacity-0 transition-all duration-300 ease-in-out min-[576px]:mx-auto min-[576px]:mt-7 min-[576px]:min-h-[calc(100%-3.5rem)] min-[576px]:max-w-[500px]">
+                                            <div class="pointer-events-auto relative flex w-full flex-col rounded-md border-none bg-white bg-clip-padding text-current shadow-lg outline-none dark:bg-neutral-600">
+                                                <div class="flex flex-shrink-0 items-center justify-between rounded-t-md border-b-2 border-neutral-100 border-opacity-100 p-4 dark:border-opacity-50">
+                                                    <!--Modal title-->
+                                                    <h5 class="text-xl font-medium leading-normal text-neutral-800 dark:text-neutral-200">
+                                                    Delete Action Slip
+                                                    </h5>
+                                                </div>
+                                                <!--Modal body-->
+                                                <div class="relative p-4">
+                                                    <p>Are you sure you want to delete action slip?</p>
+                                                </div>
+                                                <!--Modal footer-->
+                                                <div class="flex flex-shrink-0 flex-wrap items-center justify-end rounded-b-md border-t-2 border-neutral-100 border-opacity-100 p-4 dark:border-opacity-50">
+                                                    <button type="button" class="px-4 py-2 bg-gray-300 hover:bg-gray-400 text-gray-700 rounded-md" data-te-modal-dismiss data-te-ripple-init data-te-ripple-color="light">
+                                                        Cancel
+                                                    </button>
+                                                    <input type="hidden" name="submission_id" value="{{ $submission->id }}">
+                                                    <button type="submit" class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white ml-2 rounded-md" data-te-ripple-init data-te-ripple-color="light">
+                                                        Delete
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </form>
+                            </td>
+                            @endcan
+                            <!-- End of Record Slip Index -->
 
-<livewire:comments :model="$report"/>
+                            <!-- New Record Slip Show Modal -->
+                            <div data-te-modal-init class="bg-black bg-opacity-50 fixed left-0 top-0 z-[1055] hidden h-full w-full overflow-y-auto overflow-x-hidden outline-none" data-te-modal-init id="showModal{{ $submission->id }}"  tabindex="-1" aria-hidden="true" role="dialog">
+                                <div data-te-modal-dialog-ref class="relative flex min-h-[calc(100%-1rem)] w-auto translate-y-[-50px] items-center opacity-0 transition-all duration-300 ease-in-out min-[576px]:mx-auto min-[576px]:mt-7 min-[576px]:min-h-[calc(100%-3.5rem)] min-[576px]:max-w-[500px]">
+                                    <!-- Modal content -->
+                                    <div class="relative flex w-full flex-col rounded-md border-none bg-white bg-clip-padding text-current shadow-lg outline-none dark:bg-neutral-600">
+                                        <!-- Modal header/Title -->
+                                        <div class="flex flex-shrink-0 items-center justify-between rounded-t-md border-b-2 border-neutral-100 border-opacity-100 p-4 dark:border-opacity-50">
+                                            <h5 class="text-xl font-medium leading-normal text-neutral-800 dark:text-neutral-200" id="exampleModalCenterTitle">
+                                            Show Action Slip
+                                            </h5>
+                                            <!--Close button-->
+                                            <button type="button" class="box-content rounded-none border-none hover:no-underline hover:opacity-75 focus:opacity-100 focus:shadow-none focus:outline-none" data-te-modal-dismiss aria-label="Close">
+                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-6 w-6">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                                </svg>
+                                            </button>
+                                        </div>
+
+                                        <div class="relative flex-auto p-4">
+                                            <div class="submission">
+                                                <div class="mb-3">
+                                                    <p><strong>Report Name:</strong>
+                                                    {{ $submission->new_field }}</p>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <p><strong>Action Slip Date:</strong>
+                                                    {{ $submission->date }}</p>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <p><strong>Location:</strong>
+                                                    {{ $submission->location }}</p>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <p><strong>Materials:</strong></p>
+                                                    <ul class="ml-5 list-disc">
+                                                        <!-- removing array brackets -->
+                                                        @foreach (json_decode($submission->materials) as $material)
+                                                            <li>{{ $material }}</li>
+                                                        @endforeach
+                                                    </ul>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <p><strong>Personnel:</strong></p>
+                                                    <ul class="ml-5 list-disc">
+                                                        <!-- removing array brackets -->
+                                                        @foreach (json_decode($submission->personnel) as $person)
+                                                            <li>{{ $person }}</li>
+                                                        @endforeach
+                                                    </ul>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <p><strong>Actions Taken:</strong></p>
+                                                    <ul>
+                                                        @foreach ($submission->actionsTakenArray() as $action)
+                                                            <li>
+                                                                <input type="checkbox" disabled {{ in_array($action, $submission->actionsTakenArray()) ? 'checked' : '' }}>
+                                                                {{ $action }}
+                                                            </li>
+                                                        @endforeach
+                                                    </ul>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <p><strong>Remarks:</strong>
+                                                    {{ $submission->remarks }}</p>
+                                                </div>
+                                                <!-- <div class="flex items-center justify-end">
+                                                    <button class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white ml-2 rounded-md" data-te-toggle="modal" data-te-target="#deleteModal{{ $submission->id }}" data-te-ripple-init data-te-ripple-color="light" type="button">Delete Action Slip</button>
+                                                </div> -->
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </tr>
+                    @endforeach
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    @endif
+@endrole
+@endif
+
+
+
 <!-- New Create Action Slip Modal -->
 <div data-te-modal-init class="bg-black bg-opacity-50 fixed left-0 top-0 z-[1055] hidden h-full w-full overflow-y-auto overflow-x-hidden outline-none" data-te-modal-init id="authentication-modal"  tabindex="-1" aria-hidden="true" role="dialog">
     <div data-te-modal-dialog-ref class="relative h-[calc(100%-1rem)] w-auto translate-y-[-50px] opacity-0 transition-all duration-300 ease-in-out min-[576px]:mx-auto min-[576px]:mt-7 min-[576px]:h-[calc(100%-3.5rem)] min-[576px]:max-w-[500px]">

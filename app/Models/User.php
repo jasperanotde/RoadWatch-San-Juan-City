@@ -25,6 +25,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'contact_number',
     ];
 
     /**
@@ -46,6 +47,13 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
     ];
+    
+    protected function messages()
+{
+    return [
+        'contact_number.regex' => 'The contact number must start with 9 and have exactly 10 digits.',
+    ];
+}
 
     public function reports()
     {
