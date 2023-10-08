@@ -79,10 +79,11 @@
 
                                     @if (auth()->check())
                                         @foreach (auth()->user()->unreadNotifications as $notification)
-                                            <a href="#" class="text-neutral-700"><li class="p-6 text-neutral-700 max-w-sm bg-slate-300"> {{ $notification->data['data'] }}</li></a>                                            <hr class="h-0 border border-t-0 border-solid border-neutral-700 opacity-25" />
+                                            <a href="{{ $notification->data['notifURL'] ?? '#' }}" class="text-neutral-700"><li class="p-6 text-neutral-700 max-w-sm bg-slate-300"> {{ $notification->data['data'] }} </br> <span class = "text-sm">{{ $notification->data['date'] }}</span></li></a>
+                                            <hr class="h-0 border border-t-0 border-solid border-neutral-700 opacity-25" />
                                         @endforeach
                                         @foreach (auth()->user()->readNotifications as $notification)
-                                            <a href="#" class="pointer-events-none text-neutral-800"><li class="p-6 text-neutral-800 max-w-sm bg-white"> {{ $notification->data['data'] }}</li></a>
+                                            <a href="{{ $notification->data['notifURL'] ?? '#' }}" class="text-neutral-800"><li class="p-6 text-neutral-800 max-w-sm bg-white"> {{ $notification->data['data'] }} </br> <span class = "text-sm">Viewed | {{ $notification->data['date'] }}</span></li></a>
                                             <hr class="h-0 border border-t-0 border-solid border-neutral-700 opacity-25" />
                                         @endforeach
                                     @endif
@@ -123,7 +124,7 @@
                                         <a class="block w-full whitespace-nowrap bg-transparent px-4 py-2 text-sm font-normal text-neutral-700 hover:bg-neutral-100 active:text-neutral-800 active:no-underline disabled:pointer-events-none disabled:bg-transparent disabled:text-neutral-400 dark:text-neutral-200 dark:hover:bg-neutral-600"
                                             href="#"
                                             data-te-dropdown-item-ref>
-                                            Profile </a>
+                                            Dashboard </a>
                                     </li>
                                     @role('Admin')
                                     <li>

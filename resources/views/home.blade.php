@@ -24,7 +24,7 @@
             <img class="rounded-xl drop-shadow-xl" src="images/San Juan City Hall.jpg" alt="San Juan City Hall">
             <div class="mt-4 md:mt-0">
                 <h2 class="mb-4 text-4xl tracking-tight font-extrabold font-josefinsans text-primary">Lorem ipsum dolor sit amet, consectetur.</h2>
-                <p class="mb-6 font-light text-gray-500 md:text-lg">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+                <p class="mb-6 font-light text-gray-500 md:text-lg">San Juan City is a vibrant and historic urban center located in the northern part of Metro Manila. City's road network facilitates essential connectivity within the greater Metro Manila area. As a central urban hub, it serves as a vital link in the transportation system, connecting residents and commuters to neighboring cities and districts.</p>
             </div>
         </div>
     </section>
@@ -34,13 +34,13 @@
     <section class="bg-white mx-5 sm:mx-20">
         <div class="gap-8 items-center py-8 px-4 xl:gap-16 md:grid md:grid-cols-2 sm:py-14 lg:px-6">
             <div class="mt-4 md:mt-0">
-                <p class="mb-6 font-light text-gray-500 md:text-lg">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+                <p class="mb-6 font-light text-gray-500 md:text-lg">San Juan hosts a diverse range of businesses, from small local enterprises to commercial establishments. The accessibility provided by its roads encourages commerce, attracting entrepreneurs and investors, and driving economic growth.</p>
             </div>
             <img class="rounded-xl drop-shadow-xl" src="images/San Juan Road.jpg" alt="San Juan City Road">
         </div>
     </section>
 
-    <section class="bg-white mx-5 sm:mx-40">
+    <!-- <section class="bg-white mx-5 sm:mx-40">
         <div class="grid justify-items-center">
             <h1 class="text-4xl font-extrabold leading-none tracking-tight font-josefinsans text-primary"><span class="underline underline-offset-3 decoration-7 decoration-secondary">Completed Reports</span></h1>
         </div>
@@ -50,5 +50,5 @@
         </div>
         <h2 class="text-md tracking-tight font-extrabold font-josefinsans text-primary text-center">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</h2>
         <p class="font-light text-gray-500 indent-10 md:text-md py-10">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
-    </section>
+    </section>-->
 @endsection

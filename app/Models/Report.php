@@ -151,9 +151,30 @@ class Report extends Model
         $mapPopupContent .= '<div class="my-2 text-slate-800"><strong>'.__('report.address').':</strong><br>'.$this->address.'</div>';
         $mapPopupContent .= '<div class="my-2 text-slate-800"><strong>'.__('report.details').':</strong><br>'.$this->details.'</div>';
         $mapPopupContent .= '<div class="my-2 text-slate-800"><strong>'.__('report.severity').':</strong><br>'.$this->severity.'</div>';
-        $mapPopupContent .= '<div class="my-2 text-slate-800"><strong>'.__('report.urgency').':</strong><br>'.$this->urgency.'</div>';
-        // $mapPopupContent .= '<div class="my-2"><strong>'.__('report.coordinate').':</strong><br>'.$this->coordinate.'</div>';
-        $mapPopupContent .= '<div class="my-2 text-slate-800 "><strong>'.__('report.status').':<br><div class="text-lime-600">'.$this->status.'</div></strong></div>';
+        $mapPopupContent .= '<div class="my-2 text-slate-800"><strong>'.__('report.urgency').':</strong><br>'.$this->urgency.'</div>';        
+        
+        $cssClass = ''; // Initialize the CSS class variable
+
+        // Set the CSS class based on the status value
+        switch ($this->status) {
+            case 'PENDING':
+                $cssClass = 'text-yellow-500'; // Set to yellow text
+                break;
+            case 'INPROGRESS':
+                $cssClass = 'text-blue-500'; // Set to blue text
+                break;
+            case 'FINISHED':
+                $cssClass = 'text-green-500'; // Set to green text
+                break;
+            case 'DECLINED':
+                $cssClass = 'text-red-500'; // Set to red text
+                break;
+            default:
+                $cssClass = 'text-gray-500'; // Set to gray text for other statuses
+                break;
+        }
+
+        $mapPopupContent .= '<div class="my-2 text-slate-800 "><strong>'.__('report.status').':<br><div class="' . $cssClass . '">'.$this->status.'</div></strong></div>';
 
         return $mapPopupContent;
     }

@@ -272,10 +272,26 @@
 
                 // Create a new div element.
                 var statusDiv = document.createElement('div');
-                statusDiv.classList.add('status-label', 'font-bold');
+                statusDiv.classList.add('font-bold');
                 statusDiv.textContent = report.status;
                 statusCell.appendChild(statusDiv);
 
+                switch (report.status) {
+                    case 'PENDING':
+                        statusDiv.classList.add('text-yellow-400');
+                        break;
+                    case 'INPROGRESS':
+                        statusDiv.classList.add('text-blue-500');
+                        break;
+                    case 'FINISHED':
+                        statusDiv.classList.add('text-green-500');
+                        break;
+                    case 'DECLINED':
+                        statusDiv.classList.add('text-red-500');
+                        break;
+                    default:
+                }
+        
                 var editCell = document.createElement('td');
                 var routeUrl = '/reports/' + report.id;
 
@@ -342,6 +358,8 @@ window.onload = function() {
         datatable.scrollIntoView({ behavior: 'smooth' }); // You can use 'auto' or 'smooth' for scrolling behavior
     }
 };
+
+
 </script>
 @endpush
 

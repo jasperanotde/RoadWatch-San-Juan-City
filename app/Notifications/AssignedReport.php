@@ -16,10 +16,12 @@ class AssignedReport extends Notification
      * Create a new notification instance.
      */
     protected $message;
+    protected $notifURL;
 
-    public function __construct($message)
+    public function __construct($notifURL,$message)
     {
         $this->message = $message;
+        $this->notifURL = $notifURL;
     }
 
     /**
@@ -50,11 +52,20 @@ class AssignedReport extends Notification
      */
     public function toArray(object $notifiable): array
     {
-        $formattedDate = Carbon::now()->toDateTimeString();
-        
+
+        // Create a new Carbon instance
+        $carbon = new Carbon();
+
+        // Set the timezone to 'Asia/Manila'
+        $carbon->setTimezone('Asia/Manila');
+
+        // Get the current time in the Philippines timezone and format it
+        $formattedDate = $carbon->format('F j, Y \a\t h:i A');
+
         return [
             'data' => $this->message,
             'date' => $formattedDate,
+            'notifURL' => $this->notifURL,
         ];
     }
 }
