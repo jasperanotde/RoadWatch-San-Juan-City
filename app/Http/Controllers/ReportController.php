@@ -12,6 +12,7 @@ use Illuminate\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Facades\DB;
 
 
 class ReportController extends Controller
@@ -42,59 +43,6 @@ class ReportController extends Controller
         
         return view('reports.index', compact('reports', 'assignedReports'));
     }
-
-    public function getReportsByCategory($category)
-    {
-        $user = auth()->user();
-        // Validate that the category is one of the allowed values (e.g., 'PENDING', 'INPROGRESS', etc.).
-        $allowedCategories = ['PENDING', 'INPROGRESS', 'FINISHED', 'DECLINED', 'MY_REPORTS', 'ASSIGNED'];
-    
-        if (!in_array(strtoupper($category), $allowedCategories)) {
-            abort(404); // Return a 404 response for invalid categories.
-        }
-    
-        // If the category is "MY_REPORTS," retrieve reports created by the currently logged-in user.
-        if (strtoupper($category) === "MY_REPORTS") {
-            $reports = $user->reports; // Assuming you have a relationship set up.
-
-            $count = $reports->count();
-    
-        // Create an associative array containing both reports and count.
-        $data = [
-            'reports' => $reports,
-            'count' => $count,
-            'user' => $user,
-            ];
-        }
-        // If the category is "ASSIGNED," retrieve reports where user_id matches assigned_user_id.
-        elseif (strtoupper($category) === "ASSIGNED") {
-            $reports = Report::where('assigned_user_id', $user->id)->get();
-
-            $count = $reports->count();
-    
-            // Create an associative array containing both reports and count.
-            $data = [
-                'reports' => $reports,
-                'count' => $count,
-                'user' => $user,
-            ];
-        } else {
-            // Filter reports based on the selected category.
-            $reports = Report::where('status', strtoupper($category))->get();
-
-            $count = $reports->count();
-    
-            // Create an associative array containing both reports and count.
-            $data = [
-                'reports' => $reports,
-                'count' => $count,
-                'user' => $user,
-            ];
-        }
-    
-        return response()->json($data);
-    }
-    
 
     /**
      * Show the form for creating a new report.
@@ -305,6 +253,58 @@ class ReportController extends Controller
 
         return back();
     }
+
+    public function getReportsByCategory($category)
+    {
+        $user = auth()->user();
+        // Validate that the category is one of the allowed values (e.g., 'PENDING', 'INPROGRESS', etc.).
+        $allowedCategories = ['PENDING', 'INPROGRESS', 'FINISHED', 'DECLINED', 'MY_REPORTS', 'ASSIGNED'];
+    
+        if (!in_array(strtoupper($category), $allowedCategories)) {
+            abort(404); // Return a 404 response for invalid categories.
+        }
+    
+        // If the category is "MY_REPORTS," retrieve reports created by the currently logged-in user.
+        if (strtoupper($category) === "MY_REPORTS") {
+            $reports = $user->reports; // Assuming you have a relationship set up.
+
+            $count = $reports->count();
+    
+        // Create an associative array containing both reports and count.
+        $data = [
+            'reports' => $reports,
+            'count' => $count,
+            'user' => $user,
+            ];
+        }
+        // If the category is "ASSIGNED," retrieve reports where user_id matches assigned_user_id.
+        elseif (strtoupper($category) === "ASSIGNED") {
+            $reports = Report::where('assigned_user_id', $user->id)->get();
+
+            $count = $reports->count();
+    
+            // Create an associative array containing both reports and count.
+            $data = [
+                'reports' => $reports,
+                'count' => $count,
+                'user' => $user,
+            ];
+        } else {
+            // Filter reports based on the selected category.
+            $reports = Report::where('status', strtoupper($category))->get();
+
+            $count = $reports->count();
+    
+            // Create an associative array containing both reports and count.
+            $data = [
+                'reports' => $reports,
+                'count' => $count,
+                'user' => $user,
+            ];
+        }
+    
+        return response()->json($data);
+    }
     
     public function approveReport(Request $request, Report $report)
     {
@@ -463,4 +463,23 @@ class ReportController extends Controller
         return back();
     }
 
+    public function dashboard(Request $request)
+    {
+        $statuses = ['PENDING', 'INPROGRESS', 'FINISHED', 'DECLINED'];
+
+        $counts = DB::table('reports')
+            ->select('status', DB::raw('COUNT(*) as count'))
+            ->whereIn('status', $statuses)
+            ->groupBy('status')
+            ->pluck('count', 'status')
+            ->toArray();
+
+        // Return JSON response for the counts
+        if ($request->expectsJson()) {
+            return response()->json($counts);
+        }
+
+        // Return the view with counts as a variable
+        return view('reports.dashboard')->with('counts', $counts);
+    }
 }
