@@ -1,8 +1,6 @@
 import './bootstrap';
 import 'flowbite';
-import Alpine from 'alpinejs'
  
-
 // Initialization for ES Users
 // Install: npm install tw-elements -- if encountering error
 import './dropdown-init';
