@@ -9,6 +9,7 @@ import './modal-init';
 import './status-label';
 import './tab-init';
 import './radial-chart';
+import './bar-chart-init';
 
 import '@fancyapps/fancybox';
 document.addEventListener('DOMContentLoaded', function () {
