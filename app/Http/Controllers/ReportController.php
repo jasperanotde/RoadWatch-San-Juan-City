@@ -561,6 +561,8 @@ class ReportController extends Controller
 
     private function getBarChartData()
     {
+        // Set the timezone to "Asia/Manila"
+        date_default_timezone_set('Asia/Manila');
 
         // Retrieve data for the bar chart (modified logic)
         $reportCounts = DB::table('reports')

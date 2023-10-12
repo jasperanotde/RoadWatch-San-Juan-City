@@ -3,12 +3,10 @@
 @section('title', __('report.list'))
 
 @section('content')
-<div class="mx-20">
-    <section class="mx-20">
-        <div class="mt-20 mb-10 relative rounded z-0" id="mapid">
-            <button class="absolute bottom-0 bg-primary text-white p-2 rounded hover:bg-secondary m-2 z-[1000]" id="myButton">My Location</button>
-        </div> 
-    </section>
+<div class="mx-5 md:mx-10 lg:mx-20">
+    <div class="mt-20 mb-10 relative rounded z-0" id="mapid">
+        <button class="absolute bottom-0 bg-primary text-white p-2 rounded hover:bg-secondary m-2 z-[1000]" id="myButton">My Location</button>
+    </div> 
 
     @section('styles')
         <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
@@ -366,48 +364,34 @@ window.onload = function() {
 <div class="max-w-6xl mx-auto" id="reportTable"> 
 
      <div class="flex justify-between items-center">
-        <h1 class="font-josefinsans font-bold flex-grow text-4xl font-normal leading-none tracking-tight font-poppins text-primary"><span class="font-josefinsans font-bold underline underline-offset-3 decoration-7 decoration-secondary">{{ __('app.total') }}: <small><span id="count-display">{{ $reports->total() }} Total Reports </span> </span></small></h1>
+        <h1 class="font-josefinsans font-bold flex-grow text-xl md:text-2xl lg:text-4xl font-normal leading-none tracking-tight font-poppins text-primary"><span class="font-josefinsans font-bold underline underline-offset-3 decoration-7 decoration-secondary">{{ __('app.total') }}: <small><span id="count-display">{{ $reports->total() }} Total Reports </span> </span></small></h1>
     </div>
 
     <div class="mb-20 overflow-x-auto shadow-md sm:rounded-lg">
         <div class="p-4">
             <label for="datatable-search-input" class="sr-only">Search</label>
-            <div class="flex items-center justify-between mt-1">
-                <div class="pl-3 pointer-events-none">
-                    <svg class="w-5 h-5 text-gray-500 dark:text-gray-400" fill="currentColor" viewBox="0 0 20 20"
-                        xmlns="http://www.w3.org/2000/svg">
-                        <path fill-rule="evenodd"
-                            d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
-                            clip-rule="evenodd"></path>
-                    </svg>
+            <div class="flex flex-col items-center mt-1 sm:flex-row sm:items-center sm:justify-between">
+                <div class="flex items-center">
+                    <div class="pl-3 pointer-events-none mr-5">
+                        <svg class="w-5 h-5 text-gray-500 dark:text-gray-400" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                            <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd"></path>
+                        </svg>
+                    </div>
+                    <input type="search" id="datatable-search-input" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full w-3/4 sm:w-10/12 md:5/6 pl-10 p-2.5" placeholder="Search for items">
                 </div>
-                <input type="search" id="datatable-search-input" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-50 pl-10 p-2.5" placeholder="Search for items">
-                <div class="flex justify-center text-sm font-medium text-center text-gray-500 border-b border-gray-200 dark:text-gray-400 dark:border-gray-700">
-                    <ul class="font-bold flex flex-wrap -mb-px">
-                        <li class="mr-2">
-                            <a type="button" onclick="updateTable('all', this)" class="cursor-pointer inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300">ALL REPORTS</a>
-                        </li>
-                        <li class="mr-2">
-                            <a type="button" onclick="updateTable('my_reports', this)" class="cursor-pointer inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300">MY REPORTS</a>
-                        </li>
+                <div class="mt-5 sm:mt-0">
+                    <label for="reportFilter" class="mr-2 mt-2 sm:mt-0">Filter Reports</label>
+                    <select id="reportFilter" onchange="updateTable(this.value, this)" class="cursor-pointer border rounded-lg hover:text-gray-600 hover:border-gray-300">
+                        <option value="all">All Reports</option>
+                        <option value="my_reports">My Reports</option>
                         @if(auth()->check() && $assignedReports->count() > 0)
-                            <li class="mr-2">
-                                <a type="button" onclick="updateTable('assigned', this)" class="cursor-pointer inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300">ASSIGNED REPORTS</a>
-                            </li>
+                            <option value="assigned">Assigned Reports</option>
                         @endif
-                        <li class="mr-2">
-                            <a type="button" onclick="updateTable('pending', this)" class="cursor-pointer inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300">PENDING</a>
-                        </li>
-                        <li class="mr-2">
-                            <a type="button" onclick="updateTable('inprogress', this)" class="cursor-pointer inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300">INPROGRESS</a>
-                        </li>
-                        <li class="mr-2">
-                            <a type="button" onclick="updateTable('finished', this)" class="cursor-pointer inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300">FINISHED</a>
-                        </li>
-                        <li class="mr-2">
-                            <a type="button" onclick="updateTable('declined', this)" class="cursor-pointer inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:text-gray-600 hover:border-gray-300">DECLINED</a>
-                        </li>
-                    </ul>
+                        <option value="pending">Pending</option>
+                        <option value="inprogress">Inprogress</option>
+                        <option value="finished">Finished</option>
+                        <option value="declined">Declined</option>
+                    </select>
                 </div>
             </div>
         </div>

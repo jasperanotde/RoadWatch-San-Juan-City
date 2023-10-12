@@ -176,29 +176,15 @@
                         </li>
                     </ul>
                     </div>
-                    <a
-                    href="#"
-                    class="uppercase text-sm font-semibold inline-flex items-center rounded-lg text-blue-600 hover:text-blue-700 dark:hover:text-blue-500  hover:bg-gray-100 dark:hover:bg-gray-700 dark:focus:ring-gray-700 dark:border-gray-700 px-3 py-2">
-                    Progress report
-                    <svg class="w-2.5 h-2.5 ml-1.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 6 10">
-                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 9 4-4-4-4"/>
-                    </svg>
-                    </a>
                 </div>
             </div>
         </div>
-        <div class="grid grid-rows-2 gap-x-0.5 mt-10">
-            <!-- Bar Chart -->
-            <div class="mx-auto w-10/12 overflow-hidden">
-                <canvas
-                    data-te-chart="bar"
-                    data-te-dataset-label="Reports Generated"
-                    data-te-labels='@json(array_keys($barChartData["reportCounts"]))'
-                    data-te-dataset-data='@json(array_values($barChartData["reportCounts"]))'
-                    ></canvas>
-            </div>
+        <div class="mt-10">
             <!-- Pie Chart -->
             <div class="mx-auto w-10/12 overflow-hidden">
+                <div class="flex justify-center items-center text-center font-medium text-lg text-gray-600">
+                    <span class="p-5">Report Severity</span>
+                </div>
                 <canvas
                     data-te-chart="pie"
                     data-te-dataset-label="Severity"
@@ -206,6 +192,15 @@
                     data-te-dataset-data="{{ json_encode(array_values($pieChartData)) }}"
                     data-te-dataset-background-color="['rgba(255, 235, 59, 0.5)', 'rgba(255, 152, 0, 0.5)', 'rgba(255, 0, 0, 0.5)']">
                 </canvas>
+            </div>
+            <!-- Bar Chart -->
+            <div class="mx-auto w-10/12 overflow-hidden mt-10">
+                <canvas
+                    data-te-chart="bar"
+                    data-te-dataset-label="Reports Generated"
+                    data-te-labels='@json(array_keys($barChartData["reportCounts"]))'
+                    data-te-dataset-data='@json(array_values($barChartData["reportCounts"]))'
+                    ></canvas>
             </div>
         </div>
     </div>

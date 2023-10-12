@@ -1,10 +1,21 @@
 @extends('layout.layout')
 @section('title', __('report.detail'))
 @section('content')
-<div id="reports-container" class="flex justify-center m-20">
-   <div class="flex w-full max-w-screen-xl">
+<div class="my-20 flex justify-center">
+  <div class="flex flex-col w-full max-w-screen-xl md:flex-row">
+   <!-- Right Side (Map) -->
+   <div class="w-full md:w-1/2 p-4">
+         <div style="background: rgba(17,63,103); border-top-left-radius: 8px; border-top-right-radius: 8px;" class="text-white rounded-sm p-4">
+            <h1 class="text-xl font-bold text-white">{{ trans('report.location') }}</h1>
+         </div>
+         @if ($report->coordinate)
+         <div style=" border-bottom-right-radius: 8px;  border-bottom-left-radius: 8px;" id="mapid" class="border shadow-lg h-80 z-0"></div>
+         @else
+         <p>{{ __('report.no_coordinate') }}</p>
+         @endif
+      </div>
       <!-- Left Side (Report Details) -->
-      <div class="w-1/2 p-4">
+      <div class="w-full md:w-1/2 p-4">
          <div style="border-radius: 10px" id="glass" class="glass border shadow-lg ">
             <div style="background: rgba(17,63,103); border-top-left-radius: 8px; border-top-right-radius: 8px;" class="text-white rounded-sm p-4">
                <h1 class="text-xl font-bold text-white">Report Details</h1>
@@ -178,17 +189,6 @@
                @endif
             </div>
          </div>
-      </div>
-      <!-- Right Side (Map) -->
-      <div class="w-1/2 p-4">
-         <div style="background: rgba(17,63,103); border-top-left-radius: 8px; border-top-right-radius: 8px;" class="text-white rounded-sm p-4">
-            <h1 class="text-xl font-bold text-white">{{ trans('report.location') }}</h1>
-         </div>
-         @if ($report->coordinate)
-         <div style=" border-bottom-right-radius: 8px;  border-bottom-left-radius: 8px;" id="mapid" class="border shadow-lg h-80 z-0"></div>
-         @else
-         <p>{{ __('report.no_coordinate') }}</p>
-         @endif
          <livewire:comments :model="$report"/>
       </div>
    </div>
@@ -196,7 +196,7 @@
 @if (auth()->check())
 @role('Admin|City Engineer Supervisor|City Engineer')
 <!------- Record Slip Index ------->
-<div id="" class="flex justify-center m-20 rounded-lg">
+<div id="" class="flex justify-center m-5 sm:m-20 rounded-lg">
    <div class="w-full shadow-lg max-w-screen-xl">
       <div style="background: rgba(17,63,103); border-top-left-radius: 8px; border-top-right-radius: 8px; display: flex; justify-content: space-between; align-items: center;" class="text-white rounded-sm p-4">
          <h1 class="text-xl font-bold text-white">Action Slips</h1>
