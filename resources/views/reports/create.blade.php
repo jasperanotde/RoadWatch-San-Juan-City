@@ -5,9 +5,17 @@
 @section('content')
 
 <div class="my-20 flex justify-center">
-  <div class="flex w-full max-w-screen-xl">
+  <div class="flex flex-col w-full max-w-screen-xl md:flex-row">
+    <!-- Right Side (Map) -->
+    <div class="w-full md:w-1/2 p-4">
+      <div class="border rounded-lg shadow-lg p-6">
+        <h2 class="text-xl font-bold text-indigo-700">{{ trans('report.location') }}</h2>
+        <div class="mt-4 z-0" id="mapid"></div>
+      </div>
+    </div>
+
     <!-- Left Side (Form) -->
-    <div class="w-1/2 p-4">
+    <div class="w-full md:w-1/2 p-4">
       <div class="border rounded-lg shadow-lg p-6">
         <h1 class="text-2xl font-bold text-indigo-700 mb-4">Report a Road Damage</h1>
         <form method="POST" action="{{ route('reports.store') }}" enctype="multipart/form-data" accept-charset="UTF-8">
@@ -130,18 +138,8 @@
         </form>
       </div>
     </div>
-
-    <!-- Right Side (Map) -->
-    <div class="w-1/2 p-4">
-      <div class="border rounded-lg shadow-lg p-6">
-        <h2 class="text-xl font-bold text-indigo-700">{{ trans('report.location') }}</h2>
-        <div class="mt-4 z-0" id="mapid"></div>
-      </div>
-    </div>
   </div>
 </div>
-
-
 @endsection
 
 @section('styles')

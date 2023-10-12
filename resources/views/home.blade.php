@@ -18,12 +18,14 @@
 
     <section class="bg-white mx-5 sm:mx-20">
         <div class="mt-10 grid justify-items-center">
-            <h1 class="text-4xl font-extrabold leading-none tracking-tight font-josefinsans text-primary"><span class="underline underline-offset-3 decoration-7 decoration-secondary">News & Updates</span></h1>
+            <h1 class="text-4xl font-extrabold leading-none tracking-tight font-josefinsans text-primary"><span class="underline underline-offset-3 decoration-7 decoration-secondary">San Juan City Hall</span></h1>
         </div>
         <div class="gap-8 items-center py-8 px-4 xl:gap-16 md:grid md:grid-cols-2 sm:py-14 lg:px-6">
             <img class="rounded-xl drop-shadow-xl" src="images/San Juan City Hall.jpg" alt="San Juan City Hall">
             <div class="mt-4 md:mt-0">
-                <h2 class="mb-4 text-4xl tracking-tight font-extrabold font-josefinsans text-primary">Lorem ipsum dolor sit amet, consectetur.</h2>
+                <!-- <div class="flex items-center justify-center">
+                    <h2 class="mb-4 text-4xl tracking-tight font-extrabold font-josefinsans text-primary"></h2>
+                </div> -->
                 <p class="mb-6 font-light text-gray-500 md:text-lg">San Juan City is a vibrant and historic urban center located in the northern part of Metro Manila. City's road network facilitates essential connectivity within the greater Metro Manila area. As a central urban hub, it serves as a vital link in the transportation system, connecting residents and commuters to neighboring cities and districts.</p>
             </div>
         </div>

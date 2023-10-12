@@ -3,6 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RoadWatch San Juan City</title>
+  <link rel="icon" type="image/x-icon" href="/images/logo-icon-no-bg.png">
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
   @vite(['resources/css/app.css','resources/js/app.js'])

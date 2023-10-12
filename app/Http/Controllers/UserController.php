@@ -29,23 +29,36 @@ class UserController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function index(Request $request): View
-{
-    $data = User::orderBy('id', 'DESC')->paginate(5);
+    {
+        // Initialize an array to store roles that should be visible to the current user
+        $visibleRoles = [];
 
-    // Initialize empty arrays to store roles and userRoles
-    $roles;
-    $userRole = [];
+        // Check if the currently logged-in user has the "City Engineer Supervisor" role
+        if (auth()->user() && auth()->user()->hasRole('City Engineer Supervisor')) {
+            // If the user is a "City Engineer Supervisor," add the "City Engineer" role to the visible roles
+            $visibleRoles[] = 'City Engineer';
+        }
 
-    foreach ($data as $user) {
-        $roles = Role::pluck('name','name')->all();
-        // Retrieve roles for each user and add them to the $roles array
-        $userRole[$user->id] = $user->getRoleNames()->first();
+        // Check if the currently logged-in user has the "Admin" role
+        if (auth()->user() && auth()->user()->hasRole('Admin')) {
+            // If the user is an "Admin," allow them to see all roles
+            $visibleRoles = Role::pluck('name')->all();
+        }
+
+        $data = User::role($visibleRoles)->orderBy('id', 'DESC')->paginate(5);
+
+        // Initialize empty arrays to store roles and userRoles
+        $roles = Role::pluck('name', 'name')->all();
+        $userRole = [];
+
+        foreach ($data as $user) {
+            // Retrieve roles for each user and add them to the $userRole array
+            $userRole[$user->id] = $user->getRoleNames()->first();
+        }
+
+        return view('users.index', compact('data', 'roles', 'userRole'))
+            ->with('i', ($request->input('page', 1) - 1) * 5);
     }
-
-    return view('users.index', compact('data', 'roles', 'userRole'))
-        ->with('i', ($request->input('page', 1) - 1) * 5);
-}
-
     
     /**
      * Show the form for creating a new resource.
