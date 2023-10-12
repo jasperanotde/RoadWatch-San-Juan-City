@@ -334,7 +334,7 @@ class ReportController extends Controller
         $userName = $assignedUser ? $assignedUser->name : 'Unknown User';
 
         // Pass the user's name to the notification
-        User::find(Auth::user()->id)->notify(new AssignedReport($reportUrl, 'Assignment of Report '. $report->name .' to '. $userName .' was successfull.'));
+        User::find(Auth::user()->id)->notify(new AssignedReport($reportUrl, 'Assignment of Report '. $report->name .' to '. $userName .' was successful.'));
 
         // Send the notification to the assigned user
         Notification::send($assignedUser, new AssignedReport($reportUrl, 'Report '. $report->name .' was assigned to you.'));
@@ -380,9 +380,14 @@ class ReportController extends Controller
         $creatorUser = User::find($report->creator_id);
 
         $report->status = 'DECLINED';
+        $report->decline_reason = $request->input('reason');
+
         $report->save();
 
-         // Send the notification to the creator of the report
+        // Pass the user's name to the notification
+        User::find(Auth::user()->id)->notify(new AssignedReport($reportUrl, 'Report '. $report->name .' to '. $userName .' was successfully declined.'));
+
+        // Send the notification to the creator of the report
         Notification::send($creatorUser, new AssignedReport($reportUrl, 'Your report '. $report->name .' was declined'));
 
         // Send an SMS using Semaphore API

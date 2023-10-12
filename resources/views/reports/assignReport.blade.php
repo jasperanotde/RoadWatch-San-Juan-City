@@ -12,8 +12,20 @@
                 <!--Modal body-->
                 <div class="p-4">
                     <div class="mb-4">
-                        <label for="assignedUser">Assign to City Engineer user:</label>
-                    </div>
+                            <span class="font-semibold">
+                                Basis for Report Approval 
+                            </span>
+                            <ul class="list-disc ml-10">
+                                <li>Accurate Information</li>
+                                <li>Photographic Evidence</li>
+                                <li>Safety Concerns</li>
+                                <li>Relevance to Prioritization</li>
+                                <li>Compliance with Standards</li>
+                            </ul>
+                        </div>
+                        <div class="mb-4 font-semibold">
+                            <label for="assignedUser">Assign to City Engineer user:</label>
+                        </div>
                    
                     <select name="assignedUser" id="assignedUser" class="w-full py-2 px-3 border rounded-md shadow-sm focus:ring focus:ring-opacity-50 focus:ring-blue-500">
                         @foreach ($cityEngineers as $engineer)
