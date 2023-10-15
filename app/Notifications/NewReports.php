@@ -8,9 +8,9 @@ use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 use Carbon\Carbon;
 
-class AssignedReport extends Notification
+class NewReports extends Notification
 {
-    use Queueable; 
+    use Queueable;
 
     /**
      * Create a new notification instance.
@@ -18,14 +18,14 @@ class AssignedReport extends Notification
     protected $message;
     protected $notifURL;
     protected $reportName;
-    protected $userName;
+    protected $creatorName;
 
-    public function __construct($userName, $reportName, $notifURL,$message)
+    public function __construct($reportName, $creatorName, $notifURL,$message)
     {
         $this->message = $message;
         $this->notifURL = $notifURL;
         $this->reportName = $reportName;
-        $this->userName = $userName;
+        $this->creatorName = $creatorName;
     }
 
     /**
@@ -42,10 +42,10 @@ class AssignedReport extends Notification
      * Get the mail representation of the notification.
      */
     public function toMail(object $notifiable): MailMessage
-    {
+    {  
         return (new MailMessage)
-                    ->greeting('Report Assignment')
-                    ->line('Hi, '. $this->userName . ', a new report ' . $this->reportName . ' was Assigned to you.')
+                    ->greeting('New Report')
+                    ->line('A new report created. ' . $this->reportName . ' Created by User: ' . $this->creatorName)
                     ->action('Notification Action', $this->notifURL)
                     ->line('Check the link provided for investigation.');
     }
@@ -57,7 +57,6 @@ class AssignedReport extends Notification
      */
     public function toArray(object $notifiable): array
     {
-
         // Create a new Carbon instance
         $carbon = new Carbon();
 

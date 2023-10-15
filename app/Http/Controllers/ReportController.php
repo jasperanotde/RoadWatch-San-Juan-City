@@ -6,6 +6,7 @@ use App\Models\Report;
 use App\Models\ReportSubmission;
 use App\Models\User;
 use App\Notifications\AssignedReport;
+use App\Notifications\NewReports;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -80,6 +81,12 @@ class ReportController extends Controller
     {
         $this->authorize('create', new Report);
 
+        // Retrieve the users with role of Admin and City Engineer Supervisor for notification
+        $users = User::whereHas('roles', function ($query) {
+            $query->whereIn('name', ['Admin', 'City Engineer Supervisor']);
+        })->get();
+        
+
         $newReport = $request->validate([
             'name'      => 'required|max:60',
             'address'   => 'nullable|max:255',
@@ -107,6 +114,16 @@ class ReportController extends Controller
 
         $newReport['creator_id'] = auth()->id();
         $report = Report::create($newReport);
+
+        // After creating the report
+        $reportCreator = User::find($report->creator_id);
+        // Now, you can access the creator's name
+        $creatorName = $reportCreator->name;
+        $reportName = $newReport['name']; // Get the report name
+        $reportURL = url(route('reports.show', ['report' => $report->id]));
+
+        Notification::send($users, new NewReports($reportName, $creatorName, $reportURL, "New Report created: '" . $reportName . "'. Created by: " . $creatorName));
+
         return redirect()->route('reports.show', $report);
     }
 
@@ -133,7 +150,7 @@ class ReportController extends Controller
     }
 
 
-    //para sa record slip
+    // For record slip
     public function submit(Request $request, Report $report)
     {
         // Validate and save the submitted data for the report
@@ -344,13 +361,14 @@ class ReportController extends Controller
         $userName = $assignedUser ? $assignedUser->name : 'Unknown User';
 
         // Pass the user's name to the notification
-        User::find(Auth::user()->id)->notify(new AssignedReport($reportUrl, 'Assignment of Report '. $report->name .' to '. $userName .' was successful.'));
+        $currentUserAuth = User::find(Auth::user()->id);
+        Notification::send($currentUserAuth, new AssignedReport($userName, $report->name, $reportUrl, 'Assignment of Report '. $report->name .' to '. $userName .' was successful.'));
 
         // Send the notification to the assigned user
-        Notification::send($assignedUser, new AssignedReport($reportUrl, 'Report '. $report->name .' was assigned to you.'));
+        Notification::send($assignedUser, new AssignedReport($userName, $report->name, $reportUrl, 'Report '. $report->name .' was assigned to you.'));
 
         // Send the notification to the creator of the report
-        Notification::send($creatorUser, new AssignedReport($reportUrl, 'Your report '. $report->name .' was approved'));
+        Notification::send($creatorUser, new AssignedReport($userName, $report->name, $reportUrl, 'Your report '. $report->name .' was Approved'));
 
         // SMS Notification
         if ($this->smsNotif($creatorUser->contact_number, "Status of your Report: '" . $report->name . "' was marked as INPROGRESS. See report: " . $reportUrl)) {
@@ -383,11 +401,18 @@ class ReportController extends Controller
 
         $report->save();
 
+        // Retrieve the user based on the assigned_user_id
+        $assignedUser = User::find($report->assigned_user_id);
+
+        // Check if the user exists and has a name
+        $userName = $assignedUser ? $assignedUser->name : 'Unknown User';
+
         // Pass the user's name to the notification
-        User::find(Auth::user()->id)->notify(new AssignedReport($reportUrl, 'Report '. $report->name .' to '. $userName .' was successfully declined.'));
+        $currentUserAuth = User::find(Auth::user()->id);
+        Notification::send($currentUserAuth, new AssignedReport($userName, $report->name, $reportUrl, 'Report '. $report->name . ' was successfully Declined.'));
 
         // Send the notification to the creator of the report
-        Notification::send($creatorUser, new AssignedReport($reportUrl, 'Your report '. $report->name .' was declined'));
+        Notification::send($creatorUser, new AssignedReport($userName, $report->name, $reportUrl, 'Your report '. $report->name .' was Declined. See details'));
 
         // SMS Notification
         if ($this->smsNotif($creatorUser->contact_number, "Status of your Report: '" . $report->name . "' was DECLINED. See report: " . $reportUrl)) {
@@ -428,8 +453,14 @@ class ReportController extends Controller
 
         $report->save();
 
+        // Retrieve the user based on the assigned_user_id
+        $assignedUser = User::find($report->assigned_user_id);
+
+        // Check if the user exists and has a name
+        $userName = $assignedUser ? $assignedUser->name : 'Unknown User';
+
         // Send the notification to the creator of the report
-        Notification::send($creatorUser, new AssignedReport($reportUrl, 'Your report '. $report->name .' was marked as Finished'));
+        Notification::send($creatorUser, new AssignedReport($userName, $report->name, $reportUrl, 'Your report '. $report->name .' was marked as Finished. See details'));
 
         // SMS Notification
         if ($this->smsNotif($creatorUser->contact_number, "Status of your Report: '" . $report->name . "' was marked as FINISHED. See report: " . $reportUrl)) {

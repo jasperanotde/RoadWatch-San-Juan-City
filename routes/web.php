@@ -27,7 +27,7 @@ Route::get('/', function () {
     }
 
     return view('auth.login');
-})->middleware('verified');
+}); // add ->middleware('verified') for production
 
 // These routes are accessible to all users
 Route::get('/about', function () {
