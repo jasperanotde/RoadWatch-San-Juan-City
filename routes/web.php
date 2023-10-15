@@ -1,6 +1,8 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Foundation\Auth\EmailVerificationRequest;
+use Illuminate\Http\Request;
 
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
@@ -25,7 +27,7 @@ Route::get('/', function () {
     }
 
     return view('auth.login');
-});
+})->middleware('verified');
 
 // These routes are accessible to all users
 Route::get('/about', function () {
@@ -36,10 +38,12 @@ Route::get('/contact', function () {
     return view('contact');
 })->name('contact');
 
-Auth::routes();
+Auth::routes([
+    'verify' => true
+]);
 
 // These routes are accessible only to authenticated users
-Route::group(['middleware' => ['auth']], function() {
+Route::group(['middleware' => ['auth']], function() { // replace to ['auth', 'verified'] for production
     Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
     Route::resource('roles', RoleController::class);
     Route::resource('users', UserController::class);

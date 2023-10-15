@@ -18,14 +18,14 @@ class CreateCityEngineerSeeder extends Seeder
     $user1 = User::create([
         'name' => 'Albert Nicholas', 
         'email' => 'albert@gmail.com',
-        'contact_number' => '9498091321',
+        'contact_number' => '639498091321',
         'password' => bcrypt('password')
     ]);
     
     $user2 = User::create([
         'name' => 'Sigmund Pavlov', 
         'email' => 'sigmund@gmail.com',
-        'contact_number' => '9498091322',
+        'contact_number' => '639598091322',
         'password' => bcrypt('password')
     ]);
 

@@ -18,7 +18,7 @@ class CreateCityEngineerSupervisorSeeder extends Seeder
         $user = User::create([
             'name' => 'City Engineer Supervisor', 
             'email' => 'cityengisuper@gmail.com',
-            'contact_number' => '9498091322',
+            'contact_number' => '639498091322',
             'password' => bcrypt('password')
         ]);
         

@@ -14,6 +14,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
+use GuzzleHttp\Client;
+use GuzzleHttp\RequestOptions;
 
 class ReportController extends Controller
 {
@@ -22,12 +24,24 @@ class ReportController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+
+    private $client;
+
     function __construct()
     {
          $this->middleware('permission:report-list|report-create|report-edit|report-delete', ['only' => ['index','show']]);
          $this->middleware('permission:report-create', ['only' => ['create','store']]);
          $this->middleware('permission:report-edit', ['only' => ['edit','update']]);
          $this->middleware('permission:report-delete', ['only' => ['destroy','deleteSubmissions']]);
+
+         $this->client = new Client([
+            'base_uri' => "https://w11mqq.api.infobip.com/",
+            'headers' => [
+                'Authorization' => "App 74cac146a4072f0754a2bfe6eeaac0dd-bf6f1949-573d-4a74-bab7-ce8250e7291f",
+                'Content-Type' => 'application/json',
+                'Accept' => 'application/json',
+            ]
+        ]);
     }
 
     public function index()
@@ -200,7 +214,7 @@ class ReportController extends Controller
             'name'      => 'required|max:60',
             'address'   => 'nullable|max:255',
             'details'  => 'nullable|max:255',
-            'photo.*' => 'required|image|mimes:png,jpg,jpeg|max:2048',
+            'photo.*' => 'nullable|image|mimes:png,jpg,jpeg|max:2048',
             'severity'  => 'nullable|max:255',
             'urgency'  => 'nullable|max:255',
             'status'  => 'nullable|max:255',
@@ -210,15 +224,23 @@ class ReportController extends Controller
         ]);
         
         $imagePaths = [];
-        
-        // If there are no existing images, upload new ones
-        foreach ($request->file('photo') as $v) {
-            $fileName = time() . '_' . $v->getClientOriginalName();
-            $path = $v->storeAs('images', $fileName, 'public');
-            $imagePaths[] = '/storage/' . $path;
-        }
 
-        $reportData['photo'] = json_encode($imagePaths);
+        // Check if the 'photo' key exists in $reportData
+        if (array_key_exists('photo', $reportData)) {
+            // Check if there are existing images
+            if (is_null($reportData['photo'])) {
+                if (!is_null($report->photo)) {
+                    $imagePaths = json_decode($report->photo, true);
+                }
+            } else {
+                foreach ($request->file('photo') as $v) {
+                    $fileName = time() . '_' . $v->getClientOriginalName();
+                    $path = $v->storeAs('images', $fileName, 'public');
+                    $imagePaths[] = '/storage/' . $path;
+                }
+            }
+            $reportData['photo'] = json_encode($imagePaths);
+        }
         
         $report->update($reportData);
 
@@ -308,9 +330,6 @@ class ReportController extends Controller
         // Retrieve the creator user based on the report's creator_id
         $creatorUser = User::find($report->creator_id);
 
-        // Generate the URL of the report
-        $reportUrl = $reportUrl = url(route('reports.show', ['report' => $report->id]));
-
         // Update the report status to "Pending"
         $report->status = 'INPROGRESS';
     
@@ -333,27 +352,16 @@ class ReportController extends Controller
         // Send the notification to the creator of the report
         Notification::send($creatorUser, new AssignedReport($reportUrl, 'Your report '. $report->name .' was approved'));
 
-        // Send an SMS using Semaphore API
-        $apiKey = 'de63e40d8c0adf3b5bf717105371af7f'; // Replace with your Semaphore API key
-        $phoneNumber = $creatorUser->contact_number; // Replace with the recipient's phone number
-        $message = 'Status of your report: "'. $report->name .'" was updated to INPROGRESS.' . ' See your report: ' . $reportUrl; // Adjust the message as needed
-        $senderName = 'SEMAPHORE';
-
-        $ch = curl_init();
-        $parameters = [
-            'apikey' => $apiKey,
-            'number' => $phoneNumber,
-            'message' => $message,
-            'sendername' => $senderName,
-        ];
-
-        curl_setopt($ch, CURLOPT_URL, 'https://semaphore.co/api/v4/priority');
-        curl_setopt($ch, CURLOPT_POST, 1);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($parameters));
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-
-        $output = curl_exec($ch);
-        curl_close($ch);
+        // SMS Notification
+        if ($this->smsNotif($creatorUser->contact_number, "Status of your Report: '" . $report->name . "' was marked as INPROGRESS. See report: " . $reportUrl)) {
+            // SMS sent successfully
+            $successMessage = 'SMS sent successfully.';
+        } else {
+            // Handle SMS sending failure
+            $failureMessage = 'Failed to send SMS. Please try again later.';
+        }
+        // Log the message, whether it's a success or failure
+        error_log(isset($successMessage) ? $successMessage : $failureMessage);
 
         return back();
 
@@ -381,28 +389,17 @@ class ReportController extends Controller
         // Send the notification to the creator of the report
         Notification::send($creatorUser, new AssignedReport($reportUrl, 'Your report '. $report->name .' was declined'));
 
-        // Send an SMS using Semaphore API
-        $apiKey = 'de63e40d8c0adf3b5bf717105371af7f'; // Replace with your Semaphore API key
-        $phoneNumber = $creatorUser->contact_number; // Replace with the recipient's phone number
-        $message = 'Status of your report: "'. $report->name .'" was DECLINED.' . ' See your report: ' . $reportUrl; // Adjust the message as needed
-        $senderName = 'SEMAPHORE';
-
-        $ch = curl_init();
-        $parameters = [
-            'apikey' => $apiKey,
-            'number' => $phoneNumber,
-            'message' => $message,
-            'sendername' => $senderName,
-        ];
-
-        curl_setopt($ch, CURLOPT_URL, 'https://semaphore.co/api/v4/priority');
-        curl_setopt($ch, CURLOPT_POST, 1);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($parameters));
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-
-        $output = curl_exec($ch);
-        curl_close($ch);
-
+        // SMS Notification
+        if ($this->smsNotif($creatorUser->contact_number, "Status of your Report: '" . $report->name . "' was DECLINED. See report: " . $reportUrl)) {
+            // SMS sent successfully
+            $successMessage = 'SMS sent successfully.';
+        } else {
+            // Handle SMS sending failure
+            $failureMessage = 'Failed to send SMS. Please try again later.';
+        }
+        // Log the message, whether it's a success or failure
+        error_log(isset($successMessage) ? $successMessage : $failureMessage);
+        
         return back();
     }
 
@@ -431,32 +428,47 @@ class ReportController extends Controller
 
         $report->save();
 
-         // Send the notification to the creator of the report
-         Notification::send($creatorUser, new AssignedReport($reportUrl, 'Your report '. $report->name .' was marked as Finished'));
+        // Send the notification to the creator of the report
+        Notification::send($creatorUser, new AssignedReport($reportUrl, 'Your report '. $report->name .' was marked as Finished'));
 
-        // Send an SMS using Semaphore API
-        $apiKey = 'de63e40d8c0adf3b5bf717105371af7f'; // Replace with your Semaphore API key
-        $phoneNumber = $creatorUser->contact_number; // Replace with the recipient's phone number
-        $message = 'Status of your report: "'. $report->name .'" was marked as FINISHED.'; // Adjust the message as needed
-        $senderName = 'SEMAPHORE';
-
-        $ch = curl_init();
-        $parameters = [
-            'apikey' => $apiKey,
-            'number' => $phoneNumber,
-            'message' => $message,
-            'sendername' => $senderName,
-        ];
-
-        curl_setopt($ch, CURLOPT_URL, 'https://semaphore.co/api/v4/priority');
-        curl_setopt($ch, CURLOPT_POST, 1);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($parameters));
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-
-        $output = curl_exec($ch);
-        curl_close($ch);
+        // SMS Notification
+        if ($this->smsNotif($creatorUser->contact_number, "Status of your Report: '" . $report->name . "' was marked as FINISHED. See report: " . $reportUrl)) {
+            // SMS sent successfully
+            $successMessage = 'SMS sent successfully.';
+        } else {
+            // Handle SMS sending failure
+            $failureMessage = 'Failed to send SMS. Please try again later.';
+        }
+        // Log the message, whether it's a success or failure
+        error_log(isset($successMessage) ? $successMessage : $failureMessage);
 
         return back();
+    }
+
+    private function smsNotif($contactNumber, $message) 
+    {
+        $response = $this->client->request(
+            'POST',
+            'sms/2/text/advanced',
+            [
+                RequestOptions::JSON => [
+                    'messages' => [
+                        [
+                            'from' => 'InfoSMS',
+                            'destinations' => [
+                                ['to' => $contactNumber]
+                            ],
+                            'text' => $message,
+                        ]
+                    ]
+                ],
+            ]
+        );
+
+        echo("HTTP code: " . $response->getStatusCode() . PHP_EOL);
+        echo("Response body: " . $response->getBody()->getContents() . PHP_EOL);
+
+        return $response !== false;
     }
 
     public function dashboard(Request $request)
