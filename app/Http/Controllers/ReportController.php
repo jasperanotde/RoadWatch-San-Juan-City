@@ -7,6 +7,9 @@ use App\Models\ReportSubmission;
 use App\Models\User;
 use App\Notifications\AssignedReport;
 use App\Notifications\NewReports;
+use App\Notifications\ApproveReport;
+use App\Notifications\DeclineReport;
+use App\Notifications\FinishReport;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -341,45 +344,39 @@ class ReportController extends Controller
         // Validate and authorize the request here, ensuring it's a City Engineer making the request
         $assignedUserId = $request->input('assignedUser');
 
-        // Generate the URL of the report
-        $reportUrl = $reportUrl = url(route('reports.show', ['report' => $report->id]));
-        
-        // Retrieve the creator user based on the report's creator_id
-        $creatorUser = User::find($report->creator_id);
-
         // Update the report status to "Pending"
         $report->status = 'INPROGRESS';
     
         // Update the report to assign it to the selected user
         $report->assigned_user_id = $assignedUserId;
         $report->save();
-        
+
+         // Generate the URL of the report
+        $reportUrl = $reportUrl = url(route('reports.show', ['report' => $report->id]));
+        // Retrieve the creator user based on the report's creator_id
+        $creatorUser = User::find($report->creator_id);
         // Retrieve the user based on the assigned_user_id
         $assignedUser = User::find($assignedUserId);
-
         // Check if the user exists and has a name
         $userName = $assignedUser ? $assignedUser->name : 'Unknown User';
-
         // Pass the user's name to the notification
         $currentUserAuth = User::find(Auth::user()->id);
-        Notification::send($currentUserAuth, new AssignedReport($userName, $report->name, $reportUrl, 'Assignment of Report '. $report->name .' to '. $userName .' was successful.'));
 
-        // Send the notification to the assigned user
-        Notification::send($assignedUser, new AssignedReport($userName, $report->name, $reportUrl, 'Report '. $report->name .' was assigned to you.'));
+        // Send the Email Notification
+        Notification::send($currentUserAuth, new AssignedReport($assignedUser, $currentUserAuth, $userName, $report->name, $reportUrl, 'Assignment of Report \''. $report->name .'\' to '. $userName .' was successful.'));
+        Notification::send($assignedUser, new AssignedReport($assignedUser, $currentUserAuth, $userName, $report->name, $reportUrl, 'Report \''. $report->name .'\' was assigned to you.'));
+        Notification::send($creatorUser, new ApproveReport($creatorUser->name, $report->name, $reportUrl, 'Your report \''. $report->name .'\' was Approved! See details.'));
 
-        // Send the notification to the creator of the report
-        Notification::send($creatorUser, new AssignedReport($userName, $report->name, $reportUrl, 'Your report '. $report->name .' was Approved'));
-
-        // SMS Notification
-        if ($this->smsNotif($creatorUser->contact_number, "Status of your Report: '" . $report->name . "' was marked as INPROGRESS. See report: " . $reportUrl)) {
-            // SMS sent successfully
-            $successMessage = 'SMS sent successfully.';
-        } else {
-            // Handle SMS sending failure
-            $failureMessage = 'Failed to send SMS. Please try again later.';
-        }
-        // Log the message, whether it's a success or failure
-        error_log(isset($successMessage) ? $successMessage : $failureMessage);
+        // // SMS Notification
+        // if ($this->smsNotif($creatorUser->contact_number, "Status of your Report: '" . $report->name . "' was marked as INPROGRESS. See report: " . $reportUrl)) {
+        //     // SMS sent successfully
+        //     $successMessage = 'SMS sent successfully.';
+        // } else {
+        //     // Handle SMS sending failure
+        //     $failureMessage = 'Failed to send SMS. Please try again later.';
+        // }
+        // // Log the message, whether it's a success or failure
+        // error_log(isset($successMessage) ? $successMessage : $failureMessage);
 
         return back();
 
@@ -392,48 +389,35 @@ class ReportController extends Controller
 
     public function declineReport(Request $request, Report $report)
     {
-        // Generate the URL of the report
-        $reportUrl = $reportUrl = url(route('reports.show', ['report' => $report->id]));
-        $creatorUser = User::find($report->creator_id);
-
         $report->status = 'DECLINED';
         $report->decline_reason = $request->input('reason');
 
         $report->save();
 
-        // Retrieve the user based on the assigned_user_id
-        $assignedUser = User::find($report->assigned_user_id);
-
-        // Check if the user exists and has a name
-        $userName = $assignedUser ? $assignedUser->name : 'Unknown User';
-
-        // Pass the user's name to the notification
+        // Generate the URL of the report
+        $reportUrl = $reportUrl = url(route('reports.show', ['report' => $report->id]));
+        $creatorUser = User::find($report->creator_id);
         $currentUserAuth = User::find(Auth::user()->id);
-        Notification::send($currentUserAuth, new AssignedReport($userName, $report->name, $reportUrl, 'Report '. $report->name . ' was successfully Declined.'));
 
-        // Send the notification to the creator of the report
-        Notification::send($creatorUser, new AssignedReport($userName, $report->name, $reportUrl, 'Your report '. $report->name .' was Declined. See details'));
+        Notification::send($currentUserAuth, new DeclineReport($currentUserAuth, $creatorUser, $creatorUser->name, $report->name, $reportUrl, 'Report \''. $report->name .'\' was successfully Declined.'));
+        Notification::send($creatorUser, new DeclineReport($currentUserAuth, $creatorUser, $creatorUser->name, $report->name, $reportUrl, 'Your report \''. $report->name .'\' was Declined. See details.'));
 
-        // SMS Notification
-        if ($this->smsNotif($creatorUser->contact_number, "Status of your Report: '" . $report->name . "' was DECLINED. See report: " . $reportUrl)) {
-            // SMS sent successfully
-            $successMessage = 'SMS sent successfully.';
-        } else {
-            // Handle SMS sending failure
-            $failureMessage = 'Failed to send SMS. Please try again later.';
-        }
-        // Log the message, whether it's a success or failure
-        error_log(isset($successMessage) ? $successMessage : $failureMessage);
+        // // SMS Notification
+        // if ($this->smsNotif($creatorUser->contact_number, "Status of your Report: '" . $report->name . "' was DECLINED. See report: " . $reportUrl)) {
+        //     // SMS sent successfully
+        //     $successMessage = 'SMS sent successfully.';
+        // } else {
+        //     // Handle SMS sending failure
+        //     $failureMessage = 'Failed to send SMS. Please try again later.';
+        // }
+        // // Log the message, whether it's a success or failure
+        // error_log(isset($successMessage) ? $successMessage : $failureMessage);
         
         return back();
     }
 
     public function finishedReport(Request $request, Report $report)
     {
-        // Generate the URL of the report
-        $reportUrl = $reportUrl = url(route('reports.show', ['report' => $report->id]));
-        $creatorUser = User::find($report->creator_id);
-        
         // Validate and authorize the request here
         $request->validate([
             'finished_photo.*' => 'required|mimes:png,jpg,jpeg|max:2048', // Adjust validation rules as needed
@@ -448,30 +432,27 @@ class ReportController extends Controller
             $path = $v->storeAs('images', $fileName, 'public');
             $imagePaths[] = '/storage/'.$path;
         }
-
         $report['finished_photo'] = json_encode($imagePaths);
-
         $report->save();
 
-        // Retrieve the user based on the assigned_user_id
-        $assignedUser = User::find($report->assigned_user_id);
+        // Generate the URL of the report
+        $reportUrl = $reportUrl = url(route('reports.show', ['report' => $report->id]));
+        $creatorUser = User::find($report->creator_id);
+        $currentUserAuth = User::find(Auth::user()->id);
 
-        // Check if the user exists and has a name
-        $userName = $assignedUser ? $assignedUser->name : 'Unknown User';
+        // Send the email notification
+        Notification::send($currentUserAuth, new FinishReport($currentUserAuth, $creatorUser, $creatorUser->name, $report->name, $reportUrl, 'Report \''. $report->name .'\' was successfully tagged as Finished.'));
+        Notification::send($creatorUser, new FinishReport($currentUserAuth, $creatorUser, $creatorUser->name, $report->name, $reportUrl, 'Your report \''. $report->name .'\' was tagged as Finished. See details'));
 
-        // Send the notification to the creator of the report
-        Notification::send($creatorUser, new AssignedReport($userName, $report->name, $reportUrl, 'Your report '. $report->name .' was marked as Finished. See details'));
-
-        // SMS Notification
-        if ($this->smsNotif($creatorUser->contact_number, "Status of your Report: '" . $report->name . "' was marked as FINISHED. See report: " . $reportUrl)) {
-            // SMS sent successfully
-            $successMessage = 'SMS sent successfully.';
-        } else {
-            // Handle SMS sending failure
-            $failureMessage = 'Failed to send SMS. Please try again later.';
-        }
-        // Log the message, whether it's a success or failure
-        error_log(isset($successMessage) ? $successMessage : $failureMessage);
+        // if ($this->smsNotif($creatorUser->contact_number, "Status of your Report: '" . $report->name . "' was marked as FINISHED. See report: " . $reportUrl)) {
+        //     // SMS sent successfully
+        //     $successMessage = 'SMS sent successfully.';
+        // } else {
+        //     // Handle SMS sending failure
+        //     $failureMessage = 'Failed to send SMS. Please try again later.';
+        // }
+        // // Log the message, whether it's a success or failure
+        // error_log(isset($successMessage) ? $successMessage : $failureMessage);
 
         return back();
     }

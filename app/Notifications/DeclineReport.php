@@ -8,9 +8,9 @@ use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 use Carbon\Carbon;
 
-class AssignedReport extends Notification
+class DeclineReport extends Notification
 {
-    use Queueable; 
+    use Queueable;
 
     /**
      * Create a new notification instance.
@@ -18,18 +18,18 @@ class AssignedReport extends Notification
     protected $message;
     protected $notifURL;
     protected $reportName;
-    protected $userName;
+    protected $creatorName;
+    protected $creatorUser;
     protected $currentUserAuth;
-    protected $assignedUser;
 
-    public function __construct($assignedUser, $currentUserAuth, $userName, $reportName, $notifURL,$message)
+    public function __construct($currentUserAuth, $creatorUser, $creatorName, $reportName, $notifURL, $message)
     {
         $this->message = $message;
         $this->notifURL = $notifURL;
         $this->reportName = $reportName;
-        $this->userName = $userName;
+        $this->creatorName = $creatorName;
+        $this->creatorUser = $creatorUser;
         $this->currentUserAuth = $currentUserAuth;
-        $this->assignedUser = $assignedUser;
     }
 
     /**
@@ -48,17 +48,19 @@ class AssignedReport extends Notification
     public function toMail(object $notifiable): MailMessage
     {
         if ($notifiable == $this->currentUserAuth) {
-            $message = 'You have successfully approved and assigned the report \'' . $this->reportName . '\' to ' . $this->userName;
+            $message = 'You have successfully declined the report \'' . $this->reportName . '\'';
+            $message2 = 'Check the link to view the report.';
         } 
-        if ($notifiable == $this->assignedUser) {
-            $message = 'Hi, ' . $this->userName . ', a new report \'' . $this->reportName . '\' was Assigned to you.';
+        if ($notifiable == $this->creatorUser) {
+            $message = 'Hi, ' . $this->creatorName . ', your report \'' . $this->reportName . '\' was Declined.';
+            $message2 = 'Check the link to view your report.';
         }
     
         return (new MailMessage)
-            ->greeting('Report Assigned')
+            ->greeting('Report Declined')
             ->line($message)
             ->action('View Report', $this->notifURL)
-            ->line('Check the link to investigate.');
+            ->line($message2);
     }
 
     /**
@@ -68,20 +70,19 @@ class AssignedReport extends Notification
      */
     public function toArray(object $notifiable): array
     {
+       // Create a new Carbon instance
+       $carbon = new Carbon();
 
-        // Create a new Carbon instance
-        $carbon = new Carbon();
+       // Set the timezone to 'Asia/Manila'
+       $carbon->setTimezone('Asia/Manila');
 
-        // Set the timezone to 'Asia/Manila'
-        $carbon->setTimezone('Asia/Manila');
+       // Get the current time in the Philippines timezone and format it
+       $formattedDate = $carbon->format('F j, Y \a\t h:i A');
 
-        // Get the current time in the Philippines timezone and format it
-        $formattedDate = $carbon->format('F j, Y \a\t h:i A');
-
-        return [
-            'data' => $this->message,
-            'date' => $formattedDate,
-            'notifURL' => $this->notifURL,
-        ];
+       return [
+           'data' => $this->message,
+           'date' => $formattedDate,
+           'notifURL' => $this->notifURL,
+       ];
     }
 }
