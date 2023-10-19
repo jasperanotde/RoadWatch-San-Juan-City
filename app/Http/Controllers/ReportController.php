@@ -453,7 +453,7 @@ class ReportController extends Controller
         Notification::send($currentUserAuth, new FinishReport($currentUserAuth, $creatorUser, $creatorUser->name, $report->name, $reportUrl, 'Report \''. $report->name .'\' was successfully tagged as Finished.'));
         Notification::send($creatorUser, new FinishReport($currentUserAuth, $creatorUser, $creatorUser->name, $report->name, $reportUrl, 'Your report \''. $report->name .'\' was tagged as Finished. See details'));
 
-        if ($this->smsNotif("639701012412", "Status of your Report: '" . $report->name . "' was marked as FINISHED. See report: " . $reportUrl)) {
+        if ($this->smsNotif($creatorUser->contact_number, "Status of your Report: '" . $report->name . "' was marked as FINISHED. See report: " . $reportUrl)) {
             // SMS sent successfully
             $successMessage = 'SMS sent successfully.';
         } else {
