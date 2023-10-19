@@ -178,9 +178,9 @@
                            </div>
                         </div>
                      </form>
-                     <!-- MARK AS FINISHED THE REPORT -->
-                     @include('reports.finishedReport')
                   </tr>
+                  <!-- MARK AS FINISHED THE REPORT -->
+                  @include('reports.finishedReport')
                   @if ($report->status === 'FINISHED')
                     <!-- Display the Finished Report content here -->
                     <tr class="bg-blue-100 hover:bg-blue-200 border-b">

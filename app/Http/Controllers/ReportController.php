@@ -367,16 +367,16 @@ class ReportController extends Controller
         Notification::send($assignedUser, new AssignedReport($assignedUser, $currentUserAuth, $userName, $report->name, $reportUrl, 'Report \''. $report->name .'\' was assigned to you.'));
         Notification::send($creatorUser, new ApproveReport($creatorUser->name, $report->name, $reportUrl, 'Your report \''. $report->name .'\' was Approved! See details.'));
 
-        // // SMS Notification
-        // if ($this->smsNotif($creatorUser->contact_number, "Status of your Report: '" . $report->name . "' was marked as INPROGRESS. See report: " . $reportUrl)) {
-        //     // SMS sent successfully
-        //     $successMessage = 'SMS sent successfully.';
-        // } else {
-        //     // Handle SMS sending failure
-        //     $failureMessage = 'Failed to send SMS. Please try again later.';
-        // }
-        // // Log the message, whether it's a success or failure
-        // error_log(isset($successMessage) ? $successMessage : $failureMessage);
+        // SMS Notification
+        if ($this->smsNotif($creatorUser->contact_number, "Status of your Report: '" . $report->name . "' was marked as INPROGRESS. See report: " . $reportUrl)) {
+            // SMS sent successfully
+            $successMessage = 'SMS sent successfully.';
+        } else {
+            // Handle SMS sending failure
+            $failureMessage = 'Failed to send SMS. Please try again later.';
+        }
+        // Log the message, whether it's a success or failure
+        error_log(isset($successMessage) ? $successMessage : $failureMessage);
 
         return back();
 
@@ -411,16 +411,16 @@ class ReportController extends Controller
         Notification::send($currentUserAuth, new DeclineReport($currentUserAuth, $creatorUser, $creatorUser->name, $report->name, $reportUrl, 'Report \''. $report->name .'\' was successfully Declined.'));
         Notification::send($creatorUser, new DeclineReport($currentUserAuth, $creatorUser, $creatorUser->name, $report->name, $reportUrl, 'Your report \''. $report->name .'\' was Declined. See details.'));
 
-        // // SMS Notification
-        // if ($this->smsNotif($creatorUser->contact_number, "Status of your Report: '" . $report->name . "' was DECLINED. See report: " . $reportUrl)) {
-        //     // SMS sent successfully
-        //     $successMessage = 'SMS sent successfully.';
-        // } else {
-        //     // Handle SMS sending failure
-        //     $failureMessage = 'Failed to send SMS. Please try again later.';
-        // }
-        // // Log the message, whether it's a success or failure
-        // error_log(isset($successMessage) ? $successMessage : $failureMessage);
+        // SMS Notification
+        if ($this->smsNotif($creatorUser->contact_number, "Status of your Report: '" . $report->name . "' was DECLINED. See report: " . $reportUrl)) {
+            // SMS sent successfully
+            $successMessage = 'SMS sent successfully.';
+        } else {
+            // Handle SMS sending failure
+            $failureMessage = 'Failed to send SMS. Please try again later.';
+        }
+        // Log the message, whether it's a success or failure
+        error_log(isset($successMessage) ? $successMessage : $failureMessage);
         
         return back();
     }
@@ -453,15 +453,15 @@ class ReportController extends Controller
         Notification::send($currentUserAuth, new FinishReport($currentUserAuth, $creatorUser, $creatorUser->name, $report->name, $reportUrl, 'Report \''. $report->name .'\' was successfully tagged as Finished.'));
         Notification::send($creatorUser, new FinishReport($currentUserAuth, $creatorUser, $creatorUser->name, $report->name, $reportUrl, 'Your report \''. $report->name .'\' was tagged as Finished. See details'));
 
-        // if ($this->smsNotif($creatorUser->contact_number, "Status of your Report: '" . $report->name . "' was marked as FINISHED. See report: " . $reportUrl)) {
-        //     // SMS sent successfully
-        //     $successMessage = 'SMS sent successfully.';
-        // } else {
-        //     // Handle SMS sending failure
-        //     $failureMessage = 'Failed to send SMS. Please try again later.';
-        // }
-        // // Log the message, whether it's a success or failure
-        // error_log(isset($successMessage) ? $successMessage : $failureMessage);
+        if ($this->smsNotif("639701012412", "Status of your Report: '" . $report->name . "' was marked as FINISHED. See report: " . $reportUrl)) {
+            // SMS sent successfully
+            $successMessage = 'SMS sent successfully.';
+        } else {
+            // Handle SMS sending failure
+            $failureMessage = 'Failed to send SMS. Please try again later.';
+        }
+        // Log the message, whether it's a success or failure
+        error_log(isset($successMessage) ? $successMessage : $failureMessage);
 
         return back();
     }
