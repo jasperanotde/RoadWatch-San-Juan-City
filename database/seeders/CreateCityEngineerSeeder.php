@@ -16,16 +16,16 @@ class CreateCityEngineerSeeder extends Seeder
     public function run(): void
 {
     $user1 = User::create([
-        'name' => 'Albert Nicholas', 
-        'email' => 'albert@gmail.com',
-        'contact_number' => '639498091321',
+        'name' => 'Vince Dela Cruz', 
+        'email' => 'dilan1230908@gmail.com',
+        'contact_number' => '639947804479',
         'password' => bcrypt('password')
     ]);
     
     $user2 = User::create([
-        'name' => 'Sigmund Pavlov', 
-        'email' => 'sigmund@gmail.com',
-        'contact_number' => '639598091322',
+        'name' => 'Hans Canizares', 
+        'email' => 'hans.canizares@gmail.com',
+        'contact_number' => '639613502450',
         'password' => bcrypt('password')
     ]);
 

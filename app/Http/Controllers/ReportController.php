@@ -389,8 +389,17 @@ class ReportController extends Controller
 
     public function declineReport(Request $request, Report $report)
     {
+        $selectedDeclineReason = $request->input('decline_reason', []);
+        $checkboxData = [];
+    
+        foreach ($selectedDeclineReason as $checkbox) {
+            $checkboxData[$checkbox] = true;
+        }
+
+        $jsonData = json_encode($checkboxData);
+
         $report->status = 'DECLINED';
-        $report->decline_reason = $request->input('reason');
+        $report->decline_reason = $jsonData;
 
         $report->save();
 

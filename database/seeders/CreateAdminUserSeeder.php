@@ -17,8 +17,8 @@ class CreateAdminUserSeeder extends Seeder
     {
         $user = User::create([
             'name' => 'Admin', 
-            'email' => 'admin@gmail.com',
-            'contact_number' => '639498091320',
+            'email' => 'roadwatchwinit@gmail.com',
+            'contact_number' => '639457303921',
             'password' => bcrypt('password')
         ]);
         

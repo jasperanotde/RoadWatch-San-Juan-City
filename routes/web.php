@@ -8,6 +8,7 @@ use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\ActionSlipController;
+use App\Http\Controllers\ContactUsController;
 
 /*
 |--------------------------------------------------------------------------
@@ -27,7 +28,7 @@ Route::get('/', function () {
     }
 
     return view('auth.login');
-}); // add ->middleware('verified') for production
+})->middleware('verified'); // add ->middleware('verified') for production
 
 // These routes are accessible to all users
 Route::get('/about', function () {
@@ -38,12 +39,14 @@ Route::get('/contact', function () {
     return view('contact');
 })->name('contact');
 
+Route::post('/contact', 'ContactUsController@submit')->name('contact.submit');
+
 Auth::routes([
     'verify' => true
 ]);
 
 // These routes are accessible only to authenticated users
-Route::group(['middleware' => ['auth']], function() { // replace to ['auth', 'verified'] for production
+Route::group(['middleware' => ['auth', 'verified']], function() { // replace to ['auth', 'verified'] for production
     Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
     Route::resource('roles', RoleController::class);
     Route::resource('users', UserController::class);

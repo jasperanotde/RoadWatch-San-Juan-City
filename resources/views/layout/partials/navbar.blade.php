@@ -120,13 +120,13 @@
                                     class="absolute float-left m-0 hidden min-w-max list-none overflow-hidden rounded-lg border-none bg-white bg-clip-padding text-left text-base shadow-lg [&[data-te-dropdown-show]]:block"
                                     aria-labelledby="dropdownMenuButton1d"
                                     data-te-dropdown-menu-ref>
+                                    @unlessrole('Normal User')
                                     <li>
                                         <a class="block w-full whitespace-nowrap bg-transparent px-4 py-2 text-sm font-normal text-neutral-700 hover:bg-neutral-100 active:text-neutral-800 active:no-underline disabled:pointer-events-none disabled:bg-transparent disabled:text-neutral-400 dark:text-neutral-200 dark:hover:bg-neutral-600"
                                             href="{{ route('reports.dashboard') }}"
                                             data-te-dropdown-item-ref>
                                             Dashboard </a>
                                     </li>
-                                    @unlessrole('Normal User')
                                     <li>
                                         <a class="block w-full whitespace-nowrap bg-transparent px-4 py-2 text-sm font-normal text-neutral-700 hover:bg-neutral-100 active:text-neutral-800 active:no-underline disabled:pointer-events-none disabled:bg-transparent disabled:text-neutral-400 dark:text-neutral-200 dark:hover:bg-neutral-600"
                                             href="{{ route('users.index') }}"

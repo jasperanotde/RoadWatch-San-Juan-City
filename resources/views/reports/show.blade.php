@@ -121,9 +121,49 @@
                                     <p>Are you sure you want to decline the selected report?</p>
                                  </div>
                                  <div class="p-4">
+                                 <label class="flex mb-5 text-sm font-medium text-gray-900">Reason for Declining</label>
+                                 <div class=" grid grid-cols-2 gap-2 content-center mb-5">
+                                    <label class="inline-flex items-center text-xs">
+                                    <input type="checkbox" name="decline_reason[]" value="Lack of Sufficient Information"
+                                       class="form-checkbox h-5 w-5 text-blue-600">
+                                    <span class="ml-2 text-gray-900 ">Lack of Sufficient Information</span>
+                                    </label>
+                                    <label class="inline-flex items-center text-xs">
+                                    <input type="checkbox" name="decline_reason[]" value="Weak or Inadequate Documentation"
+                                       class="form-checkbox h-5 w-5 text-blue-600">
+                                    <span class="ml-2 text-gray-900 ">Weak or Inadequate Documentation</span>
+                                    </label>
+                                    <label class="inline-flex items-center text-xs">
+                                    <input type="checkbox" name="decline_reason[]" value="Lack of Clarity of Image"
+                                       class="form-checkbox h-5 w-5 text-blue-600">
+                                    <span class="ml-2 text-gray-900 ">Lack of Clarity of Image</span>
+                                    </label>
+                                    <label class="inline-flex items-center text-xs">
+                                    <input type="checkbox" name="decline_reason[]" value="Unreliable or Untrustworthy Source"
+                                       class="form-checkbox h-5 w-5 text-blue-600">
+                                    <span class="ml-2 text-gray-900 ">Unreliable or Untrustworthy Source</span>
+                                    </label>
+                                    <label class="inline-flex items-center text-xs">
+                                    <input type="checkbox" name="decline_reason[]" value="Redundant or Duplicated Information"
+                                       class="form-checkbox h-5 w-5 text-blue-600">
+                                    <span class="ml-2 text-gray-900 ">Redundant or Duplicated Information</span>
+                                    </label>
+                                    <label class="inline-flex items-center text-xs">
+                                    <input type="checkbox" name="decline_reason[]" value="Information Provided Without Adequate Context"
+                                       class="form-checkbox h-5 w-5 text-blue-600">
+                                    <span class="ml-2 text-gray-900 ">Information Provided Without Adequate Context</span>
+                                    </label>
+                                    <label class="inline-flex items-center text-xs">
+                                    <input type="checkbox" name="decline_reason[]" value="Data or Information That Is Not Relevant to the Report"
+                                       class="form-checkbox h-5 w-5 text-blue-600">
+                                    <span class="ml-2 text-gray-900 ">Data or Information That Is Not Relevant to the Report</span>
+                                    </label>
+                                    <!-- Add more checkboxes as needed -->
+                                 </div>
+                                 <!--<div class="p-4">
                                     <label for="reason" class="block text-gray-600 font-medium">Reason for Declining</label>
                                     <textarea name="reason" id="reason" class="w-full p-2 border rounded-md" rows="3" required></textarea>
-                                 </div>
+                                 </div>-->
                                  <!--Modal footer-->
                                  <div class="flex flex-shrink-0 flex-wrap items-center justify-end rounded-b-md border-t-2 border-neutral-100 border-opacity-100 p-4 dark:border-opacity-50">
                                     <button type="button" class="px-4 py-2 bg-gray-300 hover:bg-gray-400 text-gray-700 rounded-md" data-te-modal-dismiss data-te-ripple-init data-te-ripple-color="light">
@@ -159,14 +199,27 @@
                     @elseif ($report->status === 'DECLINED')
                         <!-- Display the Declined Report content here -->
                         <tr class="bg-red-100 hover:bg-red-200 border-b">
-                            <td class="px-6 py-4 w-2/5 border-r">Reason for Decline:</td>
-                            <td class="px-4 py-4 bg-gray-100 hover:bg-gray-200">
-                                @if (!is_null($report->decline_reason))
-                                    {{ $report->decline_reason }}
-                                @else
+                           <td class="px-6 py-4 w-2/5 border-r">Reason for Decline:</td>
+                           <td class="px-4 py-4 bg-gray-100 hover-bg-gray-200">
+                              @if (!is_null($report->decline_reason))
+                                    @php
+                                       $decodedReason = json_decode($report->decline_reason, true);
+                                    @endphp
+
+                                    @if ($decodedReason)
+                                       {{-- Loop through the decoded JSON data --}}
+                                       <ul>
+                                          @foreach ($decodedReason as $key => $value)
+                                                <li>| {{ $key }}</li>
+                                          @endforeach
+                                       </ul>
+                                    @else
+                                       {{ __('report.no_decline_reason')}}
+                                    @endif
+                              @else
                                     {{ __('report.no_decline_reason')}}
-                                @endif
-                            </td>
+                              @endif
+                           </td>
                         </tr>
                     @endif
                </tbody>
@@ -642,7 +695,12 @@
                   <label for="remarks" class="block text-sm font-medium text-gray-900 ">Remarks</label>
                   <textarea name="remarks" id="remarks" rows="4"
                      class="block w-full px-4 py-2 mt-1 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 "
-                     placeholder="Enter Remarks"></textarea>
+                     placeholder="Enter Remarks" required></textarea>
+                  @error('remarks')
+                     <p class="text-red-500 mt-1" role="alert">
+                           <strong>{{ $message }}</strong>
+                     </p>
+                  @enderror
                </div>
                <button type="submit" class="w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 ">Submit</button>
             </form>
