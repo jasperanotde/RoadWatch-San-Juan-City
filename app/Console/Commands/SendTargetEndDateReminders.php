@@ -34,7 +34,7 @@ class SendTargetEndDateReminders extends Command
         foreach ($reportsDueTomorrow as $report) {
             $assignedUser = User::find($report->assigned_user_id);
             
-            $assignedUser->notify(new ReportReminder($report));
+            $assignedUser->notify(new ReportReminder($report, $assignedUser));
         }
 
         $this->info('Report reminders sent successfully.');

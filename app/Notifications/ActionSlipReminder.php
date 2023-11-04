@@ -9,7 +9,7 @@ use Illuminate\Notifications\Notification;
 use App\Models\Report;
 use Carbon\Carbon;
 
-class ReportReminder extends Notification
+class ActionSlipReminder extends Notification
 {
     use Queueable;
 
@@ -18,11 +18,13 @@ class ReportReminder extends Notification
      */
 
     protected $report;
-    protected $assingedUser;
+    protected $submission;
+    protected $assignedUser;
 
-    public function __construct($report, $assignedUser)
+    public function __construct($report, $submission, $assignedUser)
     {
         $this->report = $report;
+        $this->submission = $submission;
         $this->assignedUser = $assignedUser;
     }
 
@@ -41,14 +43,17 @@ class ReportReminder extends Notification
      */
     public function toMail(object $notifiable): MailMessage
     {
-        $targetDate = Carbon::parse($this->report->targetDate, 'Asia/Manila');
+        $startDate = Carbon::parse($this->submission->startDate, 'Asia/Manila');
+        $targetDate = Carbon::parse($this->submission->targetDate, 'Asia/Manila');
         $reportURL = url(route('reports.show', ['report' => $this->report->id]));
 
         return (new MailMessage)
                 ->greeting('Hi ' . $this->assignedUser->name . ',')
-                ->line('This is to inform you that report \'' . $this->report->name . '\' assigned to you will be due on ' . $targetDate->format('F d, Y (l)'))
+                ->line('A new action slip was created for \'' . $this->report->name . '\' assigned to you.')
+                ->line('Start date: ' . $startDate->format('F d, Y (l)'))
+                ->line('End date: ' . $targetDate->format('F d, Y (l)'))
                 ->action('View Report', $reportURL)
-                ->line('Please do necessary actions to complete the report. Thank you!');
+                ->line('Please do necessary actions to complete the Action Slip. Thank you!');
     }
 
     /**
@@ -58,13 +63,11 @@ class ReportReminder extends Notification
      */
     public function toArray(object $notifiable): array
     {
-
         $carbon = new Carbon();
         $carbon->setTimezone('Asia/Manila');
         $formattedDate = $carbon->format('F j, Y \a\t h:i A');
-        $targetDate = Carbon::parse($this->report->targetDate, 'Asia/Manila');
         $reportURL = url(route('reports.show', ['report' => $this->report->id]));
-        $message = 'Report \'' . $this->report->name . '\' assigned to you will be due on ' . $targetDate->format('F d, Y (l)');
+        $message = 'New Action Slip created for report \'' . $this->report->name . '\' assigned to you.';
 
         return [
             'data' => $message,

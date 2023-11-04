@@ -10,6 +10,7 @@ use App\Notifications\NewReports;
 use App\Notifications\ApproveReport;
 use App\Notifications\DeclineReport;
 use App\Notifications\FinishReport;
+use App\Notifications\ActionSlipReminder;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -204,6 +205,12 @@ class ReportController extends Controller
             'remarks' => $request->input('remarks'),
             'photo' => 'no image',
         ]);
+
+        $assignedUser = User::find($report->assigned_user_id);
+        
+        foreach($report->submissions as $submission) {
+            Notification::send($assignedUser, new ActionSlipReminder($report, $submission, $assignedUser));
+        }
 
         return back();
     }
