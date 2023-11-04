@@ -8,8 +8,8 @@ import './modal-init';
 //import './datatable-init';
 import './status-label';
 import './tab-init';
-import './radial-chart';
 import './bar-chart-init';
+import './date-picker';
 
 import '@fancyapps/fancybox';
 document.addEventListener('DOMContentLoaded', function () {

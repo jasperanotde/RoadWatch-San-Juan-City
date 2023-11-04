@@ -12,24 +12,39 @@
                 <!--Modal body-->
                 <div class="p-4">
                     <div class="mb-4">
-                            <span class="font-semibold">
-                                Basis for Report Approval 
-                            </span>
-                            <ul class="list-disc ml-10">
-                                <li>Accurate Information</li>
-                                <li>Photographic Evidence</li>
-                                <li>Safety Concerns</li>
-                                <li>Relevance to Prioritization</li>
-                                <li>Compliance with Standards</li>
-                            </ul>
+                        <span class="font-semibold">
+                            Basis for Report Approval 
+                        </span>
+                        <ul class="list-disc ml-10">
+                            <li>Accurate Information</li>
+                            <li>Photographic Evidence</li>
+                            <li>Safety Concerns</li>
+                            <li>Relevance to Prioritization</li>
+                            <li>Compliance with Standards</li>
+                        </ul>
+                    </div>
+
+                    <div class="flex justify-between space-x-4 mb-10 mx-4">
+                        <div class="relative h-11 w-1/4 min-w-[200px]">
+                            <label for="start-date" class="block text-sm font-medium text-gray-900 ">Start Date</label>
+                                <input type="date" name="start-date" id="start-date" required
+                                    class="block w-full px-4 py-2 mt-1 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 ">
                         </div>
-                        <div class="mb-4 font-semibold">
-                            <label for="assignedUser">Assign to City Engineer user:</label>
+
+                        <div class="relative h-11 w-1/4 min-w-[200px]">
+                            <label for="target-date" class="block text-sm font-medium text-gray-900 ">Target End Date</label>
+                                <input type="date" name="target-date" id="target-date" required
+                                    class="block w-full px-4 py-2 mt-1 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 ">
                         </div>
+                    </div>
+                    
+                    <div class="mb-4 font-semibold">
+                        <label for="assignedUser">Assign to City Engineer user:</label>
+                    </div>
                    
                     <select name="assignedUser" id="assignedUser" class="w-full py-2 px-3 border rounded-md shadow-sm focus:ring focus:ring-opacity-50 focus:ring-blue-500">
                         @foreach ($cityEngineers as $engineer)
-                            <option value="{{ $engineer->id }}">{{ $engineer->name }}</option>
+                            <option class="text-primary" value="{{ $engineer->id }}">{{ $engineer->name }} (Assigned Reports: {{ $engineer->report_count }})</option>
                         @endforeach
                     </select>
                 </div>

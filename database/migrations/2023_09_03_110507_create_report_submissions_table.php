@@ -14,7 +14,8 @@ return new class extends Migration
     Schema::create('report_submissions', function (Blueprint $table) {
         $table->id();
         $table->string('new_field', 255);
-        $table->date('date');
+        $table->date('startDate');
+        $table->date('targetDate');
         $table->string('location', 255);
         $table->string('materials', 255);
         $table->string('personnel', 255);
@@ -22,6 +23,7 @@ return new class extends Migration
         $table->text('actions_taken');
         $table->string('remarks', 255);
         $table->timestamps();
+        $table->string('photo', 300);
         $table->foreign('report_id')->references('id')->on('reports')->onUpdate('cascade')->onDelete('cascade');
     });
 }

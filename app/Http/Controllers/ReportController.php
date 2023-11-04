@@ -84,6 +84,7 @@ class ReportController extends Controller
     {
         $this->authorize('create', new Report);
 
+    
         // Retrieve the users with role of Admin and City Engineer Supervisor for notification
         $users = User::whereHas('roles', function ($query) {
             $query->whereIn('name', ['Admin', 'City Engineer Supervisor']);
@@ -147,9 +148,31 @@ class ReportController extends Controller
 
         $cityEngineers = User::whereHas('roles', function ($query) {
             $query->where('name', 'City Engineer');
-        })->get();
+        })
+        ->leftJoin('reports', function ($join) {
+            $join->on('users.id', '=', 'reports.assigned_user_id')
+                 ->where('reports.status', '=', 'INPROGRESS');
+        })
+        ->select('users.id', 'users.name', DB::raw('COALESCE(COUNT(reports.id), 0) as report_count'))
+        ->groupBy('users.id', 'users.name')
+        ->get();
+    
 
-        return view('reports.show', compact('report', 'firstImageUrl', 'cityEngineers'));
+        $reportCreator = User::find($report->creator_id);
+        $creatorName = $reportCreator->name;
+        
+        $startDate = Carbon::parse($report->startDate)->format('F d, Y');
+        $targetDate = Carbon::parse($report->targetDate)->format('F d, Y');
+
+        $startDateAction = null;
+        $targetDateAction = null;
+
+        foreach($report->submissions as $submission) {
+            $startDateAction = Carbon::parse($submission->startDate)->format('F d, Y');
+            $targetDateAction = Carbon::parse($submission->targetDate)->format('F d, Y');
+        }
+
+        return view('reports.show', compact('report', 'firstImageUrl', 'cityEngineers', 'creatorName', 'startDate', 'targetDate', 'startDateAction', 'targetDateAction'));
     }
 
 
@@ -159,26 +182,72 @@ class ReportController extends Controller
         // Validate and save the submitted data for the report
         $request->validate([
             'new_field' => 'required|string|max:255',
-            'date' => 'required|date',
+            'start-date-action' => 'required|date',
+            'target-date-action' => 'required|date',
             'location' => 'required|string|max:255',
             'materials.*' => 'required|string|max:255',
             'personnel.*' => 'required|string|max:255',
-            'actions_taken.' => 'string|max:255', // Validate each action in the array
-            'remarks' => 'nullable|string|max:255', // remarks is optional
+            'actions_taken.' => 'nullable|string|max:255',
+            'remarks' => 'nullable|string|max:255',
+            'photo.*' => 'nullable|image|mimes:png,jpg,jpeg|max:2048',
+
         ]);
     
         $report->submissions()->create([
             'new_field' => $request->input('new_field'),
-            'date' => $request->input('date'),
+            'startDate' => $request->input('start-date-action'),
+            'targetDate' => $request->input('target-date-action'),
             'location' => $request->input('location'),
             'materials' => json_encode($request->input('materials')),
             'personnel' => json_encode($request->input('personnel')),
             'actions_taken' => json_encode($request->input('actions_taken')), // Convert the selected checkboxes to a JSON string
             'remarks' => $request->input('remarks'),
+            'photo' => 'no image',
         ]);
 
-    
         return back();
+    }
+
+    public function updateSubmissions(Request $request, Report $report)
+    {
+        $submissionId = $request->input('submission_id');
+
+        // Find the specific submission associated with the report by its ID
+        $submission = $report->submissions()->find($submissionId);
+
+        $request->validate([
+            'actions_taken.' => 'nullable|string|max:255',
+            'remarks' => 'nullable|string|max:255',
+            'photo.*' => 'nullable|image|mimes:png,jpg,jpeg|max:2048',
+        ]);
+
+        // Update the 'actions_taken' field if provided
+        if ($request->has('actions_taken')) {
+            $submission->actions_taken = json_encode($request->input('actions_taken'));
+        }
+    
+        // Update the 'remarks' field if provided
+        if ($request->has('remarks')) {
+            $submission->remarks = $request->input('remarks');
+        }
+
+        $imagePaths = [];
+    
+        // Update the 'photo' field if a new photo is provided
+        if ($request->hasFile('photo')) {
+            foreach($request->file('photo') as $v) {
+                $fileName = time() . '_' . $v->getClientOriginalName();
+                $path = $v->storeAs('images', $fileName, 'public');
+                $imagePaths[] = '/storage/'.$path;
+            }
+        }
+
+        $submission->photo = json_encode($imagePaths);
+        $submission->is_updated = '1';
+        
+        $submission->save();
+
+        return redirect()->back()->with('success', 'File uploaded successfully!');
     }
 
     public function deleteSubmissions(Request $request, Report $report)
@@ -341,13 +410,23 @@ class ReportController extends Controller
     
     public function approveReport(Request $request, Report $report)
     {
-        // Validate and authorize the request here, ensuring it's a City Engineer making the request
+
+        $request->validate([
+            'start-date' => 'required',
+            'target-date' => 'required',
+        ], [
+            'start-date.required' => 'The Start Date field is required.',
+            'target-date.required' => 'The Target Date field is required.',
+        ]);
+        
         $assignedUserId = $request->input('assignedUser');
+        $startDate = $request->input('start-date');
+        $targetDate = $request->input('target-date');
 
         // Update the report status to "Pending"
         $report->status = 'INPROGRESS';
-    
-        // Update the report to assign it to the selected user
+        $report->startDate = $startDate;
+        $report->targetDate = $targetDate;
         $report->assigned_user_id = $assignedUserId;
         $report->save();
 
@@ -368,15 +447,15 @@ class ReportController extends Controller
         Notification::send($creatorUser, new ApproveReport($creatorUser->name, $report->name, $reportUrl, 'Your report \''. $report->name .'\' was Approved! See details.'));
 
         // SMS Notification
-        if ($this->smsNotif($creatorUser->contact_number, "Status of your Report: '" . $report->name . "' was marked as INPROGRESS. See report: " . $reportUrl)) {
-            // SMS sent successfully
-            $successMessage = 'SMS sent successfully.';
-        } else {
-            // Handle SMS sending failure
-            $failureMessage = 'Failed to send SMS. Please try again later.';
-        }
-        // Log the message, whether it's a success or failure
-        error_log(isset($successMessage) ? $successMessage : $failureMessage);
+        // if ($this->smsNotif($creatorUser->contact_number, "Status of your Report: '" . $report->name . "' was marked as INPROGRESS. See report: " . $reportUrl)) {
+        //     // SMS sent successfully
+        //     $successMessage = 'SMS sent successfully.';
+        // } else {
+        //     // Handle SMS sending failure
+        //     $failureMessage = 'Failed to send SMS. Please try again later.';
+        // }
+        // // Log the message, whether it's a success or failure
+        // error_log(isset($successMessage) ? $successMessage : $failureMessage);
 
         return back();
 
@@ -412,15 +491,15 @@ class ReportController extends Controller
         Notification::send($creatorUser, new DeclineReport($currentUserAuth, $creatorUser, $creatorUser->name, $report->name, $reportUrl, 'Your report \''. $report->name .'\' was Declined. See details.'));
 
         // SMS Notification
-        if ($this->smsNotif($creatorUser->contact_number, "Status of your Report: '" . $report->name . "' was DECLINED. See report: " . $reportUrl)) {
-            // SMS sent successfully
-            $successMessage = 'SMS sent successfully.';
-        } else {
-            // Handle SMS sending failure
-            $failureMessage = 'Failed to send SMS. Please try again later.';
-        }
-        // Log the message, whether it's a success or failure
-        error_log(isset($successMessage) ? $successMessage : $failureMessage);
+        // if ($this->smsNotif($creatorUser->contact_number, "Status of your Report: '" . $report->name . "' was DECLINED. See report: " . $reportUrl)) {
+        //     // SMS sent successfully
+        //     $successMessage = 'SMS sent successfully.';
+        // } else {
+        //     // Handle SMS sending failure
+        //     $failureMessage = 'Failed to send SMS. Please try again later.';
+        // }
+        // // Log the message, whether it's a success or failure
+        // error_log(isset($successMessage) ? $successMessage : $failureMessage);
         
         return back();
     }
@@ -453,15 +532,15 @@ class ReportController extends Controller
         Notification::send($currentUserAuth, new FinishReport($currentUserAuth, $creatorUser, $creatorUser->name, $report->name, $reportUrl, 'Report \''. $report->name .'\' was successfully tagged as Finished.'));
         Notification::send($creatorUser, new FinishReport($currentUserAuth, $creatorUser, $creatorUser->name, $report->name, $reportUrl, 'Your report \''. $report->name .'\' was tagged as Finished. See details'));
 
-        if ($this->smsNotif($creatorUser->contact_number, "Status of your Report: '" . $report->name . "' was marked as FINISHED. See report: " . $reportUrl)) {
-            // SMS sent successfully
-            $successMessage = 'SMS sent successfully.';
-        } else {
-            // Handle SMS sending failure
-            $failureMessage = 'Failed to send SMS. Please try again later.';
-        }
-        // Log the message, whether it's a success or failure
-        error_log(isset($successMessage) ? $successMessage : $failureMessage);
+        // if ($this->smsNotif($creatorUser->contact_number, "Status of your Report: '" . $report->name . "' was marked as FINISHED. See report: " . $reportUrl)) {
+        //     // SMS sent successfully
+        //     $successMessage = 'SMS sent successfully.';
+        // } else {
+        //     // Handle SMS sending failure
+        //     $failureMessage = 'Failed to send SMS. Please try again later.';
+        // }
+        // // Log the message, whether it's a success or failure
+        // error_log(isset($successMessage) ? $successMessage : $failureMessage);
 
         return back();
     }

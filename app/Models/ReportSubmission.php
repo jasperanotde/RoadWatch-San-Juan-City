@@ -13,13 +13,14 @@ class ReportSubmission extends Model
     protected $fillable = [
         'report_id',
         'new_field',
-        'date',
+        'startDate',
+        'targetDate',
         'location',
         'materials',
         'personnel',
-        'materials',
         'actions_taken',
         'remarks',
+        'photo',
     ];
 
     public function actionsTakenArray()

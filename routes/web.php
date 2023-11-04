@@ -28,7 +28,7 @@ Route::get('/', function () {
     }
 
     return view('auth.login');
-})->middleware('verified'); // add ->middleware('verified') for production
+}); // add ->middleware('verified') for production
 
 // These routes are accessible to all users
 Route::get('/about', function () {
@@ -46,7 +46,7 @@ Auth::routes([
 ]);
 
 // These routes are accessible only to authenticated users
-Route::group(['middleware' => ['auth', 'verified']], function() { // replace to ['auth', 'verified'] for production
+Route::group(['middleware' => ['auth']], function() { // replace to ['auth', 'verified'] for production
     Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
     Route::resource('roles', RoleController::class);
     Route::resource('users', UserController::class);
@@ -59,7 +59,10 @@ Route::group(['middleware' => ['auth', 'verified']], function() { // replace to 
     Route::post('/reports/{report}/decline', [ReportController::class, 'declineReport'])->name('reports.declineReport');
     Route::post('/reports/{report}/finished', [ReportController::class, 'finishedReport'])->name('reports.finishedReport');
     Route::resource('action_slips', ActionSlipController::class);
+
+    // Action Slip
     Route::post('/reports/{report}/submit', [ReportController::class, 'submit'])->name('reports.submit');
+    Route::post('/reports/{report}/submissions', 'ReportController@updateSubmissions')->name('reports.submissions.update');
     Route::delete('/reports/{report}/submissions', 'ReportController@deleteSubmissions')->name('reports.submissions.delete');
 
     // Add the 'gallery' route here
