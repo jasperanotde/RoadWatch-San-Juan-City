@@ -7,6 +7,9 @@
          </span>
       </div> 
    </div>
+   <div class="my-10 flex flex-col items-center lg:flex-row lg:items-center">
+        <h1 class="font-josefinsans font-bold text-2xl sm:text-4xl font-normal leading-none tracking-tight font-poppins text-primary"><span class="font-josefinsans font-bold underline underline-offset-3 decoration-7 decoration-secondary">Dashboard Monitoring</span></h1>
+    </div>
    <!-- Index Total Reports -->
    <div class="col-span-12 rounded-sm border border-stroke bg-white p-8 shadow-default dark:border-strokedark dark:bg-boxdark">
       <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4 xl:gap-0">
@@ -17,12 +20,14 @@
                </h4>
                <p class="text-sm font-medium">Total Reports</p>
             </div>
-            <div class="flex items-center gap-1">
-               <svg width="19" height="19" viewBox="0 0 19 19" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M8.25259 5.87281L4.22834 9.89706L3.16751 8.83623L9.00282 3.00092L14.8381 8.83623L13.7773 9.89705L9.75306 5.87281L9.75306 15.0046L8.25259 15.0046L8.25259 5.87281Z" fill="#10B981"></path>
-               </svg>
-               <span class="text-sm font-medium text-meta-3">18%</span>
-            </div>
+            @if($totalReportCounts['reportsAdded'])
+                <div class="flex items-center gap-1">
+                    <svg width="19" height="19" viewBox="0 0 19 19" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M8.25259 5.87281L4.22834 9.89706L3.16751 8.83623L9.00282 3.00092L14.8381 8.83623L13.7773 9.89705L9.75306 5.87281L9.75306 15.0046L8.25259 15.0046L8.25259 5.87281Z" fill="#10B981"></path>
+                    </svg>
+                    <span class="text-sm font-medium text-meta-3">New Report Added</span>
+                </div>
+            @endif
          </div>
          <div class="flex items-center justify-center gap-2 border-b border-stroke pb-5 dark:border-strokedark xl:border-b-0 xl:border-r xl:pb-0">
             <div>
@@ -31,12 +36,14 @@
                </h4>
                <p class="text-sm font-medium">Total Assigned Reports</p>
             </div>
+            @if($totalReportCounts['assignedReportsAdded'])
             <div class="flex items-center gap-1">
                <svg width="19" height="19" viewBox="0 0 19 19" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <path d="M8.25259 5.87281L4.22834 9.89706L3.16751 8.83623L9.00282 3.00092L14.8381 8.83623L13.7773 9.89705L9.75306 5.87281L9.75306 15.0046L8.25259 15.0046L8.25259 5.87281Z" fill="#10B981"></path>
                </svg>
-               <span class="text-sm font-medium text-meta-3">25%</span>
+               <span class="text-sm font-medium text-meta-3">New Assigned Reports</span>
             </div>
+            @endif
          </div>
          <div class="flex items-center justify-center gap-2 border-b border-stroke pb-5 dark:border-strokedark sm:border-b-0 sm:pb-0 xl:border-r">
             <div>
@@ -45,12 +52,14 @@
                </h4>
                <p class="text-sm font-medium">Total Urgent Reports</p>
             </div>
+            @if($totalReportCounts['urgentReportsAdded'])
             <div class="flex items-center gap-1">
-               <svg width="19" height="19" viewBox="0 0 19 19" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M9.75302 12.1328L13.7773 8.10856L14.8381 9.16939L9.00279 15.0047L3.16748 9.16939L4.22831 8.10856L8.25256 12.1328V3.00098H9.75302V12.1328Z" fill="#F0950C"></path>
+                <svg width="19" height="19" viewBox="0 0 19 19" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M8.25259 5.87281L4.22834 9.89706L3.16751 8.83623L9.00282 3.00092L14.8381 8.83623L13.7773 9.89705L9.75306 5.87281L9.75306 15.0046L8.25259 15.0046L8.25259 5.87281Z" fill="#10B981"></path>
                </svg>
-               <span class="text-sm font-medium text-meta-8">7%</span>
+               <span class="text-sm font-medium text-meta-8">New Urgent Reports</span>
             </div>
+            @endif
          </div>
          <div class="flex items-center justify-center gap-2">
             <div>
@@ -59,14 +68,22 @@
                </h4>
                <p class="text-sm">Total Non-Urgent Reports</p>
             </div>
+            @if($totalReportCounts['nonUrgentReportsAdded'])
             <div class="flex items-center gap-1">
                <svg width="19" height="19" viewBox="0 0 19 19" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <path d="M8.25259 5.87281L4.22834 9.89706L3.16751 8.83623L9.00282 3.00092L14.8381 8.83623L13.7773 9.89705L9.75306 5.87281L9.75306 15.0046L8.25259 15.0046L8.25259 5.87281Z" fill="#10B981"></path>
                </svg>
-               <span class="text-meta-3">12%</span>
+               <span class="text-sm font-medium text-meta-8">New Non-Urgent Reports</span>
             </div>
+            @endif
          </div>
       </div>
+      <div class="pt-6 bg-white text-center">
+        <p class="block text-sm font-medium text-gray-500 italic">Quick snapshot of total report landscape.
+            Track the total number of reports, assigned tasks, and urgency levels at a glance.
+            Look out for the 'New Report Added' indicator, ensuring you never miss a recent update
+        </p>
+    </div>
    </div>
    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-px mt-10">
         <!-- Radial Chart -->
@@ -74,7 +91,7 @@
             <div class="flex justify-between mb-3">
                 <div class="flex items-center">
                     <div class="flex justify-center items-center">
-                    <h5 class="text-xl font-bold leading-none text-gray-900 dark:text-white pr-1">Report Progress (Last 7 days)</h5>
+                    <h5 class="text-xl font-bold leading-none text-gray-900 dark:text-white pr-1 report-progress-heading">Report Progress (Last 7 days)</h5>
                     <svg data-popover-target="chart-info" data-popover-placement="bottom" class="w-3.5 h-3.5 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white cursor-pointer ml-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
                         <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5Zm0 16a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3Zm1-5.034V12a1 1 0 0 1-2 0v-1.418a1 1 0 0 1 1.038-.999 1.436 1.436 0 0 0 1.488-1.441 1.501 1.501 0 1 0-3-.116.986.986 0 0 1-1.037.961 1 1 0 0 1-.96-1.037A3.5 3.5 0 1 1 11 11.466Z"/>
                     </svg>
@@ -96,6 +113,7 @@
                     </div>
                 </div>
             </div>
+
             <div class="bg-gray-50 dark:bg-gray-700 p-3 rounded-lg">
                 <div class="grid grid-cols-3 gap-3 mb-2">
                     <dl class="bg-orange-50 dark:bg-gray-600 rounded-lg flex flex-col items-center justify-center h-[78px]">
@@ -142,7 +160,7 @@
                 </div>
             </div>
             <!-- Radial Chart -->
-            <div class="py-6" id="radial-chart"></div>
+            <div class="py-6" id="radial-chart" data-total-report-counts="{{ $totalReports }}"></div>
             <div class="grid grid-cols-1 items-center border-gray-200 border-t dark:border-gray-700 justify-between">
                 <div class="flex justify-between items-center pt-5">
                     <!-- Button -->
@@ -157,7 +175,7 @@
                         <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 4 4 4-4"/>
                     </svg>
                     </button>
-                    <div id="lastDaysdropdown" class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700">
+                    <div id="lastDaysdropdown" class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-44">
                     <ul class="py-2 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdownDefaultButton">
                         <li>
                             <a href="#" id="yesterday-button" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Yesterday</a>
@@ -178,10 +196,13 @@
                     </div>
                 </div>
             </div>
+            <div class="block py-2 text-sm font-medium text-gray-500 italic">
+                The Radial Chart provides a visual snapshot of report progress for the selected date range, showcasing the distribution of PENDING, INPROGRESS, FINISHED, and DECLINED reports. For instance, in the past 7 days, out of a total of 20 reports, 10 have been completed, reflecting a 50% overall completion rate across all status categories.
+            </div>
         </div>
         <div class="mt-10">
             <!-- Pie Chart -->
-            <div class="mx-auto w-10/12 overflow-hidden">
+            <div class="mx-auto w-10/12 overflow-hidden rounded-lg shadow-md p-6">
                 <div class="flex justify-center items-center text-center font-medium text-lg text-gray-600">
                     <span class="p-5">Report Severity</span>
                 </div>
@@ -192,15 +213,28 @@
                     data-te-dataset-data="{{ json_encode(array_values($pieChartData)) }}"
                     data-te-dataset-background-color="['rgba(255, 235, 59, 0.5)', 'rgba(255, 152, 0, 0.5)', 'rgba(255, 0, 0, 0.5)']">
                 </canvas>
+                <div class="pt-6 bg-white text-center">
+                    <p class="block text-sm font-medium text-gray-500 italic">Get insights into the severity of reported issues with the interactive pie chart. 
+                        See the breakdown of Mild, Moderate, and Severe damages, 
+                        allowing you to prioritize and address concerns efficiently.
+                    </p>
+                </div>
             </div>
             <!-- Bar Chart -->
-            <div class="mx-auto w-10/12 overflow-hidden mt-10">
+            <div class="mx-auto w-10/12 overflow-hidden mt-10 rounded-lg shadow-md p-6">
                 <canvas
                     data-te-chart="bar"
                     data-te-dataset-label="Reports Generated"
                     data-te-labels='@json(array_keys($barChartData["reportCounts"]))'
                     data-te-dataset-data='@json(array_values($barChartData["reportCounts"]))'
-                    ></canvas>
+                    >
+                </canvas>
+                <div class="pt-6 bg-white text-center">
+                    <p class="block text-sm font-medium text-gray-500 italic">Track the pulse of the operations over time with the Report Generated chart. 
+                        Easily visualize the ebb and flow of reported issues, 
+                        helping you identify trends and patterns in report creation activity.
+                    </p>
+                </div>
             </div>
         </div>
     </div>

@@ -199,6 +199,10 @@
                             @else
                                 {{ __('report.no_photo') }}
                             @endif
+                            <span class="text-primary">
+                            Updated at {{ $report->updated_at->format('M. d, Y') }}
+                            </span>
+                        </td>
                     </tr>
                     @elseif ($report->status === 'DECLINED')
                         <!-- Display the Declined Report content here -->

@@ -18,6 +18,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Session;
 use Carbon\Carbon;
 use GuzzleHttp\Client;
 use GuzzleHttp\RequestOptions;
@@ -547,7 +548,7 @@ class ReportController extends Controller
         //     $failureMessage = 'Failed to send SMS. Please try again later.';
         // }
         // // Log the message, whether it's a success or failure
-        // error_log(isset($successMessage) ? $successMessage : $failureMessage);
+        // error_log(isset($successMessage) ? $successMessage : $failureMessage);  
 
         return back();
     }
@@ -633,7 +634,7 @@ class ReportController extends Controller
             ->whereIn('status', ['PENDING', 'INPROGRESS', 'FINISHED', 'DECLINED']);
 
         if ($startDate && $endDate) {
-            $query->whereBetween('created_at', [$startDate, $endDate]);
+            $query->whereBetween('updated_at', [$startDate, $endDate]);
         }
 
         // Retrieve counts from the database
@@ -649,7 +650,7 @@ class ReportController extends Controller
         if ($request->expectsJson()) {
             return response()->json($counts);
         }
-        
+
         // Retrieve data for the bar chart using a separate function
         $barChartData = $this->getBarChartData();
 
@@ -659,6 +660,13 @@ class ReportController extends Controller
         // Retrieve data for the index chart
         $totalReportCounts = $this->getReportCounts();
 
+        $totalReports = Report::count();
+
+        // Return JSON response for the counts
+        if ($request->expectsJson()) {
+            return response()->json($totalReports);
+        }
+
         // Return the view with data as variables
         return view('reports.dashboard', [
             'counts' => $counts,
@@ -666,6 +674,7 @@ class ReportController extends Controller
             'barChartData' => $barChartData,
             'pieChartData' => $pieChartData,
             'totalReportCounts' => $totalReportCounts,
+            'totalReports' => $totalReports,
         ]);
     }
 
@@ -676,9 +685,9 @@ class ReportController extends Controller
 
         // Retrieve data for the bar chart (modified logic)
         $reportCounts = DB::table('reports')
-            ->selectRaw("DATE_FORMAT(created_at, '%M %e') as report_date, count(*) as count")
+            ->selectRaw("DATE_FORMAT(created_at, '%Y-%m-%d') as report_date, count(*) as count")
             ->groupBy('report_date')
-            ->orderBy('report_date', 'desc')
+            ->orderBy('report_date', 'asc')
             ->pluck('count', 'report_date')
             ->toArray();
 
@@ -701,16 +710,56 @@ class ReportController extends Controller
 
     private function getReportCounts()
     {
+        // Set the timezone to "Asia/Manila"
+        date_default_timezone_set('Asia/Manila');
+
+        // Get the current date
+        $currentDate = now()->format('Y-m-d');
+
+        // Retrieve the count of reports before fetching the data
+        $previousReportCount = Session::get('report_count_' . $currentDate, null);
+
+        $previousAssignedReports = Session::get('assigned_reports_count_' . $currentDate, null);
+        $previousUrgentReports = Session::get('urgent_reports_count_' . $currentDate, null);
+        $previousNonUrgentReports = Session::get('non_urgent_reports_count_' . $currentDate, null);
+
+        $currentReportCount = Session::get('report_count_' . $currentDate, 0);
+        \Log::info("Current Report Count: $currentReportCount, Previous Report Count: $previousReportCount");
+
         $totalReports = Report::count();
         $assignedReports = Report::whereNotNull('assigned_user_id')->count();
         $urgentReports = Report::where('urgency', 'Urgent')->count();
         $nonUrgentReports = Report::where('urgency', 'Non-Urgent')->count();
+
+        // Check if the count is not set or if it's different from the previous value
+        $reportsAdded = $previousReportCount === null || $totalReports > $previousReportCount;
+
+        // Check if the counts are not set or if they're different from the previous values
+        $assignedReportsAdded = $previousAssignedReports === null || $assignedReports > $previousAssignedReports;
+        $urgentReportsAdded = $previousUrgentReports === null || $urgentReports > $previousUrgentReports;
+        $nonUrgentReportsAdded = $previousNonUrgentReports === null || $nonUrgentReports > $previousNonUrgentReports;
+
+        // Set the counts in the session for the next comparison
+        Session::put('report_count_' . $currentDate, $totalReports);
+        Session::put('assigned_reports_count_' . $currentDate, $assignedReports);
+        Session::put('urgent_reports_count_' . $currentDate, $urgentReports);
+        Session::put('non_urgent_reports_count_' . $currentDate, $nonUrgentReports);
+
+        \Log::info("Reports Added: " . ($reportsAdded ? 'Yes' : 'No'));
+        \Log::info("Assigned Reports Added: " . ($assignedReportsAdded ? 'Yes' : 'No'));
+        \Log::info("Urgent Reports Added: " . ($urgentReportsAdded ? 'Yes' : 'No'));
+        \Log::info("Non-Urgent Reports Added: " . ($nonUrgentReportsAdded ? 'Yes' : 'No'));
 
         return [
             'totalReports' => $totalReports,
             'assignedReports' => $assignedReports,
             'urgentReports' => $urgentReports,
             'nonUrgentReports' => $nonUrgentReports,
+            'reportsAdded' => $reportsAdded,
+            'assignedReportsAdded' => $assignedReportsAdded,
+            'urgentReportsAdded' => $urgentReportsAdded,
+            'nonUrgentReportsAdded' => $nonUrgentReportsAdded,
         ];
     }
+
 }

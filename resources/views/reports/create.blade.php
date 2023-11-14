@@ -43,6 +43,7 @@
             name="address"
             class="w-full bg-gray-100 bg-opacity-50 rounded border border-gray-300 focus:border-indigo-500 focus:bg-white focus:ring-2 focus:ring-indigo-200 h-32 text-base outline-none text-gray-700 py-1 px-3 resize-none leading-6 transition-colors duration-200 ease-in-out"
             rows="4"
+            required
           >{{ old('address', request('address')) }}</textarea>
           {!! $errors->first('address', '<span class="text-red-500 text-sm">:message</span>') !!}
         </div>
@@ -74,6 +75,7 @@
             name="details"
             class="w-full bg-gray-100 bg-opacity-50 rounded border border-gray-300 focus:border-indigo-500 focus:bg-white focus:ring-2 focus:ring-indigo-200 h-32 text-base outline-none text-gray-700 py-1 px-3 resize-none leading-6 transition-colors duration-200 ease-in-out"
             rows="4"
+            required
           >{{ old('details') }}</textarea>
           {!! $errors->first('details', '<span class="text-red-500 text-sm">:message</span>') !!}
         </div>
@@ -86,7 +88,7 @@
             name="urgency"
             required
           >
-            <option selected disabled>Select Urgency</option>
+            <option value="" selected disabled>Select Urgency</option>
             <option value="Urgent">Urgent</option>
             <option value="Non-Urgent">Non-Urgent</option>
           </select>
@@ -102,6 +104,7 @@
             type="file"
             id="photo"
             multiple
+            required
           >
           <div class="px-4 py-4 bg-gray-100 hover:bg-gray-200" id="selectedImagesContainer" hidden>
             <div class="block text-sm font-medium text-gray-600">
@@ -121,7 +124,7 @@
             class="w-full bg-gray-100 bg-opacity-50 rounded border border-gray-300 focus:border-indigo-500 focus:bg-white focus:ring-2 focus:ring-indigo-200 text-base outline-none text-gray-700 py-1 px-3 leading-8 transition-colors duration-200 ease-in-out"
             name="severity"
             required>
-            <option selected disabled>Select Severity</option>
+            <option value="" selected disabled>Select Severity</option>
             <option value="Mild">Mild</option>
             <option value="Moderate">Moderate</option>
             <option value="Severe Damage">Severe Damage</option>

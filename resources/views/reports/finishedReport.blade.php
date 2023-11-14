@@ -19,7 +19,8 @@
                             name="finished_photo[]"
                             type="file"
                             id="photo"
-                            multiple>
+                            multiple
+                            required>
                             <div class="px-4 py-4 bg-gray-100 hover:bg-gray-200" id="newImagesContainer" hidden>
                                 <div class="block text-sm font-medium text-gray-600">
                                     Updated Images of the Report to mark as Done
