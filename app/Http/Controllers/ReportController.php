@@ -20,8 +20,8 @@ use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
 use Carbon\Carbon;
-use GuzzleHttp\Client;
-use GuzzleHttp\RequestOptions;
+use Vonage\Client;
+use Vonage\Client\Credentials\Basic;
 
 class ReportController extends Controller
 {
@@ -40,14 +40,8 @@ class ReportController extends Controller
          $this->middleware('permission:report-edit', ['only' => ['edit','update']]);
          $this->middleware('permission:report-delete', ['only' => ['destroy','deleteSubmissions']]);
 
-         $this->client = new Client([
-            'base_uri' => "https://w11mqq.api.infobip.com/",
-            'headers' => [
-                'Authorization' => "App 74cac146a4072f0754a2bfe6eeaac0dd-bf6f1949-573d-4a74-bab7-ce8250e7291f",
-                'Content-Type' => 'application/json',
-                'Accept' => 'application/json',
-            ]
-        ]);
+         $basic = new Basic("79521729", "5dvQMscp3QIYf1YI");
+         $this->client = new Client($basic);
     }
 
     public function index()
@@ -203,7 +197,7 @@ class ReportController extends Controller
             'materials' => json_encode($request->input('materials')),
             'personnel' => json_encode($request->input('personnel')),
             'actions_taken' => json_encode($request->input('actions_taken')), // Convert the selected checkboxes to a JSON string
-            'remarks' => $request->input('remarks'),
+            'remarks' => '',
             'photo' => 'no image',
         ]);
 
@@ -454,6 +448,8 @@ class ReportController extends Controller
         Notification::send($assignedUser, new AssignedReport($assignedUser, $currentUserAuth, $userName, $report->name, $reportUrl, 'Report \''. $report->name .'\' was assigned to you.'));
         Notification::send($creatorUser, new ApproveReport($creatorUser->name, $report->name, $reportUrl, 'Your report \''. $report->name .'\' was Approved! See details.'));
 
+        $this->smsNotif($creatorUser->contact_number, "Status of your Report: '" . $report->name . "' was marked as INPROGRESS. See report: " . $reportUrl);
+
         // SMS Notification
         // if ($this->smsNotif($creatorUser->contact_number, "Status of your Report: '" . $report->name . "' was marked as INPROGRESS. See report: " . $reportUrl)) {
         //     // SMS sent successfully
@@ -498,6 +494,8 @@ class ReportController extends Controller
         Notification::send($currentUserAuth, new DeclineReport($currentUserAuth, $creatorUser, $creatorUser->name, $report->name, $reportUrl, 'Report \''. $report->name .'\' was successfully Declined.'));
         Notification::send($creatorUser, new DeclineReport($currentUserAuth, $creatorUser, $creatorUser->name, $report->name, $reportUrl, 'Your report \''. $report->name .'\' was Declined. See details.'));
 
+        $this->smsNotif($creatorUser->contact_number, "Status of your Report: '" . $report->name . "' was DECLINED. See report: " . $reportUrl);
+
         // SMS Notification
         // if ($this->smsNotif($creatorUser->contact_number, "Status of your Report: '" . $report->name . "' was DECLINED. See report: " . $reportUrl)) {
         //     // SMS sent successfully
@@ -540,6 +538,8 @@ class ReportController extends Controller
         Notification::send($currentUserAuth, new FinishReport($currentUserAuth, $creatorUser, $creatorUser->name, $report->name, $reportUrl, 'Report \''. $report->name .'\' was successfully tagged as Finished.'));
         Notification::send($creatorUser, new FinishReport($currentUserAuth, $creatorUser, $creatorUser->name, $report->name, $reportUrl, 'Your report \''. $report->name .'\' was tagged as Finished. See details'));
 
+        $this->smsNotif($creatorUser->contact_number, "Status of your Report: '" . $report->name . "' was marked as FINISHED. See report: " . $reportUrl);
+
         // if ($this->smsNotif($creatorUser->contact_number, "Status of your Report: '" . $report->name . "' was marked as FINISHED. See report: " . $reportUrl)) {
         //     // SMS sent successfully
         //     $successMessage = 'SMS sent successfully.';
@@ -553,30 +553,19 @@ class ReportController extends Controller
         return back();
     }
 
-    private function smsNotif($contactNumber, $message) 
+    private function smsNotif($contactNumber, $messageContent) 
     {
-        $response = $this->client->request(
-            'POST',
-            'sms/2/text/advanced',
-            [
-                RequestOptions::JSON => [
-                    'messages' => [
-                        [
-                            'from' => 'InfoSMS',
-                            'destinations' => [
-                                ['to' => $contactNumber]
-                            ],
-                            'text' => $message,
-                        ]
-                    ]
-                ],
-            ]
+        $response = $this->client->sms()->send(
+            new \Vonage\SMS\Message\SMS($contactNumber, 'Vonage APIs', $messageContent)
         );
 
-        echo("HTTP code: " . $response->getStatusCode() . PHP_EOL);
-        echo("Response body: " . $response->getBody()->getContents() . PHP_EOL);
+        $message = $response->current();
 
-        return $response !== false;
+        if ($message->getStatus() == 0) {
+            return "The message was sent successfully\n";
+        } else {
+            return "The message failed with status: " . $message->getStatus() . "\n";
+        }
     }
 
     public function dashboard(Request $request)
@@ -667,6 +656,7 @@ class ReportController extends Controller
             return response()->json($totalReports);
         }
 
+        
         // Return the view with data as variables
         return view('reports.dashboard', [
             'counts' => $counts,

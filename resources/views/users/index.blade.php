@@ -73,6 +73,7 @@
                 </thead>
                 <tbody>
                     @foreach ($data as $key => $user)
+                    @if(!$user->getRoleNames()->contains('Admin'))
                     <tr class="bg-white border-b hover:bg-gray-50">
                         <td class="px-6 py-4">
                             {{ ++$i }}
@@ -151,6 +152,7 @@
                             @include('users.edit')
                         </td>
                     </tr>
+                    @endif
                     @endforeach
                 </tbody>
             </table>

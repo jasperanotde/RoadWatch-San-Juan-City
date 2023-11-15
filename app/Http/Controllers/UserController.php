@@ -49,11 +49,26 @@ class UserController extends Controller
 
         // Initialize empty arrays to store roles and userRoles
         $roles = Role::pluck('name', 'name')->all();
+
+        if (auth()->user() && auth()->user()->hasRole('City Engineer Supervisor')) {
+            $roles = collect($roles)->forget('Admin')->toArray();
+        }
+
         $userRole = [];
 
         foreach ($data as $user) {
-            // Retrieve roles for each user and add them to the $userRole array
-            $userRole[$user->id] = $user->getRoleNames()->first();
+            $userRoles = $user->getRoleNames();
+        
+            // Check if the currently logged-in user has the 'Admin' role
+            if (auth()->user() && auth()->user()->hasRole('Admin')) {
+                // If the logged-in user is an 'Admin', exclude users with the 'Admin' role from the displayed list
+                if ($userRoles->contains('Admin')) {
+                    $userRole[$user->id] = $userRoles->first();
+                }
+            } else {
+                // If the logged-in user is not an 'Admin', display all users
+                $userRole[$user->id] = $userRoles->first();
+            }
         }
 
         return view('users.index', compact('data', 'roles', 'userRole'))

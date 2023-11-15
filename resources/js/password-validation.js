@@ -93,4 +93,51 @@ inputElement.addEventListener('input', function() {
    
 });
 
+document.getElementById("phoneForm").addEventListener("submit", function(event) {
+    event.preventDefault(); // Prevents the form from submitting by default
+    
+    var password = document.getElementById("password").value;
+    var checks = [
+        password.length > 5,
+        password.length < 10,
+        /\d/.test(password), // Checks for at least one numerical character
+        /[!@#$%^&*(),.?":{}|<>]/.test(password), // Checks for at least one special character
+        !/\s/.test(password) // Checks for no spaces
+    ];
+
+    // Check if all criteria are met
+    var isValid = checks.every(function(check) {
+        return check;
+    });
+
+    // Check if all criteria are met
+    var isValid = checks.every(function(check) {
+        return check;
+    });
+
+    var errorMessage = document.getElementById("errorMessage");
+    var errorMessageText = document.getElementById("errorMessageText");
+
+    // Get the value of the contact number input
+    var contactNumber = document.getElementById('contact_number').value;
+
+    // Get the error message div
+    var errorMessage = document.getElementById('errorMessage');
+
+    if (isValid) {
+    // Check if the contact number starts with '63'
+        if (contactNumber.startsWith('63')) {
+        // If it starts with '63', submit the form
+        document.getElementById("phoneForm").submit();
+        } else {
+            // If it doesn't start with '63', display the error message
+            errorMessage.style.display = 'block';
+        }
+    } else {
+        // Password doesn't meet all criteria, show error message
+        errorMessage.classList.remove("hidden");
+        errorMessageText.textContent = "Password does not meet all criteria.";
+    }
+});
+
 });

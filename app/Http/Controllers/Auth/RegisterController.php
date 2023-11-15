@@ -77,7 +77,8 @@ class RegisterController extends Controller
      * @return \App\Models\User
      */
     protected function create(array $data)
-{
+    {
+    
     // Create the user
     $user = User::create([
         'name' => $data['name'],
@@ -86,20 +87,9 @@ class RegisterController extends Controller
         'password' => Hash::make($data['password']),
     ]);
 
-    // Check if the user was created successfully
-    if (!$user) {
-        // Handle the case where user creation fails (e.g., return an error response)
-        return null;
-    }
 
     // Create the "Normal User" role
     $role = Role::firstOrCreate(['name' => 'Normal User']);
-
-    // Check if the role was created successfully
-    if (!$role) {
-        // Handle the case where role creation fails (e.g., return an error response)
-        return null;
-    }
 
     // Find the necessary permissions
     $permissions = Permission::whereIn('name', [
@@ -108,12 +98,6 @@ class RegisterController extends Controller
         'report-edit',
         'report-delete',
     ])->get();
-
-    // Check if permissions were retrieved successfully
-    if (!$permissions) {
-        // Handle the case where permission retrieval fails (e.g., return an error response)
-        return null;
-    }
 
     // Assign the permissions to the role
     $role->syncPermissions($permissions);

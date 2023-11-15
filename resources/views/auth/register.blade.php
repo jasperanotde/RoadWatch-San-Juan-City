@@ -29,6 +29,11 @@
                 @enderror   
             </div>
 
+            <div id="errorMessage" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert" style="display: none;">
+                <strong class="font-bold">Wrong number!</strong>
+                <span class="block sm:inline">Should be starting with 63 for PH code.</span>
+            </div>
+
             <div class="w-full mt-4">
                 <input id="contact_number"class="block w-full px-4 py-2 mt-2 text-gray-700 placeholder-gray-500 bg-white border rounded-lg focus:border-blue-400 focus:ring-opacity-40 focus:outline-none focus:ring focus:ring-blue-300 @error('contact_number') is-invalid @enderror" type="text" class="form-control @error('contact_number') is-invalid @enderror" name="contact_number" value="{{ old('contact_number') }}" placeholder="Contact Number (ex: 639456331110)" required autocomplete="contact_number">
                 @error('contact_number')
@@ -40,6 +45,11 @@
 
             <div class="w-full mt-4">
                 <div class="relative">
+                    <div id="errorMessage" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative hidden" role="alert">
+                        <strong class="font-bold">Wrong password!</strong>
+                        <span id="errorMessageText" class="block sm:inline">Password does not meet all criteria.</span>
+                    </div>
+
                     <input id="password" type="password" class="block w-full px-4 py-2 mt-2 text-gray-700 placeholder-gray-500 bg-white border rounded-lg focus:border-blue-400 focus:ring-opacity-40 focus:outline-none focus:ring focus:ring-blue-300 @error('password') is-invalid @enderror" name="password" placeholder="Password" required autocomplete="current-password" aria-label="Password"/>
                     @error('password')  
                         <p class="text-red-500 mt-1">{{ $message }}</p>
@@ -69,7 +79,7 @@
 
             <div class="w-full mt-4">
                 <input id="password-confirm" type="password" class="block w-full px-4 py-2 mt-2 text-gray-700 placeholder-gray-500 bg-white border rounded-lg focus:border-blue-400 focus:ring-opacity-40 focus:outline-none focus:ring focus:ring-blue-300" name="password_confirmation" placeholder="Confirm Password" required autocomplete="new-password">
-         </div>
+            </div>
 
             <div class="flex items-center justify-between mt-4">
                 <button type="submit" class="px-6 py-2 text-sm font-medium tracking-wide text-white capitalize transition-colors duration-300 transform bg-blue-500 rounded-lg hover:bg-blue-400 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-50">
