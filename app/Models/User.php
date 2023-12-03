@@ -58,5 +58,10 @@ class User extends Authenticatable implements MustVerifyEmail
     public function reports()
     {
         return $this->hasMany(Report::class, 'creator_id'); // Assuming 'creator_id' is the foreign key in the reports table.
-    }   
+    }
+
+    public function personnels()
+    {
+        return $this->hasMany(Personnel::class);
+    }
 }

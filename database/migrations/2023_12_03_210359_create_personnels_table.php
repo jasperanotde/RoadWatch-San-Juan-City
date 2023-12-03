@@ -13,7 +13,12 @@ return new class extends Migration
     {
         Schema::create('personnels', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('user_id')->nullable();
+            $table->string('name');
+            $table->unsignedBigInteger('assigned_report_id')->nullable();
             $table->timestamps();
+            $table->foreign('user_id')->references('id')->on('users')->onUpdate('cascade')->onDelete('cascade');
+            $table->foreign('assigned_report_id')->references('id')->on('reports')->onUpdate('cascade')->onDelete('cascade');
         });
     }
 
@@ -23,5 +28,6 @@ return new class extends Migration
     public function down(): void
     {
         Schema::dropIfExists('personnels');
+        
     }
 };

@@ -8,4 +8,13 @@ use Illuminate\Database\Eloquent\Model;
 class Personnel extends Model
 {
     use HasFactory;
+
+    protected $fillable = [
+        'user_id', 'name', 'assigned_report_id',
+    ];
+
+    public function users()
+    {
+        return $this->belongsTo(User::class);
+    }
 }

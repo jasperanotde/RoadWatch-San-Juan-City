@@ -186,7 +186,6 @@ class ReportController extends Controller
         ->groupBy('users.id', 'users.name')
         ->get();
     
-
         $reportCreator = User::find($report->creator_id);
         $creatorName = $reportCreator->name;
         
