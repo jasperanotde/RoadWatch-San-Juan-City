@@ -50,6 +50,7 @@ Route::group(['middleware' => ['auth']], function() { // replace to ['auth', 've
     Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
     Route::resource('roles', RoleController::class);
     Route::resource('users', UserController::class);
+    Route::resource('personnels', PersonnelController::class);
 
     // For Dashboard
     Route::get('/reports/dashboard', 'ReportController@dashboard')->name('reports.dashboard');

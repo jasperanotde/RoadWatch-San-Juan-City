@@ -200,7 +200,22 @@ class ReportController extends Controller
             $targetDateAction = Carbon::parse($submission->targetDate)->format('F d, Y');
         }
 
-        return view('reports.show', compact('report', 'firstImageUrl', 'cityEngineers', 'creatorName', 'startDate', 'targetDate', 'startDateAction', 'targetDateAction'));
+        // For List of Personnel
+        $cityEngineer = $report->assigned_user_id;
+
+        $personnelForEngineer = DB::table('users')
+            ->join('personnels', 'users.id', '=', 'personnels.user_id')
+            ->where('users.id', $cityEngineer)
+            ->whereExists(function ($query) use ($cityEngineer) {
+                $query->select(DB::raw(1))
+                    ->from('reports')
+                    ->whereColumn('reports.assigned_user_id', '=', 'users.id')
+                    ->where('personnels.user_id', $cityEngineer);
+            })
+            ->select('personnels.*')
+            ->get();
+
+        return view('reports.show', compact('report', 'firstImageUrl', 'cityEngineers', 'creatorName', 'startDate', 'targetDate', 'startDateAction', 'targetDateAction', 'personnelForEngineer'));
     }
 
 

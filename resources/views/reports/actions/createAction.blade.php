@@ -72,96 +72,47 @@
                      readonly
                      >
                </div>
+
                <div>
-                  <label for="materials" class="block text-sm font-medium text-gray-900 ">Materials</label>
+                  <label for="materials" class="leading-7 text-sm text-gray-600">Materials</label>
                   <div id="materials-container">
-                     <div class="mb-2">
-                        <input
-                           type="text"
-                           name="materials[]"
-                           class="block w-full px-4 py-2 mt-1 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 "
-                           placeholder="Enter Materials"
-                           required
-                           >
-                     </div>
+                     <select
+                        class="block w-full px-4 py-2 mt-1 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400"
+                        name="materials[]"
+                        required>
+                        <option value="" selected disabled>Select Materials</option>
+                        <option value="Asphalt">Asphalt</option>
+                        <option value="Concrete">Concrete</option>
+                        <option value="Gravel">Gravel</option>
+                        <option value="Paint">Paint</option>
+                        <option value="Concrete Barriers">Concrete Barriers</option>
+                        <option value="Manhole Covers">Manhole Covers</option>
+                        <option value="Road Marking Tape">Road Marking Tape</option>
+                        <option value="Drainage Rods">Drainage Rods</option>
+                        <option value="Rebars">Rebars</option>
+                        <option value="Epoxy Resins">Epoxy Resins</option>
+                        <option value="Sealants">Sealants</option>
+                        <option value="Sand">Sand</option>
+                        <option value="Cement">Cement</option>
+                        <option value="Grout">Grout</option>
+                     </select>
+                  {!! $errors->first('materials', '<span class="text-red-500 text-sm">:message</span>') !!}
                   </div>
                   <button type="button" id="add-material" class="text-blue-500 hover:underline focus:outline-none">
                   Add Material
                   </button>
                </div>
+
                <div>
-                  <label for="personnel" class="block text-sm font-medium text-gray-900 ">Personnel</label>
-                  <div id="personnel-container">
-                     <input
-                        type="text"
-                        name="personnel[]"
-                        class="block w-full px-4 py-2 mt-1 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 "
-                        placeholder="Enter Personnel"
-                        required
-                        >
-                  </div>
-                  <button type="button" id="add-personnel" class="text-blue-500 hover:underline focus:outline-none">
-                  Add Personnel
-                  </button>
+                  <label for="personnel" class="leading-7 text-sm text-gray-600"> Select Personnel</label>
+                  @foreach($personnelForEngineer as $person)
+                     <label for="personnel" class="flex items-center space-x-2">
+                        <input type="checkbox" id="personnel" name="personnel[]" value="{{ $person->name }}" class="form-checkbox rounded text-blue-500 focus:ring-blue-400">
+                        <span class="text-gray-800">{{ $person->name }}</span>
+                     </label>
+                  @endforeach
                </div>
-               <!--
-               <div class="p-4">
-                  <label class="flex mb-5 text-sm font-medium text-gray-900">Actions Taken</label>
-                  <div class=" grid grid-cols-2 gap-2 content-center">
-                     <label class="inline-flex items-center">
-                     <input type="checkbox" name="actions_taken[]" value="Declogged"
-                        class="form-checkbox h-5 w-5 text-blue-600">
-                     <span class="ml-2 text-gray-900 ">Declogged</span>
-                     </label>
-                     <label class="inline-flex items-center">
-                     <input type="checkbox" name="actions_taken[]" value="Repaired"
-                        class="form-checkbox h-5 w-5 text-blue-600">
-                     <span class="ml-2 text-gray-900 ">Repaired</span>
-                     </label>
-                     <label class="inline-flex items-center">
-                     <input type="checkbox" name="actions_taken[]" value="Inspected"
-                        class="form-checkbox h-5 w-5 text-blue-600">
-                     <span class="ml-2 text-gray-900 ">Inspected</span>
-                     </label>
-                     <label class="inline-flex items-center">
-                     <input type="checkbox" name="actions_taken[]" value="Painted"
-                        class="form-checkbox h-5 w-5 text-blue-600">
-                     <span class="ml-2 text-gray-900 ">Painted</span>
-                     </label>
-                     <label class="inline-flex items-center">
-                     <input type="checkbox" name="actions_taken[]" value="Tree Trimmed/Cut"
-                        class="form-checkbox h-5 w-5 text-blue-600">
-                     <span class="ml-2 text-gray-900 ">Tree Trimmed/Cut</span>
-                     </label>
-                     <label class="inline-flex items-center">
-                     <input type="checkbox" name="actions_taken[]" value="Trouble Shoot"
-                        class="form-checkbox h-5 w-5 text-blue-600">
-                     <span class="ml-2 text-gray-900 ">Trouble Shoot</span>
-                     </label>
-                     <label class="inline-flex items-center">
-                     <input type="checkbox" name="actions_taken[]" value="Installed"
-                        class="form-checkbox h-5 w-5 text-blue-600">
-                     <span class="ml-2 text-gray-900 ">Installed</span>
-                     </label>
-                     <label class="inline-flex items-center">
-                     <input type="checkbox" name="actions_taken[]" value="Others"
-                        class="form-checkbox h-5 w-5 text-blue-600">
-                     <span class="ml-2 text-gray-900 ">Others</span>
-                     </label>
-                  </div>
-               </div>
-               <div>
-                  <label for="remarks" class="block text-sm font-medium text-gray-900 ">Remarks</label>
-                  <textarea name="remarks" id="remarks" rows="4"
-                     class="block w-full px-4 py-2 mt-1 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 "
-                     placeholder="Enter Remarks" required></textarea>
-                  @error('remarks')
-                     <p class="text-red-500 mt-1" role="alert">
-                           <strong>{{ $message }}</strong>
-                     </p>
-                  @enderror
-               </div>
-               -->
+
                <button type="submit" class="w-full text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 ">Submit</button>
             </form>
          </div>

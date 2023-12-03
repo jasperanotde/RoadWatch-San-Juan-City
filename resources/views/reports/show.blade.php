@@ -311,14 +311,28 @@
        addMaterialButton.addEventListener("click", function () {
            const materialInput = document.createElement("div");
            materialInput.innerHTML = `
-               <div class="relative mb-2">
-                   <input
-                       type="text"
-                       name="materials[]"
-                       class="block w-full px-4 py-2 mt-1 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400"
-                       placeholder="Enter Materials"
-                       required
-                   >
+               <div class="relative my-2">
+                  <select
+                     class="w-full bg-gray-100 bg-opacity-50 rounded border border-gray-300 focus:border-indigo-500 focus:bg-white focus:ring-2 focus:ring-indigo-200 text-base outline-none text-gray-700 py-1 px-3 leading-8 transition-colors duration-200 ease-in-out"
+                     name="materials[]"
+                     required>
+                     <option value="" selected disabled>Select Materials</option>
+                     <option value="Asphalt">Asphalt</option>
+                     <option value="Concrete">Concrete</option>
+                     <option value="Gravel">Gravel</option>
+                     <option value="Paint">Paint</option>
+                     <option value="Concrete Barriers">Concrete Barriers</option>
+                     <option value="Manhole Covers">Manhole Covers</option>
+                     <option value="Road Marking Tape">Road Marking Tape</option>
+                     <option value="Drainage Rods">Drainage Rods</option>
+                     <option value="Rebars">Rebars</option>
+                     <option value="Epoxy Resins">Epoxy Resins</option>
+                     <option value="Sealants">Sealants</option>
+                     <option value="Sand">Sand</option>
+                     <option value="Cement">Cement</option>
+                     <option value="Grout">Grout</option>
+                  </select>
+                  {!! $errors->first('materials', '<span class="text-red-500 text-sm">:message</span>') !!}
                    <div class="absolute top-1 right-1">
                        <button class="delete-material p-1 h-8 w-7 text-white rounded-lg bg-red-500 hover:bg-red-600">
                            <svg xmlns="http://www.w3.org/2000/svg" class="flex w-5 h-5 items-center justify-center" fill="currentColor" viewBox="0 0 24 24">
