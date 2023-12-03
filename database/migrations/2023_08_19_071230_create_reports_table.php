@@ -23,6 +23,7 @@ return new class extends Migration
             $table->string('photo', 300)->nullable();
             $table->string('severity', 254)->nullable();
             $table->string('status', 254)->nullable();
+            $table->integer('parent_report_id')->nullable();
             $table->timestamps();
             $table->foreign('creator_id')->references('id')->on('users')->onDelete('restrict');
         });

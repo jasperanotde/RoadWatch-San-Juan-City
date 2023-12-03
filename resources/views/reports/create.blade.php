@@ -20,17 +20,33 @@
         <h1 class="text-2xl font-bold text-indigo-700 mb-4">Report a Road Damage</h1>
         <form method="POST" action="{{ route('reports.store') }}" enctype="multipart/form-data" accept-charset="UTF-8">
           {{ csrf_field() }}
-          <div class="p-2 w-full">
+      <div class="p-2 w-full">
         <div class="relative">
           <label for="name" class="leading-7 text-sm text-gray-600">Report Name</label>
-          <input
-            type="text"
-            id="name"
-            name="name"
+          <select
             class="w-full bg-gray-100 bg-opacity-50 rounded border border-gray-300 focus:border-indigo-500 focus:bg-white focus:ring-2 focus:ring-indigo-200 text-base outline-none text-gray-700 py-1 px-3 leading-8 transition-colors duration-200 ease-in-out"
-            value="{{ old('name') }}"
-            required
-          >
+            name="name"
+            required>
+            <option value="" selected disabled>Select Report Name</option>
+            <option value="Potholes">Potholes</option>
+            <option value="Broken Bump">Broken Bump</option>
+            <option value="Cracks in the pavement">Cracks in the pavement</option>
+            <option value="Uneven road surface">Uneven road surface</option>
+            <option value="Road debris or litter">Road debris or litter</option>
+            <option value="Sinkholes">Sinkholes</option>
+            <option value="Faded or missing road markings">Faded or missing road markings</option>
+            <option value="Damaged or missing road signs">Damaged or missing road signs</option>
+            <option value="Road flooding or standing water">Road flooding or standing water</option>
+            <option value="Construction-related damage">Construction-related damage</option>
+            <option value="Roadway erosion">Roadway erosion</option>
+            <option value="Clogged manhole or canals">Clogged manhole or canals</option>
+            <option value="Damaged guardrails or barriers">Damaged guardrails or barriers</option>
+            <option value="Faded or non-reflective road signs">Faded or non-reflective road signs</option>
+            <option value="Oil or other hazardous spills on the road">Oil or other hazardous spills on the road</option>
+            <option value="Streetlight outages">Streetlight outages</option>
+            <option value="Missing or damaged manhole covers">Missing or damaged manhole covers</option>
+            <option value="Malfunctioning traffic lights or signals">Malfunctioning traffic lights or signals</option>
+          </select>
           {!! $errors->first('name', '<span class="text-red-500 text-sm">:message</span>') !!}
         </div>
       </div>

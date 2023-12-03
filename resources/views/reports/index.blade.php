@@ -363,10 +363,6 @@ window.onload = function() {
 
 <div class="max-w-6xl mx-auto" id="reportTable"> 
 
-     <div class="flex justify-between items-center">
-        <h1 class="font-josefinsans font-bold flex-grow text-xl md:text-2xl lg:text-4xl font-normal leading-none tracking-tight font-poppins text-primary"><span class="font-josefinsans font-bold underline underline-offset-3 decoration-7 decoration-secondary">{{ __('app.total') }}: <small><span id="count-display">{{ $reports->total() }} Total Reports </span> </span></small></h1>
-    </div>
-
     <div class="mb-20 overflow-x-auto shadow-md sm:rounded-lg">
         <div class="p-4">
             <label for="datatable-search-input" class="sr-only">Search</label>
@@ -427,53 +423,102 @@ window.onload = function() {
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach($reports as $key => $report)
+                    @php $groupCounter = 1; @endphp
+                    @foreach($reports as $key => $groupedReports)
+                    @if ($groupedReports->count() > 1)
                     <tr class="bg-white border-b hover:bg-gray-50">
-                        <td class="px-6 py-4">
-                            {{ $reports->firstItem() + $key }}
-                        </td>
-                        <td class="px-6 py-4">
-                            {!! $report->name_link !!}
-                        </td>
-                        <td class="px-6 py-4">
-                            {{ $report->address }}
-                        </td>
-                        <td class="px-6 py-4">
-                            {{ $report->severity }}
-                        </td>
-                        <td class="px-6 py-4">
-                            {{ $report->urgency }}
-                        </td>
-                        <td class="px-6 py-4">
-                        @if (!is_null($report->photo))
-                            @foreach (json_decode($report->photo) as $image)
-                                <img src="{{ asset($image) }}" width="50" height="50" class="img img-responsive" />
-                                @break
+                        <tr class="bg-white border-b hover:bg-gray-50">
+                            <td class="px-6 py-4 font-bold" colspan="8">
+                                <div class="flex items-center">
+                                    <div class="relative px-4 py-3 leading-normal text-red-700 bg-red-100 rounded-lg" role="alert">
+                                        <span class="absolute inset-y-0 left-0 flex items-center ml-4">
+                                            <svg class="w-4 h-4 fill-current" viewBox="0 0 20 20">
+                                                <path d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" fill-rule="evenodd"></path>
+                                            </svg>
+                                        </span>
+                                        <p class="ml-6">#{{ $groupCounter }}: This is with high importance. Act now!</p>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                            @foreach($groupedReports as $report)
+                                <tr>
+                                    <td class="px-6 py-4"></td>
+                                    <td class="px-6 py-4">{!! $report->name_link !!}</td>
+                                    <td class="px-6 py-4">{{ $report->address }}</td>
+                                    <td class="px-6 py-4">{{ $report->severity }}</td>
+                                    <td class="px-6 py-4">{{ $report->urgency }}</td>
+                                    <td class="px-6 py-4">
+                                        @if (!is_null($report->photo))
+                                            @foreach (json_decode($report->photo) as $image)
+                                                <img src="{{ asset($image) }}" width="50" height="50" class="img img-responsive" />
+                                                @break
+                                            @endforeach
+                                        @else
+                                            {{ __('report.no_photo') }}
+                                        @endif
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        <div class="status-label font-bold">{{ $report->status }}</div>
+                                    </td>
+                                    <td class="px-6 py-4" data-image="{{ $report->getPhoto() }}">
+                                        <a href="{{ route('reports.show', ['report' => $report]) }}">
+                                            {{ __('app.show') }}
+                                        </a>
+                                    </td>
+                                </tr>
                             @endforeach
-                        @else
-                            {{ __('report.no_photo') }}
-                        @endif
-                        </td>
-                        <td class="px-6 py-4">
-                            <div class="status-label font-bold">{{ $report->status }}</div>
-                        </td>
-                        <td class="px-6 py-4" data-image="{{ $report->getPhoto() }}">
-                            <a href="{{ route('reports.show', ['report' => $report]) }}">
-                                {{ __('app.show') }}
-                            </a>
-                        </td>
+                        @php $groupCounter++; @endphp
                     </tr>
+                    @endif
+                    @endforeach
+
+                    @foreach($reports as $key => $groupedReports)
+                    @if ($groupedReports->count() === 1)
+                    <tr class="bg-white border-b hover:bg-gray-50">
+                        <tr class="bg-white border-b hover:bg-gray-50">
+                            <td class="px-6 py-4 font-bold" colspan="8">#{{ $groupCounter }}</td>
+                        </tr>
+                            @foreach($groupedReports as $report)
+                                <tr>
+                                    <td class="px-6 py-4"></td>
+                                    <td class="px-6 py-4">{!! $report->name_link !!}</td>
+                                    <td class="px-6 py-4">{{ $report->address }}</td>
+                                    <td class="px-6 py-4">{{ $report->severity }}</td>
+                                    <td class="px-6 py-4">{{ $report->urgency }}</td>
+                                    <td class="px-6 py-4">
+                                        @if (!is_null($report->photo))
+                                            @foreach (json_decode($report->photo) as $image)
+                                                <img src="{{ asset($image) }}" width="50" height="50" class="img img-responsive" />
+                                                @break
+                                            @endforeach
+                                        @else
+                                            {{ __('report.no_photo') }}
+                                        @endif
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        <div class="status-label font-bold">{{ $report->status }}</div>
+                                    </td>
+                                    <td class="px-6 py-4" data-image="{{ $report->getPhoto() }}">
+                                        <a href="{{ route('reports.show', ['report' => $report]) }}">
+                                            {{ __('app.show') }}
+                                        </a>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        @php $groupCounter++; @endphp
+                    </tr>
+                    @endif
                     @endforeach
                 </tbody>
             </table>
             <div class="">
-            <a href="{{ route('reports.create') }}">
-                <button class="bg-primary text-white p-2 rounded hover:bg-secondary m-2 font-bold py-2 px-4 rounded">
-                    Create Report
-                </button></a>
+                <a href="{{ route('reports.create') }}">
+                    <button class="bg-primary text-white p-2 rounded hover:bg-secondary m-2 font-bold py-2 px-4 rounded">
+                        Create Report
+                    </button>
+                </a>
             </div>
-        </div>
-            <div class="card-body">{{ $reports->appends(Request::except('page'))->render() }}</div>
         </div>
         <script src="https://unpkg.com/flowbite@1.3.4/dist/flowbite.js"></script>
     </div>

@@ -52,9 +52,12 @@ class ReportController extends Controller
         $assignedReports = Report::where('assigned_user_id', $user->id);
 
         $reportQuery = Report::query();
-        $reportQuery->where('name', 'like', '%'.request('q').'%');
-        $reports = $reportQuery->paginate(25);
-        
+        $reportQuery->where('name', 'like', '%' . request('q') . '%');
+        $reportQuery->orderBy('created_at', 'desc');
+
+        // Group the reports by parent_report_id
+        $reports = $reportQuery->get()->groupBy('parent_report_id');
+
         return view('reports.index', compact('reports', 'assignedReports'));
     }
 
@@ -79,7 +82,6 @@ class ReportController extends Controller
     public function store(Request $request)
     {
         $this->authorize('create', new Report);
-
     
         // Retrieve the users with role of Admin and City Engineer Supervisor for notification
         $users = User::whereHas('roles', function ($query) {
@@ -114,6 +116,37 @@ class ReportController extends Controller
 
         $newReport['creator_id'] = auth()->id();
         $report = Report::create($newReport);
+
+        // Find the nearest report to associate with
+        $nearestReport = Report::select('id', 'name')
+            ->selectRaw('(6371000 * acos(cos(radians(?)) * cos(radians(latitude)) * cos(radians(longitude) - radians(?)) + sin(radians(?)) * sin(radians(latitude)))) AS distance', [
+                $newReport['latitude'],
+                $newReport['longitude'],
+                $newReport['latitude']
+            ])
+            ->where('id', '!=', $report->id) // Exclude the newly created report
+            ->whereRaw('(6371000 * acos(cos(radians(?)) * cos(radians(latitude)) * cos(radians(longitude) - radians(?)) + sin(radians(?)) * sin(radians(latitude)))) <= 10', [
+                $newReport['latitude'],
+                $newReport['longitude'],
+                $newReport['latitude']
+            ])
+            ->orderBy('id', 'asc')
+            ->first();
+        
+        try {
+            if ($nearestReport) {
+                if ($nearestReport->name === $report->name) {
+                    $report->update(['parent_report_id' => $nearestReport->id]);
+                }
+            } else {
+                // No nearby report found, consider it as the first report with this location
+                $report->update(['parent_report_id' => $report->id]);
+            }
+        } catch (\Exception $e) {
+            DB::rollBack();
+            // Handle the exception (log, notify admin, etc.)
+            return back()->withError('Failed to update parent_report_id');
+        }
 
         // After creating the report
         $reportCreator = User::find($report->creator_id);
@@ -448,7 +481,7 @@ class ReportController extends Controller
         Notification::send($assignedUser, new AssignedReport($assignedUser, $currentUserAuth, $userName, $report->name, $reportUrl, 'Report \''. $report->name .'\' was assigned to you.'));
         Notification::send($creatorUser, new ApproveReport($creatorUser->name, $report->name, $reportUrl, 'Your report \''. $report->name .'\' was Approved! See details.'));
 
-        $this->smsNotif($creatorUser->contact_number, "Status of your Report: '" . $report->name . "' was marked as INPROGRESS. See report: " . $reportUrl);
+        // $this->smsNotif($creatorUser->contact_number, "Status of your Report: '" . $report->name . "' was marked as INPROGRESS. See report: " . $reportUrl);
 
         // SMS Notification
         // if ($this->smsNotif($creatorUser->contact_number, "Status of your Report: '" . $report->name . "' was marked as INPROGRESS. See report: " . $reportUrl)) {
@@ -494,7 +527,7 @@ class ReportController extends Controller
         Notification::send($currentUserAuth, new DeclineReport($currentUserAuth, $creatorUser, $creatorUser->name, $report->name, $reportUrl, 'Report \''. $report->name .'\' was successfully Declined.'));
         Notification::send($creatorUser, new DeclineReport($currentUserAuth, $creatorUser, $creatorUser->name, $report->name, $reportUrl, 'Your report \''. $report->name .'\' was Declined. See details.'));
 
-        $this->smsNotif($creatorUser->contact_number, "Status of your Report: '" . $report->name . "' was DECLINED. See report: " . $reportUrl);
+        // $this->smsNotif($creatorUser->contact_number, "Status of your Report: '" . $report->name . "' was DECLINED. See report: " . $reportUrl);
 
         // SMS Notification
         // if ($this->smsNotif($creatorUser->contact_number, "Status of your Report: '" . $report->name . "' was DECLINED. See report: " . $reportUrl)) {
@@ -538,7 +571,7 @@ class ReportController extends Controller
         Notification::send($currentUserAuth, new FinishReport($currentUserAuth, $creatorUser, $creatorUser->name, $report->name, $reportUrl, 'Report \''. $report->name .'\' was successfully tagged as Finished.'));
         Notification::send($creatorUser, new FinishReport($currentUserAuth, $creatorUser, $creatorUser->name, $report->name, $reportUrl, 'Your report \''. $report->name .'\' was tagged as Finished. See details'));
 
-        $this->smsNotif($creatorUser->contact_number, "Status of your Report: '" . $report->name . "' was marked as FINISHED. See report: " . $reportUrl);
+        // $this->smsNotif($creatorUser->contact_number, "Status of your Report: '" . $report->name . "' was marked as FINISHED. See report: " . $reportUrl);
 
         // if ($this->smsNotif($creatorUser->contact_number, "Status of your Report: '" . $report->name . "' was marked as FINISHED. See report: " . $reportUrl)) {
         //     // SMS sent successfully
