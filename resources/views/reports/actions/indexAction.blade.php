@@ -7,14 +7,10 @@
          <h1 class="text-xl font-bold text-white">Action Slips</h1>
          <!-- Modal toggle -->
          @if($report->status != 'PENDING')
-            @foreach($report->submissions as $submission)
-               @if ($submission->submissionsUpdate->count() === 0)
          <button class="float-right block mt-1 mx-2 md:mt-4 md:mx-3 px-4 py-1.5 md:px-9 md:py-2.5 bg-white text-primary text-xxs md:text-xs font-poppins font-normal rounded hover:bg-secondary hover:text-white focus:outline-none focus:bg-primary transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-110 duration-300" type="button" data-te-target="#authentication-modal" data-te-toggle="modal" data-te-ripple-init data-te-ripple-color="light">
             Create Action Slip <span styleg="font-size: 18px; font-weight: bold; margin-left: 5px;">+</span>
             </span>
          </button>
-               @endif
-            @endforeach
          @endif
       </div>
          <div class="submission">
