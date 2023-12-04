@@ -64,7 +64,7 @@ Route::group(['middleware' => ['auth']], function() { // replace to ['auth', 've
 
     // Action Slip
     Route::post('/reports/{report}/submit', [ReportController::class, 'submit'])->name('reports.submit');
-    Route::post('/reports/{report}/submissions', 'ReportController@updateSubmissions')->name('reports.submissions.update');
+    Route::post('/reports/{report}/submissions/{submission}/updates', 'ReportController@createSubmissions')->name('reports.submissions.create');
     Route::delete('/reports/{report}/submissions', 'ReportController@deleteSubmissions')->name('reports.submissions.delete');
 
     // Add the 'gallery' route here

@@ -1,5 +1,5 @@
 <!-- Update Action Slip Modal -->
-<div data-te-modal-init class="bg-black bg-opacity-50 fixed left-0 top-0 z-[1055] hidden h-full w-full overflow-y-auto overflow-x-hidden outline-none" data-te-modal-init id="updateModal{{ $submission->id }}"  tabindex="-1" aria-hidden="true" role="dialog">
+<div data-te-modal-init class="bg-black bg-opacity-50 fixed left-0 top-0 z-[1055] hidden h-full w-full overflow-y-auto overflow-x-hidden outline-none" data-te-modal-init id="updateModal"  tabindex="-1" aria-hidden="true" role="dialog">
    <div data-te-modal-dialog-ref class="relative flex min-h-[calc(100%-1rem)] w-auto translate-y-[-50px] items-center opacity-0 transition-all duration-300 ease-in-out min-[768px]:mx-auto min-[768px]:mt-7 min-[768px]:min-h-[calc(100%-3.5rem)] max-w-[768px]">
       <!-- Modal content -->
       <div class="relative flex w-full flex-col rounded-md border-none bg-white bg-clip-padding text-current shadow-lg outline-none dark:bg-neutral-600">
@@ -60,7 +60,7 @@
                   @endforeach
                </div>
             
-               <Form action="{{ route('reports.submissions.update', ['report' => $report, 'submission' => $submission]) }}"  method="POST" enctype="multipart/form-data">
+               <Form action="{{ route('reports.submissions.create', ['report' => $report, 'submission' => $submission]) }}"  method="POST" enctype="multipart/form-data">
                   @csrf
                   <div class="p-4">
                      <label class="flex mb-5 text-sm font-medium text-gray-900">Actions Taken</label>
@@ -68,9 +68,9 @@
                         <label class="inline-flex items-center">
                         <input type="checkbox" name="actions_taken[]" value="Declogged"
                            class="form-checkbox h-5 w-5 text-blue-600"
-                           @if (!empty($submission->actions_taken))
+                           @if (!empty($submission->submissionsUpdate()->actions_taken))
                               @php
-                                 $actionsTakenArray = json_decode($submission->actions_taken, true);
+                                 $actionsTakenArray = json_decode($submission->submissionsUpdate()->actions_taken, true);
                               @endphp
 
                               @if (is_array($actionsTakenArray) && in_array('Declogged', $actionsTakenArray))
@@ -82,9 +82,9 @@
                         <label class="inline-flex items-center">
                         <input type="checkbox" name="actions_taken[]" value="Repaired"
                            class="form-checkbox h-5 w-5 text-blue-600"
-                           @if (!empty($submission->actions_taken))
+                           @if (!empty($submission->submissionsUpdate()->actions_taken))
                               @php
-                                 $actionsTakenArray = json_decode($submission->actions_taken, true);
+                                 $actionsTakenArray = json_decode($submission->submissionsUpdate()->actions_taken, true);
                               @endphp
 
                               @if (is_array($actionsTakenArray) && in_array('Repaired', $actionsTakenArray))
@@ -96,9 +96,9 @@
                         <label class="inline-flex items-center">
                         <input type="checkbox" name="actions_taken[]" value="Inspected"
                            class="form-checkbox h-5 w-5 text-blue-600"
-                           @if (!empty($submission->actions_taken))
+                           @if (!empty($submission->submissionsUpdate()->actions_taken))
                               @php
-                                 $actionsTakenArray = json_decode($submission->actions_taken, true);
+                                 $actionsTakenArray = json_decode($submission->submissionsUpdate()->actions_taken, true);
                               @endphp
 
                               @if (is_array($actionsTakenArray) && in_array('Inspected', $actionsTakenArray))
@@ -110,9 +110,9 @@
                         <label class="inline-flex items-center">
                         <input type="checkbox" name="actions_taken[]" value="Painted"
                            class="form-checkbox h-5 w-5 text-blue-600"
-                           @if (!empty($submission->actions_taken))
+                           @if (!empty($submission->submissionsUpdate()->actions_taken))
                               @php
-                                 $actionsTakenArray = json_decode($submission->actions_taken, true);
+                                 $actionsTakenArray = json_decode($submission->submissionsUpdate()->actions_taken, true);
                               @endphp
 
                               @if (is_array($actionsTakenArray) && in_array('Painted', $actionsTakenArray))
@@ -124,9 +124,9 @@
                         <label class="inline-flex items-center">
                         <input type="checkbox" name="actions_taken[]" value="Tree Trimmed/Cut"
                            class="form-checkbox h-5 w-5 text-blue-600"
-                           @if (!empty($submission->actions_taken))
+                           @if (!empty($submission->submissionsUpdate()->actions_taken))
                               @php
-                                 $actionsTakenArray = json_decode($submission->actions_taken, true);
+                                 $actionsTakenArray = json_decode($submission->submissionsUpdate()->actions_taken, true);
                               @endphp
 
                               @if (is_array($actionsTakenArray) && in_array('Tree Trimmed/Cut', $actionsTakenArray))
@@ -138,9 +138,9 @@
                         <label class="inline-flex items-center">
                         <input type="checkbox" name="actions_taken[]" value="Trouble Shoot"
                            class="form-checkbox h-5 w-5 text-blue-600"
-                           @if (!empty($submission->actions_taken))
+                           @if (!empty($submission->submissionsUpdate()->actions_taken))
                               @php
-                                 $actionsTakenArray = json_decode($submission->actions_taken, true);
+                                 $actionsTakenArray = json_decode($submission->submissionsUpdate()->actions_taken, true);
                               @endphp
 
                               @if (is_array($actionsTakenArray) && in_array('Trouble Shoot', $actionsTakenArray))
@@ -152,9 +152,9 @@
                         <label class="inline-flex items-center">
                         <input type="checkbox" name="actions_taken[]" value="Installed"
                            class="form-checkbox h-5 w-5 text-blue-600"
-                           @if (!empty($submission->actions_taken))
+                           @if (!empty($submission->submissionsUpdate()->actions_taken))
                               @php
-                                 $actionsTakenArray = json_decode($submission->actions_taken, true);
+                                 $actionsTakenArray = json_decode($submission->submissionsUpdate()->actions_taken, true);
                               @endphp
 
                               @if (is_array($actionsTakenArray) && in_array('Installed', $actionsTakenArray))
@@ -166,9 +166,9 @@
                         <label class="inline-flex items-center">
                         <input type="checkbox" name="actions_taken[]" value="Others"
                            class="form-checkbox h-5 w-5 text-blue-600"
-                           @if (!empty($submission->actions_taken))
+                           @if (!empty($submission->submissionsUpdate()->actions_taken))
                               @php
-                                 $actionsTakenArray = json_decode($submission->actions_taken, true);
+                                 $actionsTakenArray = json_decode($submission->submissionsUpdate()->actions_taken, true);
                               @endphp
 
                               @if (is_array($actionsTakenArray) && in_array('Others', $actionsTakenArray))
@@ -188,14 +188,14 @@
                             class="w-full bg-gray-100 bg-opacity-50 rounded border border-gray-300 focus:border-indigo-500 focus:bg-white focus:ring-2 focus:ring-indigo-200 text-base outline-none text-gray-700 py-1 px-3 leading-8 transition-colors duration-200 ease-in-out"
                             name="photo[]"
                             type="file"
-                            id="photoAction-{{ $submission->id }}"
+                            id="photoAction"
                             multiple
                             required>
-                            <div class="px-4 py-4 bg-gray-100 hover:bg-gray-200" id="selectedImagesContainerAction-{{ $submission->id }}" hidden>
+                            <div class="px-4 py-4 bg-gray-100 hover:bg-gray-200" id="selectedImagesContainerAction" hidden>
                                 <div class="block text-sm font-medium text-gray-600">
                                     Updated Images of the Report to mark as Done
                                     <div class="flex items-center place-content-center">
-                                        <div id="photoPreviewsAction-{{ $submission->id }}"></div>
+                                        <div id="photoPreviewsAction"></div>
                                     </div>
                                 </div>
                             </div>
@@ -216,9 +216,9 @@
                      @enderror
                   </div>
                   <div class="flex items-center justify-end m-4">
-                     <button class="inline-flex items-center px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded-md" data-te-toggle="modal" data-te-target="#confirmUpdateModal{{ $submission->id }}" data-te-ripple-init data-te-ripple-color="light" type="button">Update</button>
+                     <button class="inline-flex items-center px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded-md" data-te-toggle="modal" data-te-target="#confirmUpdateModal" data-te-ripple-init data-te-ripple-color="light" type="button">Update</button>
                   </div>
-                  <div data-te-modal-init class="bg-black bg-opacity-50 fixed left-0 top-0 z-[1055] hidden h-full w-full overflow-y-auto overflow-x-hidden outline-none" id="confirmUpdateModal{{ $submission->id }}" tabindex="-1" aria-modal="true" role="dialog">
+                  <div data-te-modal-init class="bg-black bg-opacity-50 fixed left-0 top-0 z-[1055] hidden h-full w-full overflow-y-auto overflow-x-hidden outline-none" id="confirmUpdateModal" tabindex="-1" aria-modal="true" role="dialog">
                      <div data-te-modal-dialog-ref class="pointer-events-none relative flex min-h-[calc(100%-1rem)] w-auto translate-y-[-50px] items-center opacity-0 transition-all duration-300 ease-in-out min-[576px]:mx-auto min-[576px]:mt-7 min-[576px]:min-h-[calc(100%-3.5rem)] min-[576px]:max-w-[500px]">
                         <div class="pointer-events-auto relative flex w-full flex-col rounded-md border-none bg-white bg-clip-padding text-current shadow-lg outline-none dark:bg-neutral-600">
                            <div class="flex flex-shrink-0 items-center justify-between rounded-t-md border-b-2 border-neutral-100 border-opacity-100 p-4 dark:border-opacity-50">
@@ -236,7 +236,7 @@
                               <button type="button" class="px-4 py-2 bg-gray-300 hover:bg-gray-400 text-gray-700 rounded-md" data-te-modal-dismiss data-te-ripple-init data-te-ripple-color="light">
                               Cancel
                               </button>
-                              <input type="hidden" name="submission_id" value="{{ $submission->id }}">
+                              <!-- <input type="hidden" name="submission_id" value="{{ $submission->id }}"> -->
                               <button type="submit" class="inline-flex items-center px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded-md" data-te-ripple-init data-te-ripple-color="light">
                               Update
                               </button>
@@ -257,9 +257,9 @@
 document.addEventListener("DOMContentLoaded", function() {
 // Image Handler   
 // Get references to the input field and image previews container
-var imageInput = document.getElementById('photoAction-{{ $submission->id }}');
-var imagePreviews = document.getElementById('photoPreviewsAction-{{ $submission->id }}');
-var selectedImagesContainer = document.getElementById('selectedImagesContainerAction-{{ $submission->id }}');
+var imageInput = document.getElementById('photoAction');
+var imagePreviews = document.getElementById('photoPreviewsAction');
+var selectedImagesContainer = document.getElementById('selectedImagesContainerAction');
 
 // Create an array to store Fancybox gallery items
 var galleryItems = [];

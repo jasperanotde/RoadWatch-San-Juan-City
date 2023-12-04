@@ -8,9 +8,6 @@
                <h2 class="text-2xl ">
                   Action Slip
                </h2>
-               <p class="text-sm text-gray-500">
-                  <span class="text-primary">Start Action Date: </span>{{ \Carbon\Carbon::parse($submission->startDate)->format('F d, Y') }}<span class="text-primary"> | Target Action End Date: </span> {{ \Carbon\Carbon::parse($submission->targetDate)->format('F d, Y') }}
-               </p>
             </div>
             <!--Close button-->
             <button type="button" class="box-content rounded-none border-none hover:no-underline hover:opacity-75 focus:opacity-100 focus:shadow-none focus:outline-none" data-te-modal-dismiss aria-label="Close">
@@ -97,38 +94,55 @@
                </div>
             </div>
             @endif
-            <!--<div class="md:grid md:grid-cols-2 hover:bg-gray-50 md:space-y-0 space-y-1 p-4">
-               <p class="text-gray-600">
-                   Attachments
-               </p>
-               <div class="space-y-2">
-                   <div class="border-2 flex items-center p-2 rounded justify-between space-x-2">
-                       <div class="space-x-2 truncate">
-                           <svg xmlns="http://www.w3.org/2000/svg" class="fill-current inline text-gray-500" width="24" height="24" viewBox="0 0 24 24"><path d="M17 5v12c0 2.757-2.243 5-5 5s-5-2.243-5-5v-12c0-1.654 1.346-3 3-3s3 1.346 3 3v9c0 .551-.449 1-1 1s-1-.449-1-1v-8h-2v8c0 1.657 1.343 3 3 3s3-1.343 3-3v-9c0-2.761-2.239-5-5-5s-5 2.239-5 5v12c0 3.866 3.134 7 7 7s7-3.134 7-7v-12h-2z"/></svg>
-                           <span>
-                               resume_for_manager.pdf
-                           </span>
-                       </div>
-                       <a href="#" class="text-purple-700 hover:underline">
-                           Download
-                       </a>
-                   </div>
-               
-                   <div class="border-2 flex items-center p-2 rounded justify-between space-x-2">
-                       <div class="space-x-2 truncate">
-                           <svg xmlns="http://www.w3.org/2000/svg" class="fill-current inline text-gray-500" width="24" height="24" viewBox="0 0 24 24"><path d="M17 5v12c0 2.757-2.243 5-5 5s-5-2.243-5-5v-12c0-1.654 1.346-3 3-3s3 1.346 3 3v9c0 .551-.449 1-1 1s-1-.449-1-1v-8h-2v8c0 1.657 1.343 3 3 3s3-1.343 3-3v-9c0-2.761-2.239-5-5-5s-5 2.239-5 5v12c0 3.866 3.134 7 7 7s7-3.134 7-7v-12h-2z"/></svg>
-                           <span>
-                               resume_for_manager.pdf
-                           </span>
-                       </div>
-                       <a href="#" class="text-purple-700 hover:underline">
-                           Download
-                       </a>
-                   </div>
+            @foreach($submission->submissionsUpdate as $updates)
+            <div class='border border-gray-300 rounded p-4'>
+               <div class="flex justify-center items-center">
+                  <p class="underline text-center text-green-600">
+                     Updated at: {{ $updates->created_at->format('F j, Y') }}
+                  </p>
                </div>
-               </div>-->
+               <div class="md:grid md:grid-cols-2 hover:bg-gray-50 md:space-y-0 space-y-1 p-4 border-b">
+                  <p class="text-gray-600">
+                     Actions Taken
+                  </p>
+                  <ul>
+                     @foreach ($updates->actionsTakenArray() as $action)
+                     <li>
+                        <input type="checkbox" disabled {{ in_array($action, $updates->actionsTakenArray()) ? 'checked' : '' }}>
+                        {{ $action }}
+                     </li>
+                     @endforeach
+                  </ul>
+               </div>
+               <div class="md:grid md:grid-cols-2 hover:bg-gray-50 md:space-y-0 space-y-1 p-4 border-b">
+                  <p class="text-gray-600">
+                     Remarks
+                  </p>
+                  <p>
+                     {{ $updates->remarks }}
+                  </p>
+               </div>
+               <div class="md:grid md:grid-cols-2 hover:bg-gray-50 md:space-y-0 space-y-1 p-4 border-b">
+                  <p class="text-gray-600">
+                     Updated Image
+                  </p>
+                  <div class="flex space-x-4"> <!-- Add a flex container and set spacing between children -->
+                     @if (!is_null($updates->photo))
+                           @foreach (json_decode($updates->photo) as $image)
+                              <a href="{{ asset($image) }}" data-fancybox="gallery">
+                                 <img src="{{ asset($image) }}" width="100" height="100" class="rounded-lg border-solid border-2 border-primary img img-responsive" />
+                              </a>
+                           @endforeach
+                     @else
+                           {{ __('report.no_photo') }}
+                     @endif
+                  </div>
+               </div>
+            </div>
+            @endforeach      
+            
          </div>
-         @if ($submission->is_updated != 1)
+         @if ($submission->submissionsUpdate->count() === 0)
          <div class="flex items-center justify-end m-4">
             <button class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white ml-2 rounded-md" data-te-toggle="modal" data-te-target="#deleteModal{{ $submission->id }}" data-te-ripple-init data-te-ripple-color="light" type="button">Delete Action Slip</button>
          </div>

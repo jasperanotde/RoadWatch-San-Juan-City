@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\Report;
 use App\Models\ReportSubmission;
-use App\Models\ReportSubmissionUpdate;
 use App\Models\User;
 use App\Notifications\AssignedReport;
 use App\Notifications\NewReports;
@@ -24,7 +23,7 @@ use Carbon\Carbon;
 use Vonage\Client;
 use Vonage\Client\Credentials\Basic;
 
-class ReportController extends Controller
+class ReportControllerBackup extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -226,16 +225,27 @@ class ReportController extends Controller
         // Validate and save the submitted data for the report
         $request->validate([
             'new_field' => 'required|string|max:255',
+            'start-date-action' => 'required|date',
+            'target-date-action' => 'required|date',
             'location' => 'required|string|max:255',
             'materials.*' => 'required|string|max:255',
             'personnel.*' => 'required|string|max:255',
+            'actions_taken.' => 'nullable|string|max:255',
+            'remarks' => 'nullable|string|max:255',
+            'photo.*' => 'nullable|image|mimes:png,jpg,jpeg|max:2048',
+
         ]);
     
         $report->submissions()->create([
             'new_field' => $request->input('new_field'),
+            'startDate' => $request->input('start-date-action'),
+            'targetDate' => $request->input('target-date-action'),
             'location' => $request->input('location'),
             'materials' => json_encode($request->input('materials')),
             'personnel' => json_encode($request->input('personnel')),
+            'actions_taken' => json_encode($request->input('actions_taken')), // Convert the selected checkboxes to a JSON string
+            'remarks' => '',
+            'photo' => 'no image',
         ]);
 
         $assignedUser = User::find($report->assigned_user_id);
@@ -247,21 +257,31 @@ class ReportController extends Controller
         return back();
     }
 
-    public function createSubmissions(Request $request, Report $report, ReportSubmission $submission)
+    public function updateSubmissions(Request $request, Report $report)
     {
+        $submissionId = $request->input('submission_id');
+
+        // Find the specific submission associated with the report by its ID
+        $submission = $report->submissions()->find($submissionId);
+
         $request->validate([
-            'actions_taken.*' => 'nullable|string|max:255',
+            'actions_taken.' => 'nullable|string|max:255',
             'remarks' => 'nullable|string|max:255',
             'photo.*' => 'nullable|image|mimes:png,jpg,jpeg|max:2048',
         ]);
 
-        $createUpdateSubmission = $submission->submissionsUpdate()->create([
-            'actions_taken' => json_encode($request->input('actions_taken')),
-            'remarks' => $request->input('remarks'),
-        ]);
+        // Update the 'actions_taken' field if provided
+        if ($request->has('actions_taken')) {
+            $submission->actions_taken = json_encode($request->input('actions_taken'));
+        }
     
-        $imagePaths = [];
+        // Update the 'remarks' field if provided
+        if ($request->has('remarks')) {
+            $submission->remarks = $request->input('remarks');
+        }
 
+        $imagePaths = [];
+    
         // Update the 'photo' field if a new photo is provided
         if ($request->hasFile('photo')) {
             foreach($request->file('photo') as $v) {
@@ -271,11 +291,12 @@ class ReportController extends Controller
             }
         }
 
-        $createUpdateSubmission->photo = json_encode($imagePaths);
-        $createUpdateSubmission->report_submission_id = $submission->id;
-        $createUpdateSubmission->save();
+        $submission->photo = json_encode($imagePaths);
+        $submission->is_updated = '1';
+        
+        $submission->save();
 
-        return redirect()->back()->with('success', 'Submission updated successfully!');
+        return redirect()->back()->with('success', 'File uploaded successfully!');
     }
 
     public function deleteSubmissions(Request $request, Report $report)

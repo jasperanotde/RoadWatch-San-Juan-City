@@ -33,32 +33,6 @@
                      readonly
                      >                    
                </div>
-
-               <div id="dateSelectError" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative hidden" role="alert">
-                    <strong class="font-bold">Select other valid dates!</strong>
-                    <span class="block sm:inline">Selected date is out of Report's Start and Target End date.</span>
-               </div>
-
-               <div>
-                  <div class="flex justify-between space-x-4">
-                     <div class="relative h-11 w-1/4 min-w-[200px]">
-                           <label for="start-date-action" class="block text-sm font-medium text-gray-900 ">Start Date</label>
-                              <input type="date" name="start-date-action" id="start-date-action" required
-                                 class="block w-full px-4 py-2 mt-1 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 ">
-                     </div>
-
-                     <div class="relative h-11 w-1/4 min-w-[200px]">
-                           <label for="target-date-action" class="block text-sm font-medium text-gray-900 ">Target End Date</label>
-                              <input type="date" name="target-date-action" id="target-date-action" required
-                                 class="block w-full px-4 py-2 mt-1 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 ">
-                     </div>
-                  </div>
-               </div>
-
-               <div class="mt-4">
-                  <span class="block text-sm font-medium text-gray-900" id="daysCount"></span>
-               </div>
-
                <div>
                   <label for="location" class="block text-sm font-medium text-gray-900 ">Location</label>
                   <input
@@ -120,63 +94,3 @@
    </div>
 </div>
 
-@push('scripts')
-<script>
-$(document).ready(function () {
-    var disabledDateRanges = [
-    {
-        startDate: '{{$report->startDate}}', 
-        targetDate: '{{$report->targetDate}}',
-        
-    },
-    @foreach ($report->submissions as $submission)
-         {
-               startDateAction: '{{$submission->startDate}}',
-               targetDateAction: '{{$submission->targetDate}}',
-         },
-      @endforeach
-   ];
-
-    $('#start-date-action, #target-date-action').on('change', function () {
-        var selectedDate = $(this).val();
-        var disableDate = true;
-        var dateSelectError = document.getElementById('dateSelectError');
-
-        var startDateActionDiff = new Date($('#start-date-action').val());
-        var targetDateActionDiff = new Date($('#target-date-action').val());
-
-        if (startDateActionDiff !== null && targetDateActionDiff !== null) {
-            var dateDifference = calculateDateDifference(startDateActionDiff, targetDateActionDiff);
-            document.getElementById('daysCount').textContent = dateDifference + ' Working days.';
-         } 
-
-        disabledDateRanges.forEach(function (dateRange) {
-            if (selectedDate >= dateRange.startDate && selectedDate <= dateRange.targetDate) {
-                disableDate = false;
-            }
-        });
-
-        disabledDateRanges.forEach(function (dateRange) {
-            if (selectedDate >= dateRange.startDateAction && selectedDate <= dateRange.targetDateAction) {
-               disableDate = true;
-            }
-        });
-        
-
-        if (disableDate) {
-         dateSelectError.style.display = 'block';
-         $(this).val('');
-        } else {
-         dateSelectError.style.display = 'none';
-        }
-    });
-
-    function calculateDateDifference(startDate, endDate) {
-      // Calculate the date difference in days
-      const oneDay = 24 * 60 * 60 * 1000; // hours * minutes * seconds * milliseconds
-      const diffDays = Math.round(Math.abs((startDate - endDate) / oneDay));
-      return diffDays;
-   }
-});
-</script>
-@endpush

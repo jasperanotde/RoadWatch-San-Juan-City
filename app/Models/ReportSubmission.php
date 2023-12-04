@@ -13,36 +13,19 @@ class ReportSubmission extends Model
     protected $fillable = [
         'report_id',
         'new_field',
-        'startDate',
-        'targetDate',
         'location',
         'materials',
         'personnel',
-        'actions_taken',
-        'remarks',
-        'photo',
     ];
-
-    public function actionsTakenArray()
-    {
-        return json_decode($this->actions_taken, true);
-    }
-
-
-    public function materialsArray()
-    {
-        return json_decode($this->materials, true);
-    }
-
-    public function personnelArray()
-    {
-        return json_decode($this->personnel, true);
-    }
-
 
     public function report()
     {
         return $this->belongsTo(Report::class);
+    }
+
+    public function submissionsUpdate()
+    {
+        return $this->hasMany(ReportSubmissionUpdate::class);
     }
      
 }
