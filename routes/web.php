@@ -9,6 +9,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\ActionSlipController;
 use App\Http\Controllers\ContactUsController;
+use App\Http\Controllers\ReportGenerationController;
 
 /*
 |--------------------------------------------------------------------------
@@ -73,6 +74,9 @@ Route::group(['middleware' => ['auth']], function() { // replace to ['auth', 've
 
     // For Notification
     Route::get('/mark-as-read', [App\Http\Controllers\ReportController::class,'markAsRead'])->name('mark-as-read');
+
+    // For Report Generation
+    Route::get('generate-pdf', [ReportGenerationController::class, 'generatePDF']);
 });
 
 

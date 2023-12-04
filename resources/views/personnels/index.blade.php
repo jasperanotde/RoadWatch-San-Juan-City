@@ -32,7 +32,7 @@
 @endif
 
     <div class="my-10 flex flex-col items-center lg:flex-row lg:items-center">
-        <h1 class="font-josefinsans font-bold text-2xl sm:text-4xl font-normal leading-none tracking-tight font-poppins text-primary"><span class="font-josefinsans font-bold underline underline-offset-3 decoration-7 decoration-secondary">{{ __('app.user_title') }}</span></h1>
+        <h1 class="font-josefinsans font-bold text-2xl sm:text-4xl font-normal leading-none tracking-tight font-poppins text-primary"><span class="font-josefinsans font-bold underline underline-offset-3 decoration-7 decoration-secondary">Personnel Management</span></h1>
     </div>
 
     <div class="mb-20 relative overflow-x-auto shadow-md sm:rounded-lg">
