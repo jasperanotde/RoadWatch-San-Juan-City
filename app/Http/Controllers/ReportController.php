@@ -474,7 +474,7 @@ class ReportController extends Controller
         Notification::send($assignedUser, new AssignedReport($assignedUser, $currentUserAuth, $userName, $report->name, $reportUrl, 'Report \''. $report->name .'\' was assigned to you.'));
         Notification::send($creatorUser, new ApproveReport($creatorUser->name, $report->name, $reportUrl, 'Your report \''. $report->name .'\' was Approved! See details.'));
 
-        // $this->smsNotif($creatorUser->contact_number, "Status of your Report: '" . $report->name . "' was marked as INPROGRESS. See report: " . $reportUrl);
+        $this->smsNotif($creatorUser->contact_number, "Status of your Report: '" . $report->name . "' was marked as INPROGRESS. See report: " . $reportUrl);
 
         // SMS Notification
         // if ($this->smsNotif($creatorUser->contact_number, "Status of your Report: '" . $report->name . "' was marked as INPROGRESS. See report: " . $reportUrl)) {
@@ -520,7 +520,7 @@ class ReportController extends Controller
         Notification::send($currentUserAuth, new DeclineReport($currentUserAuth, $creatorUser, $creatorUser->name, $report->name, $reportUrl, 'Report \''. $report->name .'\' was successfully Declined.'));
         Notification::send($creatorUser, new DeclineReport($currentUserAuth, $creatorUser, $creatorUser->name, $report->name, $reportUrl, 'Your report \''. $report->name .'\' was Declined. See details.'));
 
-        // $this->smsNotif($creatorUser->contact_number, "Status of your Report: '" . $report->name . "' was DECLINED. See report: " . $reportUrl);
+        $this->smsNotif($creatorUser->contact_number, "Status of your Report: '" . $report->name . "' was DECLINED. See report: " . $reportUrl);
 
         // SMS Notification
         // if ($this->smsNotif($creatorUser->contact_number, "Status of your Report: '" . $report->name . "' was DECLINED. See report: " . $reportUrl)) {
@@ -564,7 +564,7 @@ class ReportController extends Controller
         Notification::send($currentUserAuth, new FinishReport($currentUserAuth, $creatorUser, $creatorUser->name, $report->name, $reportUrl, 'Report \''. $report->name .'\' was successfully tagged as Finished.'));
         Notification::send($creatorUser, new FinishReport($currentUserAuth, $creatorUser, $creatorUser->name, $report->name, $reportUrl, 'Your report \''. $report->name .'\' was tagged as Finished. See details'));
 
-        // $this->smsNotif($creatorUser->contact_number, "Status of your Report: '" . $report->name . "' was marked as FINISHED. See report: " . $reportUrl);
+        $this->smsNotif($creatorUser->contact_number, "Status of your Report: '" . $report->name . "' was marked as FINISHED. See report: " . $reportUrl);
 
         // if ($this->smsNotif($creatorUser->contact_number, "Status of your Report: '" . $report->name . "' was marked as FINISHED. See report: " . $reportUrl)) {
         //     // SMS sent successfully
