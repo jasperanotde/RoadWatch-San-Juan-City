@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Report;
 use App\Models\ReportSubmission;
 use App\Models\ReportSubmissionUpdate;
+use App\Models\Personnel;
 use App\Models\User;
 use App\Notifications\AssignedReport;
 use App\Notifications\NewReports;
@@ -47,7 +48,7 @@ class ReportController extends Controller
 
     public function index()
     {
-        $this->authorize('manage_report');
+        // $this->authorize('manage_report');
 
         $user = auth()->user();
         $assignedReports = Report::where('assigned_user_id', $user->id);
@@ -59,7 +60,7 @@ class ReportController extends Controller
         // Group the reports by parent_report_id
         $reports = $reportQuery->get()->groupBy('parent_report_id');
 
-        return view('reports.index', compact('reports', 'assignedReports'));
+        return view('reports.index', compact('reports', 'assignedReports', 'reportQuery'));
     }
 
     /**
@@ -230,6 +231,19 @@ class ReportController extends Controller
             'materials.*' => 'required|string|max:255',
             'personnel.*' => 'required|string|max:255',
         ]);
+
+        $personnelNames = $request->input('personnel'); // Array of personnel names
+
+        $personnelIDs = [];
+        foreach ($personnelNames as $personName) {
+            $person = Personnel::where('name', $personName)->first(); // Retrieve personnel by name
+            if ($person) {
+                $personnelIDs[] = $person->id; // Store the ID of each personnel
+            }
+        }
+
+        $report->assigned_personnel_id = json_encode($personnelIDs);
+        $report->save();
     
         $report->submissions()->create([
             'new_field' => $request->input('new_field'),

@@ -40,7 +40,7 @@
 
     @foreach($cityEngineers as $user)
         @foreach($reports as $report)
-            @foreach($report->submissions as $submission)
+            @foreach($report->submissions as $submission && $report->status === 'FINISHED')
                 @if($user->id === $report->assigned_user_id)
                     <div class="border rounded p-3 m-3">
                         <div class="container py-4">

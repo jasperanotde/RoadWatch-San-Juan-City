@@ -15,7 +15,7 @@ class Report extends Model
     protected $guarded = [];
 
     protected $fillable = [
-        'name', 'address', 'latitude', 'longitude', 'creator_id', 'details','photo', 'severity', 'urgency','status', 'parent_report_id', 'assigned_user_id', 'finished_photo'
+        'name', 'address', 'latitude', 'longitude', 'creator_id', 'details','photo', 'severity', 'urgency','status', 'parent_report_id', 'assigned_user_id', 'finished_photo', 'assigned_personnel_id'
     ];
 
     /**

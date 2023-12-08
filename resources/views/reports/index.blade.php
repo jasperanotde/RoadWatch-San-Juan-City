@@ -361,7 +361,11 @@ window.onload = function() {
 </script>
 @endpush
 
-<div class="max-w-6xl mx-auto" id="reportTable"> 
+<div class="max-w-6xl mx-auto" id="reportTable">
+
+    <div class="flex justify-between items-center">
+        <h1 class="font-josefinsans font-bold flex-grow text-xl md:text-2xl lg:text-4xl font-normal leading-none tracking-tight font-poppins text-primary"><span class="font-josefinsans font-bold underline underline-offset-3 decoration-7 decoration-secondary">{{ __('app.total') }}: <small><span id="count-display">{{ $reportQuery->count() }} Total Reports </span> </span></small></h1>
+    </div>
 
     <div class="mb-20 overflow-x-auto shadow-md sm:rounded-lg">
         <div class="p-4">
